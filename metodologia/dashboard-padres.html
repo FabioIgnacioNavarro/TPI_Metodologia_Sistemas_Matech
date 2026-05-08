@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal del Tutor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="page">
+
+    <header>
+      <a href="index.html" class="brand">
+        <img src="IMG/logo.png" alt="Logo">
+
+        <div>
+          <div class="brand-title">Educar para Transformar</div>
+          <div class="brand-subtitle">Portal del Tutor</div>
+        </div>
+      </a>
+
+      <nav></nav>
+
+      <div class="login">
+        <a href="login.html">Cerrar sesión</a>
+      </div>
+    </header>
+
+    <div class="dashboard-layout">
+
+      <aside class="sidebar">
+
+        <div class="sidebar-user">
+          <div class="avatar">MR</div>
+
+          <strong>María Ramírez</strong>
+
+          <span>Tutora de Lucía Ramírez</span>
+        </div>
+
+        <nav class="sidebar-nav">
+
+          <a href="#" class="active" onclick="showPanel('inicio', this)">
+            <span class="nav-icon">🏠</span> Inicio
+          </a>
+
+          <a href="#" onclick="showPanel('hijos', this)">
+            <span class="nav-icon">👨‍👩‍👧</span> Mi/s hijo/s
+          </a>
+
+          <a href="#" onclick="showPanel('calificaciones', this)">
+            <span class="nav-icon">📊</span> Calificaciones
+          </a>
+
+          <a href="#" onclick="showPanel('asistencias', this)">
+            <span class="nav-icon">✅</span> Asistencias
+          </a>
+
+          <a href="#" onclick="showPanel('mensajes', this)">
+            <span class="nav-icon">💬</span> Mensajes
+          </a>
+
+          <a href="#" onclick="showPanel('perfil', this)">
+            <span class="nav-icon">👤</span> Mi perfil
+          </a>
+
+        </nav>
+
+      </aside>
+
+      <main class="dashboard-main">
+
+        <!-- INICIO -->
+        <div id="panel-inicio" class="panel active">
+
+          <p class="section-title">
+            Bienvenida, María 👋
+          </p>
+
+          <div class="stat-grid">
+
+            <div class="stat-card">
+              <div class="stat-label">Promedio general</div>
+              <div class="stat-value" style="color:#16a34a">8.4</div>
+              <div class="stat-sub">Lucía Ramírez</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Asistencia</div>
+              <div class="stat-value" style="color:#1d66c2">92%</div>
+              <div class="stat-sub">Ciclo lectivo actual</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Mensajes nuevos</div>
+              <div class="stat-value" style="color:#e61c92">3</div>
+              <div class="stat-sub">Pendientes de lectura</div>
+            </div>
+
+          </div>
+
+          <p class="section-title" style="font-size:18px">
+            Novedades importantes
+          </p>
+
+          <div class="notif-item">
+            <div class="notif-icon" style="background:#dbeafe">📢</div>
+
+            <div class="notif-text">
+              <strong>Reunión de padres – 20 de mayo</strong>
+
+              <span>
+                La reunión se realizará a las 18:00 hs en el salón principal.
+              </span>
+            </div>
+          </div>
+
+          <div class="notif-item">
+            <div class="notif-icon" style="background:#dcfce7">📝</div>
+
+            <div class="notif-text">
+              <strong>Nuevo boletín disponible</strong>
+
+              <span>
+                Ya se encuentra cargado el boletín correspondiente al segundo bimestre.
+              </span>
+            </div>
+          </div>
+
+          <div class="notif-item">
+            <div class="notif-icon" style="background:#fef9c3">⚽</div>
+
+            <div class="notif-text">
+              <strong>Jornada deportiva escolar</strong>
+
+              <span>
+                Se realizará el viernes 22 de mayo con participación de todos los niveles.
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- hijos -->
+        <div id="panel-hijos" class="panel">
+
+          <p class="section-title">
+            Mi/s hijo/s
+          </p>
+
+          <table class="tabla">
+
+            <thead>
+              <tr>
+                <th>Alumno</th>
+                <th>Curso</th>
+                <th>Turno</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <tr>
+                <td>Lucía Ramírez</td>
+                <td>3° Año B</td>
+                <td>Mañana</td>
+                <td>
+                  <span class="badge badge-green">
+                    Regular
+                  </span>
+                </td>
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <!-- CALIFICACIONES -->
+        <div id="panel-calificaciones" class="panel">
+
+          <p class="section-title">
+            Calificaciones de Lucía Ramírez
+          </p>
+
+          <table class="tabla">
+
+            <thead>
+              <tr>
+                <th>Materia</th>
+                <th>Promedio</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <tr><td>Matemática</td><td>7.5</td><td><span class="badge badge-green">Regular</span></td></tr>
+              <tr><td>Lengua</td><td>9.0</td><td><span class="badge badge-green">Regular</span></td></tr>
+              <tr><td>Historia</td><td>8.0</td><td><span class="badge badge-green">Regular</span></td></tr>
+              <tr><td>Química</td><td>4.0</td><td><span class="badge badge-red">En riesgo</span></td></tr>
+              <tr><td>Biología</td><td>9.5</td><td><span class="badge badge-green">Regular</span></td></tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <!-- ASISTENCIAS -->
+        <div id="panel-asistencias" class="panel">
+
+          <p class="section-title">
+            Asistencias de Lucía Ramírez
+          </p>
+
+          <div class="stat-grid">
+
+            <div class="stat-card">
+              <div class="stat-label">Presentes</div>
+              <div class="stat-value" style="color:#16a34a">68</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Ausencias</div>
+              <div class="stat-value" style="color:#dc2626">6</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Tardanzas</div>
+              <div class="stat-value" style="color:#d97706">3</div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- MENSAJES -->
+        <div id="panel-mensajes" class="panel">
+
+          <p class="section-title">
+            Mensajes institucionales
+          </p>
+
+          <div class="notif-item">
+            <div class="notif-icon" style="background:#fce7f3">👩‍🏫</div>
+
+            <div class="notif-text">
+              <strong>Mensaje de la profesora de Matemática</strong>
+
+              <span>
+                Lucía mostró una gran mejora en sus últimas evaluaciones.
+              </span>
+            </div>
+          </div>
+
+          <div class="notif-item">
+            <div class="notif-icon" style="background:#dbeafe">🏫</div>
+
+            <div class="notif-text">
+              <strong>Comunicado institucional</strong>
+
+              <span>
+                El lunes próximo no habrá actividades por jornada docente.
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- PERFIL -->
+        <div id="panel-perfil" class="panel">
+
+          <p class="section-title">
+            Mi perfil
+          </p>
+
+          <table class="tabla">
+
+            <tbody>
+
+              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>María Ramírez</td></tr>
+
+              <tr><td style="font-weight:600;color:#64748b">DNI</td><td>31.456.222</td></tr>
+
+              <tr><td style="font-weight:600;color:#64748b">Alumno asociado</td><td>Lucía Ramírez</td></tr>
+
+              <tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>(362) 4112233</td></tr>
+
+              <tr><td style="font-weight:600;color:#64748b">Correo electrónico</td><td>maria.ramirez@gmail.com</td></tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <script>
+    function showPanel(id, el) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+      document.getElementById('panel-' + id).classList.add('active');
+      el.classList.add('active');
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal del Preceptor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="page">
+
+    <header>
+      <a href="index.html" class="brand">
+        <img src="IMG/logo.png" alt="Logo">
+        <div>
+          <div class="brand-title">Educar para Transformar</div>
+          <div class="brand-subtitle">Portal del Preceptor</div>
+        </div>
+      </a>
+
+      <nav></nav>
+
+      <div class="login">
+        <a href="login.html">Cerrar sesión</a>
+      </div>
+    </header>
+
+    <div class="dashboard-layout">
+
+      <aside class="sidebar">
+        <div class="sidebar-user">
+          <div class="avatar">AP</div>
+          <strong>Ana Pereira</strong>
+          <span>Preceptora · 3° Año B</span>
+        </div>
+
+        <nav class="sidebar-nav">
+          <a href="#" class="active" onclick="showPanel('inicio', this)">
+            <span class="nav-icon">🏠</span> Inicio
+          </a>
+          <a href="#" onclick="showPanel('cursos', this)">
+            <span class="nav-icon">📚</span> Cursos
+          </a>
+          <a href="#" onclick="showPanel('asistencias', this)">
+            <span class="nav-icon">✅</span> Asistencias
+          </a>
+          <a href="#" onclick="showPanel('justificaciones', this)">
+            <span class="nav-icon">📝</span> Justificaciones
+          </a>
+          <a href="#" onclick="showPanel('comunicados', this)">
+            <span class="nav-icon">📢</span> Comunicados
+          </a>
+          <a href="#" onclick="showPanel('perfil', this)">
+            <span class="nav-icon">👤</span> Mi perfil
+          </a>
+        </nav>
+      </aside>
+
+      <main class="dashboard-main">
+
+        <div id="panel-inicio" class="panel active">
+          <p class="section-title">Bienvenida, Ana 👋</p>
+
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-label">Alumnos presentes</div>
+              <div class="stat-value" style="color:#16a34a">124</div>
+              <div class="stat-sub">Registrados hoy</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Ausentes</div>
+              <div class="stat-value" style="color:#dc2626">12</div>
+              <div class="stat-sub">Entre cursos asignados</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Justificaciones</div>
+              <div class="stat-value" style="color:#d97706">5</div>
+              <div class="stat-sub">Pendientes de revisión</div>
+            </div>
+          </div>
+
+          <div class="img-placeholder">
+            <img src="img/preceptor.jpg" alt="Preceptoría" class="card-image">
+          </div>
+
+          <p class="section-title" style="font-size:18px">Avisos del día</p>
+
+          <div class="notif-item">
+            <div class="notif-icon" style="background:#dbeafe">📋</div>
+            <div class="notif-text">
+              <strong>Control de asistencia pendiente</strong>
+              <span>Registrar asistencia de 2° Año A antes de las 10:00 hs.</span>
+            </div>
+          </div>
+
+          <div class="notif-item">
+            <div class="notif-icon" style="background:#dcfce7">👨‍👩‍👧</div>
+            <div class="notif-text">
+              <strong>Reunión con tutores</strong>
+              <span>Familia de Lucía Ramírez solicitó entrevista por seguimiento académico.</span>
+            </div>
+          </div>
+
+          <div class="notif-item">
+            <div class="notif-icon" style="background:#fef9c3">📢</div>
+            <div class="notif-text">
+              <strong>Comunicado institucional</strong>
+              <span>Recordar a los estudiantes la jornada deportiva del viernes.</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="panel-cursos" class="panel">
+          <p class="section-title">Cursos asignados</p>
+
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Curso</th>
+                <th>Nivel</th>
+                <th>Turno</th>
+                <th>Alumnos</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr><td>1° Año A</td><td>Secundario</td><td>Mañana</td><td>28</td><td><span class="badge badge-green">Activo</span></td></tr>
+              <tr><td>2° Año A</td><td>Secundario</td><td>Mañana</td><td>31</td><td><span class="badge badge-green">Activo</span></td></tr>
+              <tr><td>3° Año B</td><td>Secundario</td><td>Mañana</td><td>27</td><td><span class="badge badge-green">Activo</span></td></tr>
+              <tr><td>4° Año A</td><td>Secundario</td><td>Tarde</td><td>30</td><td><span class="badge badge-yellow">Revisar</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="panel-asistencias" class="panel">
+  <p class="section-title">Tomar asistencia</p>
+
+  <div class="stat-grid">
+
+    <div class="stat-card">
+      <div class="stat-label">1° Año A</div>
+      <div class="stat-value" style="color:#e61c92">28</div>
+      <div class="stat-sub">Alumnos</div>
+      <button class="btn-small" onclick="showPanel('asistencia-curso', this)">Tomar asistencia</button>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">2° Año A</div>
+      <div class="stat-value" style="color:#e61c92">31</div>
+      <div class="stat-sub">Alumnos</div>
+      <button class="btn-small" onclick="showPanel('asistencia-curso', this)">Tomar asistencia</button>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">3° Año B</div>
+      <div class="stat-value" style="color:#e61c92">27</div>
+      <div class="stat-sub">Alumnos</div>
+      <button class="btn-small" onclick="showPanel('asistencia-curso', this)">Tomar asistencia</button>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">4° Año A</div>
+      <div class="stat-value" style="color:#e61c92">30</div>
+      <div class="stat-sub">Alumnos</div>
+      <button class="btn-small" onclick="showPanel('asistencia-curso', this)">Tomar asistencia</button>
+    </div>
+
+  </div>
+</div>
+
+        <div id="panel-asistencia-curso" class="panel">
+        <p class="section-title">Asistencia · 3° Año B</p>
+
+        <table class="tabla">
+            <thead>
+            <tr>
+                <th>Alumno</th>
+                <th>Presente</th>
+                <th>Ausente</th>
+                <th>Tarde</th>
+                <th>Observación</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr>
+                <td>Lucía Ramírez</td>
+                <td><input type="radio" name="lucia" checked></td>
+                <td><input type="radio" name="lucia"></td>
+                <td><input type="radio" name="lucia"></td>
+                <td><input class="nota-input" placeholder="Sin observación"></td>
+            </tr>
+
+            <tr>
+                <td>Tomás González</td>
+                <td><input type="radio" name="tomas"></td>
+                <td><input type="radio" name="tomas" checked></td>
+                <td><input type="radio" name="tomas"></td>
+                <td><input class="nota-input" placeholder="Ej: Sin justificar"></td>
+            </tr>
+
+            <tr>
+                <td>Valentina López</td>
+                <td><input type="radio" name="valentina"></td>
+                <td><input type="radio" name="valentina"></td>
+                <td><input type="radio" name="valentina" checked></td>
+                <td><input class="nota-input" placeholder="Ej: Llegó 15 min tarde"></td>
+            </tr>
+
+            <tr>
+                <td>Mateo Herrera</td>
+                <td><input type="radio" name="mateo" checked></td>
+                <td><input type="radio" name="mateo"></td>
+                <td><input type="radio" name="mateo"></td>
+                <td><input class="nota-input" placeholder="Sin observación"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <button type="button" class="btn-form">Guardar asistencia</button>
+        </div>
+
+        <div id="panel-justificaciones" class="panel">
+          <p class="section-title">Justificaciones pendientes</p>
+
+          <div class="tarea-card">
+            <div class="tarea-info">
+              <strong>Tomás González · 3° Año B</strong>
+              <span>Ausencia del 07/05/2026 · Certificado médico presentado</span>
+            </div>
+            <span class="badge badge-yellow">Pendiente</span>
+          </div>
+
+          <div class="tarea-card">
+            <div class="tarea-info">
+              <strong>Martina Suárez · 2° Año A</strong>
+              <span>Retiro anticipado · Solicitud del tutor</span>
+            </div>
+            <span class="badge badge-blue">En revisión</span>
+          </div>
+
+          <div class="tarea-card">
+            <div class="tarea-info">
+              <strong>Joaquín Núñez · 4° Año A</strong>
+              <span>Llegada tarde reiterada · Requiere seguimiento</span>
+            </div>
+            <span class="badge badge-red">Urgente</span>
+          </div>
+        </div>
+
+        <div id="panel-comunicados" class="panel">
+          <p class="section-title">Comunicados para cursos</p>
+
+          <div class="form-section" style="margin-top:20px">
+            <form class="form-card">
+              <h2>Nuevo comunicado</h2>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="curso">Curso</label>
+                  <select id="curso" name="curso">
+                    <option>1° Año A</option>
+                    <option>2° Año A</option>
+                    <option>3° Año B</option>
+                    <option>4° Año A</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="asunto">Asunto</label>
+                  <input type="text" id="asunto" name="asunto" placeholder="Ej: Reunión de tutores">
+                </div>
+              </div>
+
+              <div class="form-group full">
+                <label for="mensaje">Mensaje</label>
+                <textarea id="mensaje" name="mensaje" rows="5" placeholder="Escriba el comunicado..."></textarea>
+              </div>
+
+              <button type="button" class="btn-form">Publicar comunicado</button>
+            </form>
+          </div>
+        </div>
+
+        <div id="panel-perfil" class="panel">
+          <p class="section-title">Mi perfil</p>
+
+          <table class="tabla">
+            <tbody>
+              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>Ana Pereira</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">DNI</td><td>29.123.456</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Cargo</td><td>Preceptora</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Cursos asignados</td><td>1° A, 2° A, 3° B y 4° A</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>a.pereira@educarparatransformar.com</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>(362) 4556677</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function showPanel(id, el) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+      document.getElementById('panel-' + id).classList.add('active');
+      el.classList.add('active');
+    }
+  </script>
+
+</body>
+</html>
