@@ -6,6 +6,49 @@
   <title>Portal del Alumno</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
+<div class="modal-overlay" id="modalCerrarSesion">
+
+  <div class="modal-box">
+
+    <h2>¿Cerrar sesión?</h2>
+
+    <p>
+      Vas a salir del portal de alumno.
+    </p>
+
+    <div class="modal-buttons">
+
+      <button class="btn-cancelar" onclick="cerrarModal()">
+        Cancelar
+      </button>
+
+      <button class="btn-cerrar" onclick="confirmarCerrarSesion()">
+        Cerrar sesión
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+  function abrirModalCerrarSesion() {
+    document.getElementById("modalCerrarSesion").classList.add("active");
+  }
+
+  function cerrarModal() {
+    document.getElementById("modalCerrarSesion").classList.remove("active");
+  }
+
+  function confirmarCerrarSesion() {
+    window.location.href = "login.html";
+  }
+
+</script>
+
 <body>
   <div class="page">
     <header>
@@ -18,7 +61,7 @@
       </a>
       <nav></nav>
       <div class="login">
-        <a href="login.html">Cerrar sesión</a>
+        <a href="#" onclick="abrirModalCerrarSesion()">Cerrar sesión</a>
       </div>
     </header>
 
@@ -73,7 +116,6 @@
               <div class="stat-sub">2 en curso</div>
             </div>
           </div>
-          <div class="img-placeholder"><img src="img/campus.webp" alt="Campus" class="card-image"></div>
           <p class="section-title" style="font-size:18px">Notificaciones recientes</p>
           <div class="notif-item">
             <div class="notif-icon" style="background:#dbeafe">📝</div>
@@ -247,7 +289,6 @@
         <!-- PERFIL -->
         <div id="panel-perfil" class="panel">
           <p class="section-title">Mi perfil</p>
-          <div class="img-placeholder">📷 Acá va una foto de perfil del alumno</div>
           <table class="tabla">
             <tbody>
               <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>Lucía Ramírez</td></tr>

@@ -6,6 +6,49 @@
   <title>Portal del Docente</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
+<div class="modal-overlay" id="modalCerrarSesion">
+
+  <div class="modal-box">
+
+    <h2>¿Cerrar sesión?</h2>
+
+    <p>
+      Vas a salir del portal de docente.
+    </p>
+
+    <div class="modal-buttons">
+
+      <button class="btn-cancelar" onclick="cerrarModal()">
+        Cancelar
+      </button>
+
+      <button class="btn-cerrar" onclick="confirmarCerrarSesion()">
+        Cerrar sesión
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+  function abrirModalCerrarSesion() {
+    document.getElementById("modalCerrarSesion").classList.add("active");
+  }
+
+  function cerrarModal() {
+    document.getElementById("modalCerrarSesion").classList.remove("active");
+  }
+
+  function confirmarCerrarSesion() {
+    window.location.href = "login.html";
+  }
+
+</script>
+
 <body>
   <div class="page">
     <header>
@@ -17,7 +60,9 @@
         </div>
       </a>
       <nav></nav>
-      <div class="login"><a href="login.html">Cerrar sesión</a></div>
+      <div class="login">
+        <a href="#" onclick="abrirModalCerrarSesion()">Cerrar sesión</a>
+      </div>
     </header>
 
     <div class="dashboard-layout">
@@ -71,7 +116,6 @@
               <div class="stat-sub">Por corregir</div>
             </div>
           </div>
-          <div class="img-placeholder"><img src="img/aula.jpg" alt="Idiomas" class="card-image"></div>
           <p class="section-title" style="font-size:18px">Próximas clases hoy</p>
           <table class="tabla">
             <thead>
@@ -172,7 +216,6 @@
         <!-- PERFIL -->
         <div id="panel-perfil" class="panel">
           <p class="section-title">Mi perfil docente</p>
-          <div class="img-placeholder">📷 Acá va una foto de perfil del docente</div>
           <table class="tabla">
             <tbody>
               <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>Mario Villalba</td></tr>
