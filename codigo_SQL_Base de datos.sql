@@ -219,8 +219,26 @@ CREATE TABLE Reserva (
     id_reserva INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100),
     hora_inicio TIME,
-    hora_fin TIME
+    hora_fin TIME,
+    legajo_personal INT,
+    FOREIGN KEY (legajo_personal) REFERENCES Personal_Administrativo(legajo)
 );
+
+-- =========================
+-- SOLICITANTE
+-- =========================
+CREATE TABLE Solicitante (
+    id_solicitante INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100),
+    email VARCHAR(100),
+    telefono VARCHAR(20),
+    --dni VARCHAR(15), LE PODEMOS PONER LEGAJO DE DOCENTE O PRECEPTOR
+    --FOREIGN KEY (dni) REFERENCES Persona(legajo)
+    id_reserva INT,
+    FOREIGN KEY (id_reserva) REFERENCES Reserva(id_reserva)
+
+);
+
 
 -- =========================
 -- DISCIPLINA DEPORTIVA
@@ -276,7 +294,9 @@ CREATE TABLE Noticia (
     id_noticia INT PRIMARY KEY AUTO_INCREMENT,
     titulo VARCHAR(200),
     contenido TEXT,
-    fecha_publicacion DATE
+    fecha_publicacion DATE,
+    legajo_personal INT,
+    FOREIGN KEY (legajo_personal) REFERENCES Personal_Administrativo(legajo)
 );
 
 -- =========================
@@ -287,6 +307,8 @@ CREATE TABLE Certificado (
     tipo VARCHAR(100),
     fecha_emision DATE,
     descripcion TEXT
+    dni_persona INT,
+    FOREIGN KEY (dni_persona) REFERENCES Persona(dni)
 );
 -- =========================
 -- TABLAS INTERMEDIAS
@@ -299,9 +321,32 @@ CREATE TABLE Vehiculo_Viaje (
 
     PRIMARY KEY (id_vehiculo, id_viaje),
 
-    FOREIGN KEY (id_vehiculo)
-        REFERENCES Vehiculo(id_vehiculo),
+    FOREIGN KEY (id_vehiculo) REFERENCES Vehiculo(id_vehiculo),
 
-    FOREIGN KEY (id_viaje)
-        REFERENCES Viaje(id_viaje)
+    FOREIGN KEY (id_viaje) REFERENCES Viaje(id_viaje)
+);
+
+
+CREATE TABLE Curso_Viaje (
+    id_curso INT,
+    id_viaje INT,
+
+    PRIMARY KEY (id_curso, id_viaje),
+
+    FOREIGN KEY (id_curso) REFERENCES Curso(id_curso),
+
+    FOREIGN KEY (id_viaje) REFERENCES Viaje(id_viaje)
+);
+
+
+CREATE TABLE Reserva_Instalacion (
+    id_reserva INT,
+    id_instalacion INT,
+    horario DATETIME,
+
+    PRIMARY KEY (id_reserva, id_instalacion),
+
+    FOREIGN KEY (id_reserva) REFERENCES Reserva(id_reserva),
+
+    FOREIGN KEY (id_instalacion) REFERENCES Instalacion(id_instalacion)
 );
