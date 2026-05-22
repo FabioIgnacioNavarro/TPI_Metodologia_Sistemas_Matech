@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal del Docente</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<div class="modal-overlay" id="modalCerrarSesion">
+
+  <div class="modal-box">
+
+    <h2>¿Cerrar sesión?</h2>
+
+    <p>
+      Vas a salir del portal de docente.
+    </p>
+
+    <div class="modal-buttons">
+
+      <button class="btn-cancelar" onclick="cerrarModal()">
+        Cancelar
+      </button>
+
+      <button class="btn-cerrar" onclick="confirmarCerrarSesion()">
+        Cerrar sesión
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+  function abrirModalCerrarSesion() {
+    document.getElementById("modalCerrarSesion").classList.add("active");
+  }
+
+  function cerrarModal() {
+    document.getElementById("modalCerrarSesion").classList.remove("active");
+  }
+
+  function confirmarCerrarSesion() {
+    window.location.href = "login.html";
+  }
+
+</script>
+
+<body>
+  <div class="page">
+    <header>
+      <a href="index.html" class="brand">
+        <img src="IMG/logo.png" alt="Logo">
+        <div>
+          <div class="brand-title">Educar para Transformar</div>
+          <div class="brand-subtitle">Portal del Docente</div>
+        </div>
+      </a>
+      <nav></nav>
+      <div class="login">
+        <a href="#" onclick="abrirModalCerrarSesion()">Cerrar sesión</a>
+      </div>
+    </header>
+
+    <div class="dashboard-layout">
+      <aside class="sidebar">
+        <div class="sidebar-user">
+          <div class="avatar">MV</div>
+          <strong>Prof. Mario Villalba</strong>
+          <span>Matemática · Secundario</span>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="#" class="active" onclick="showPanel('inicio',this)">
+            <span class="nav-icon">🏠</span> Inicio
+          </a>
+          <a href="#" onclick="showPanel('cursos',this)">
+            <span class="nav-icon">📚</span> Mis cursos
+          </a>
+          <a href="#" onclick="showPanel('notas',this)">
+            <span class="nav-icon">📝</span> Cargar notas
+          </a>
+          <a href="#" onclick="showPanel('tareas',this)">
+            <span class="nav-icon">📋</span> Tareas y evaluaciones
+          </a>
+          <a href="#" onclick="showPanel('horario',this)">
+            <span class="nav-icon">📅</span> Mi horario
+          </a>
+          <a href="#" onclick="showPanel('perfil',this)">
+            <span class="nav-icon">👤</span> Mi perfil
+          </a>
+        </nav>
+      </aside>
+
+      <main class="dashboard-main">
+
+        <!-- INICIO -->
+        <div id="panel-inicio" class="panel active">
+          <p class="section-title">Bienvenido, Prof. Villalba 👋</p>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-label">Cursos a cargo</div>
+              <div class="stat-value" style="color:#e61c92">4</div>
+              <div class="stat-sub">Este ciclo lectivo</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Total de alumnos</div>
+              <div class="stat-value" style="color:#1d66c2">112</div>
+              <div class="stat-sub">En todos los cursos</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Evaluaciones pendientes</div>
+              <div class="stat-value" style="color:#d97706">3</div>
+              <div class="stat-sub">Por corregir</div>
+            </div>
+          </div>
+          <p class="section-title" style="font-size:18px">Próximas clases hoy</p>
+          <table class="tabla">
+            <thead>
+              <tr><th>Horario</th><th>Curso</th><th>Aula</th><th>Estado</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>7:30 – 8:30</td><td>1° A – Matemática</td><td>Aula 5</td><td><span class="badge badge-green">Confirmada</span></td></tr>
+              <tr><td>8:30 – 9:30</td><td>2° B – Matemática</td><td>Aula 8</td><td><span class="badge badge-green">Confirmada</span></td></tr>
+              <tr><td>10:30 – 11:30</td><td>3° B – Matemática</td><td>Aula 12</td><td><span class="badge badge-yellow">Por comenzar</span></td></tr>
+              <tr><td>11:30 – 12:30</td><td>4° A – Matemática</td><td>Aula 3</td><td><span class="badge badge-blue">Pendiente</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- CURSOS -->
+        <div id="panel-cursos" class="panel">
+          <p class="section-title">Mis cursos</p>
+          <table class="tabla">
+            <thead>
+              <tr><th>Curso</th><th>Nivel</th><th>Turno</th><th>Alumnos</th><th>Promedio</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1° Año A</td><td>Secundario</td><td>Mañana</td><td>28</td><td>7.2</td></tr>
+              <tr><td>2° Año B</td><td>Secundario</td><td>Mañana</td><td>30</td><td>6.9</td></tr>
+              <tr><td>3° Año B</td><td>Secundario</td><td>Mañana</td><td>27</td><td>7.8</td></tr>
+              <tr><td>4° Año A</td><td>Secundario</td><td>Mañana</td><td>27</td><td>7.1</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- NOTAS -->
+        <div id="panel-notas" class="panel">
+          <p class="section-title">Cargar notas – 3° Año B</p>
+          <table class="tabla">
+            <thead>
+              <tr><th>Alumno</th><th>DNI</th><th>1° Bimestre</th><th>2° Bimestre</th><th>Guardar</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Ramírez, Lucía</td><td>44.321.100</td><td><input class="nota-input" value="7"></td><td><input class="nota-input" value="8"></td><td><button class="btn-small">Guardar</button></td></tr>
+              <tr><td>González, Tomás</td><td>44.100.200</td><td><input class="nota-input" value="6"></td><td><input class="nota-input" value="5"></td><td><button class="btn-small">Guardar</button></td></tr>
+              <tr><td>López, Valentina</td><td>44.500.300</td><td><input class="nota-input" value="9"></td><td><input class="nota-input" value="10"></td><td><button class="btn-small">Guardar</button></td></tr>
+              <tr><td>Herrera, Mateo</td><td>44.200.400</td><td><input class="nota-input" value="5"></td><td><input class="nota-input" value="–"></td><td><button class="btn-small">Guardar</button></td></tr>
+              <tr><td>Domínguez, Ana</td><td>44.600.500</td><td><input class="nota-input" value="8"></td><td><input class="nota-input" value="8"></td><td><button class="btn-small">Guardar</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TAREAS -->
+        <div id="panel-tareas" class="panel">
+          <p class="section-title">Tareas y evaluaciones</p>
+          <div class="tarea-card">
+            <div class="tarea-info">
+              <strong>Evaluación integradora – 3° Año B</strong>
+              <span>Álgebra y funciones · Viernes 16/5 · Aula 12</span>
+            </div>
+            <span class="badge badge-yellow">Pendiente</span>
+          </div>
+          <div class="tarea-card">
+            <div class="tarea-info">
+              <strong>Trabajo práctico – 2° Año B</strong>
+              <span>Geometría euclidiana · Entrega 20/5</span>
+            </div>
+            <span class="badge badge-blue">Publicado</span>
+          </div>
+          <div class="tarea-card">
+            <div class="tarea-info">
+              <strong>Evaluación recuperatoria – 1° Año A</strong>
+              <span>Números enteros · Jueves 22/5 · Aula 5</span>
+            </div>
+            <span class="badge badge-pink">Por programar</span>
+          </div>
+          <div class="tarea-card">
+            <div class="tarea-info">
+              <strong>Quiz rápido – 4° Año A</strong>
+              <span>Estadística básica · Martes 13/5</span>
+            </div>
+            <span class="badge badge-green">Corregido</span>
+          </div>
+        </div>
+
+        <!-- HORARIO -->
+        <div id="panel-horario" class="panel">
+          <p class="section-title">Mi horario semanal</p>
+          <table class="tabla">
+            <thead>
+              <tr><th>Hora</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>7:30</strong></td><td>1° A</td><td>–</td><td>2° B</td><td>–</td><td>3° B</td></tr>
+              <tr><td><strong>8:30</strong></td><td>2° B</td><td>4° A</td><td>–</td><td>1° A</td><td>4° A</td></tr>
+              <tr><td><strong>9:30</strong></td><td>–</td><td>3° B</td><td>4° A</td><td>2° B</td><td>–</td></tr>
+              <tr><td><strong>10:30</strong></td><td>3° B</td><td>–</td><td>1° A</td><td>3° B</td><td>2° B</td></tr>
+              <tr><td><strong>11:30</strong></td><td>4° A</td><td>1° A</td><td>–</td><td>–</td><td>–</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PERFIL -->
+        <div id="panel-perfil" class="panel">
+          <p class="section-title">Mi perfil docente</p>
+          <table class="tabla">
+            <tbody>
+              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>Mario Villalba</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">DNI</td><td>27.450.890</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Materia</td><td>Matemática</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Nivel</td><td>Secundario</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Antigüedad</td><td>8 años en el centro</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>m.villalba@educarparatransformar.com</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>(362) 4445566</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function showPanel(id, el) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+      document.getElementById('panel-' + id).classList.add('active');
+      el.classList.add('active');
+    }
+  </script>
+</body>
+</html>
