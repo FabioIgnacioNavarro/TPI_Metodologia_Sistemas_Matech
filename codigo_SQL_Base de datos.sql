@@ -24,8 +24,10 @@ CREATE TABLE Alumno (
     fecha_ingreso DATE,
     usuario VARCHAR(50) UNIQUE,
     contrasena VARCHAR(255),
+    id_curso INT,
 
-    FOREIGN KEY (dni) REFERENCES Persona(dni)
+    FOREIGN KEY (dni) REFERENCES Persona(dni),
+    FOREIGN KEY (id_curso) REFERENCES Curso(id_curso)
 );
 
 -- =========================
@@ -93,7 +95,11 @@ CREATE TABLE Curso (
     comision VARCHAR(20),
     turno VARCHAR(30),
     nivel VARCHAR(30),
-    cupo_maximo INT
+    cupo_maximo INT,
+    legajo_preceptor INT,
+    id_aula INT,
+    FOREIGN KEY (legajo_preceptor) REFERENCES Preceptor(legajo),
+    FOREIGN KEY (id_aula) REFERENCES Aula(id_aula)
 );
 
 -- =========================
@@ -120,21 +126,6 @@ CREATE TABLE Materia (
     cantidad_clases INT
 );
 
--- =========================
--- HORARIO
--- =========================
---Esto hay que sacar por ahora, o lo podemos usar como tabla intermedia
-/*
-CREATE TABLE Horario (
-    id_horario INT PRIMARY KEY AUTO_INCREMENT,
-    hora_inicio TIME,
-    hora_fin TIME,
-    dia VARCHAR(20),
-    id_curso INT,
-
-    FOREIGN KEY (id_curso) REFERENCES Curso(id_curso)
-);
-*/
 -- =========================
 -- INSCRIPCION
 -- =========================
@@ -209,7 +200,8 @@ CREATE TABLE Instalacion (
     id_instalacion INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100),
     capacidad INT,
-    estado VARCHAR(50)
+    estado VARCHAR(50),
+    
 );
 
 -- =========================
@@ -221,7 +213,9 @@ CREATE TABLE Reserva (
     hora_inicio TIME,
     hora_fin TIME,
     legajo_personal INT,
-    FOREIGN KEY (legajo_personal) REFERENCES Personal_Administrativo(legajo)
+    id_solicitante INT,
+    FOREIGN KEY (legajo_personal) REFERENCES Personal_Administrativo(legajo),
+    FOREIGN KEY (id_solicitante) REFERENCES Solicitante(id_solicitante)
 );
 
 -- =========================
@@ -234,8 +228,6 @@ CREATE TABLE Solicitante (
     telefono VARCHAR(20),
     --dni VARCHAR(15), LE PODEMOS PONER LEGAJO DE DOCENTE O PRECEPTOR
     --FOREIGN KEY (dni) REFERENCES Persona(legajo)
-    id_reserva INT,
-    FOREIGN KEY (id_reserva) REFERENCES Reserva(id_reserva)
 
 );
 
@@ -349,4 +341,42 @@ CREATE TABLE Reserva_Instalacion (
     FOREIGN KEY (id_reserva) REFERENCES Reserva(id_reserva),
 
     FOREIGN KEY (id_instalacion) REFERENCES Instalacion(id_instalacion)
+);
+
+CREATE TABLE Curso_Materia (
+    id_curso INT,
+    id_materia INT,
+    horario DATETIME,
+
+    PRIMARY KEY (id_curso, id_materia),
+
+    FOREIGN KEY (id_curso) REFERENCES Curso(id_curso),
+    FOREIGN KEY (id_materia) REFERENCES Materia(id_materia)
+);
+CREATE TABLE Alumno_Calificacion (
+    legajo_alumno INT,
+    id_calificacion INT,
+
+    PRIMARY KEY (legajo_alumno, id_calificacion),
+
+    FOREIGN KEY (legajo_alumno) REFERENCES Alumno(legajo),
+    FOREIGN KEY (id_calificacion) REFERENCES Calificacion(id_calificacion)
+);
+CREATE TABLE Docente_Materia (
+    legajo_docente INT,
+    id_materia INT,
+
+    PRIMARY KEY (legajo_docente, id_materia),
+
+    FOREIGN KEY (legajo_docente) REFERENCES Docente(legajo),
+    FOREIGN KEY (id_materia) REFERENCES Materia(id_materia)
+);
+CREATE TABLE Alumno_Cuota (
+    legajo_alumno INT,
+    id_cuota INT,
+
+    PRIMARY KEY (legajo_alumno, id_cuota),
+
+    FOREIGN KEY (legajo_alumno) REFERENCES Alumno(legajo),
+    FOREIGN KEY (id_cuota) REFERENCES Cuota(id_cuota)
 );
