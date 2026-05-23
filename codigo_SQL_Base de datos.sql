@@ -1,5 +1,5 @@
---CREATE DATABASE colegio;
---USE colegio;
+CREATE DATABASE colegio;
+USE colegio;
 
 -- =========================
 -- PERSONA
@@ -12,6 +12,64 @@ CREATE TABLE Persona (
     direccion VARCHAR(100),
     telefono VARCHAR(20),
     email VARCHAR(100)
+);
+
+-- =========================
+-- DOCENTE
+-- =========================
+CREATE TABLE Docente (
+    legajo INT PRIMARY KEY AUTO_INCREMENT,
+    dni VARCHAR(15) UNIQUE,
+    titulo VARCHAR(100),
+    especialidad VARCHAR(100),
+    fecha_ingreso DATE,
+    usuario VARCHAR(50) UNIQUE,
+    contrasena VARCHAR(255),
+
+    FOREIGN KEY (dni) REFERENCES Persona(dni)
+);
+
+
+-- =========================
+-- PRECEPTOR
+-- =========================
+CREATE TABLE Preceptor (
+    legajo INT PRIMARY KEY AUTO_INCREMENT,
+    dni VARCHAR(15) UNIQUE,
+    turno VARCHAR(30),
+    fecha_ingreso DATE,
+    usuario VARCHAR(50) UNIQUE,
+    contrasena VARCHAR(255),
+
+    FOREIGN KEY (dni) REFERENCES Persona(dni)
+);
+
+-- =========================
+-- AULA
+-- =========================
+CREATE TABLE Aula (
+    id_aula INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(50),
+    numero INT,
+    piso INT,
+    capacidad INT,
+    tipo VARCHAR(50),
+    estado VARCHAR(50) -- en este capaz pueda ser un un array de tres opciones
+);
+
+-- =========================
+-- CURSO
+-- =========================
+CREATE TABLE Curso (
+    id_curso INT PRIMARY KEY AUTO_INCREMENT,
+    comision VARCHAR(20),
+    turno VARCHAR(30),
+    nivel VARCHAR(30),
+    cupo_maximo INT,
+    legajo_preceptor INT,
+    id_aula INT,
+    FOREIGN KEY (legajo_preceptor) REFERENCES Preceptor(legajo),
+    FOREIGN KEY (id_aula) REFERENCES Aula(id_aula)
 );
 
 -- =========================
@@ -35,41 +93,12 @@ CREATE TABLE Alumno (
 -- =========================
 CREATE TABLE Tutor (
     id_tutor INT PRIMARY KEY AUTO_INCREMENT,
-    legajo_alumno VARCHAR(15),
+    legajo_alumno INT,
     parentesco VARCHAR(50),
     telefono_contacto VARCHAR(20),
     email_contacto VARCHAR(100),
 
     FOREIGN KEY (legajo_alumno) REFERENCES Alumno(legajo)
-);
-
--- =========================
--- DOCENTE
--- =========================
-CREATE TABLE Docente (
-    legajo INT PRIMARY KEY AUTO_INCREMENT,
-    dni VARCHAR(15) UNIQUE,
-    titulo VARCHAR(100),
-    especialidad VARCHAR(100),
-    fecha_ingreso DATE,
-    usuario VARCHAR(50) UNIQUE,
-    contrasena VARCHAR(255),
-
-    FOREIGN KEY (dni) REFERENCES Persona(dni)
-);
-
--- =========================
--- PRECEPTOR
--- =========================
-CREATE TABLE Preceptor (
-    legajo INT PRIMARY KEY AUTO_INCREMENT,
-    dni VARCHAR(15) UNIQUE,
-    turno VARCHAR(30),
-    fecha_ingreso DATE,
-    usuario VARCHAR(50) UNIQUE,
-    contrasena VARCHAR(255),
-
-    FOREIGN KEY (dni) REFERENCES Persona(dni)
 );
 
 -- =========================
@@ -85,34 +114,6 @@ CREATE TABLE Personal_Administrativo (
     contrasena VARCHAR(255),
 
     FOREIGN KEY (dni) REFERENCES Persona(dni)
-);
-
--- =========================
--- CURSO
--- =========================
-CREATE TABLE Curso (
-    id_curso INT PRIMARY KEY AUTO_INCREMENT,
-    comision VARCHAR(20),
-    turno VARCHAR(30),
-    nivel VARCHAR(30),
-    cupo_maximo INT,
-    legajo_preceptor INT,
-    id_aula INT,
-    FOREIGN KEY (legajo_preceptor) REFERENCES Preceptor(legajo),
-    FOREIGN KEY (id_aula) REFERENCES Aula(id_aula)
-);
-
--- =========================
--- AULA
--- =========================
-CREATE TABLE Aula (
-    id_aula INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(50),
-    numero INT,
-    piso INT,
-    capacidad INT,
-    tipo VARCHAR(50),
-    estado VARCHAR(50) --en este capaz pueda ser un un array de tres opciones
 );
 
 -- =========================
@@ -147,9 +148,7 @@ CREATE TABLE Asistencia (
     id_asistencia INT PRIMARY KEY AUTO_INCREMENT,
     legajo_alumno INT,
     fecha DATE,
-
     observacion TEXT,
-
     FOREIGN KEY (legajo_alumno) REFERENCES Alumno(legajo)
 );
 
@@ -200,8 +199,17 @@ CREATE TABLE Instalacion (
     id_instalacion INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100),
     capacidad INT,
-    estado VARCHAR(50),
-    
+    estado VARCHAR(50)
+);
+
+-- =========================
+-- SOLICITANTE
+-- =========================
+CREATE TABLE Solicitante (
+    id_solicitante INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100),
+    email VARCHAR(100),
+    telefono VARCHAR(20)
 );
 
 -- =========================
@@ -217,20 +225,6 @@ CREATE TABLE Reserva (
     FOREIGN KEY (legajo_personal) REFERENCES Personal_Administrativo(legajo),
     FOREIGN KEY (id_solicitante) REFERENCES Solicitante(id_solicitante)
 );
-
--- =========================
--- SOLICITANTE
--- =========================
-CREATE TABLE Solicitante (
-    id_solicitante INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(100),
-    email VARCHAR(100),
-    telefono VARCHAR(20),
-    --dni VARCHAR(15), LE PODEMOS PONER LEGAJO DE DOCENTE O PRECEPTOR
-    --FOREIGN KEY (dni) REFERENCES Persona(legajo)
-
-);
-
 
 -- =========================
 -- DISCIPLINA DEPORTIVA
@@ -254,6 +248,18 @@ CREATE TABLE Vehiculo (
 );
 
 -- =========================
+-- SOLICITUD VIAJE
+-- =========================
+CREATE TABLE Solicitud_Viaje (
+    id_solicitud INT PRIMARY KEY AUTO_INCREMENT,
+    fecha_solicitud DATE,
+    estado VARCHAR(50),
+    observaciones TEXT,
+    legajo_docente INT,
+    FOREIGN KEY (legajo_docente) REFERENCES Docente(legajo)
+);
+
+-- =========================
 -- VIAJE
 -- =========================
 CREATE TABLE Viaje (
@@ -265,18 +271,6 @@ CREATE TABLE Viaje (
     id_solicitud INT UNIQUE,
 
     FOREIGN KEY (id_solicitud) REFERENCES Solicitud_Viaje(id_solicitud)
-);
-
--- =========================
--- SOLICITUD VIAJE
--- =========================
-CREATE TABLE Solicitud_Viaje (
-    id_solicitud INT PRIMARY KEY AUTO_INCREMENT,
-    fecha_solicitud DATE,
-    estado VARCHAR(50),
-    observaciones TEXT
-    legajo_docente INT,
-    FOREIGN KEY (legajo_docente) REFERENCES Docente(legajo)
 );
 
 -- =========================
@@ -298,8 +292,8 @@ CREATE TABLE Certificado (
     id_certificado INT PRIMARY KEY AUTO_INCREMENT,
     tipo VARCHAR(100),
     fecha_emision DATE,
-    descripcion TEXT
-    dni_persona INT,
+    descripcion TEXT,
+    dni_persona VARCHAR(15),
     FOREIGN KEY (dni_persona) REFERENCES Persona(dni)
 );
 -- =========================
