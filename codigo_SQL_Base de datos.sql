@@ -1,10 +1,10 @@
-CREATE DATABASE colegio;
+CREATE DATABASE IF NOT EXISTS colegio;
 USE colegio;
 
 -- =========================
 -- PERSONA
 -- =========================
-CREATE TABLE Persona (
+CREATE TABLE IF NOT EXISTS Persona (
     dni VARCHAR(15) PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
     apellido VARCHAR(50) NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE Persona (
 -- =========================
 -- DOCENTE
 -- =========================
-CREATE TABLE Docente (
+CREATE TABLE IF NOT EXISTS Docente (
     legajo INT PRIMARY KEY AUTO_INCREMENT,
     dni VARCHAR(15) UNIQUE,
     titulo VARCHAR(100),
@@ -33,7 +33,7 @@ CREATE TABLE Docente (
 -- =========================
 -- PRECEPTOR
 -- =========================
-CREATE TABLE Preceptor (
+CREATE TABLE IF NOT EXISTS Preceptor (
     legajo INT PRIMARY KEY AUTO_INCREMENT,
     dni VARCHAR(15) UNIQUE,
     turno VARCHAR(30),
@@ -47,7 +47,7 @@ CREATE TABLE Preceptor (
 -- =========================
 -- AULA
 -- =========================
-CREATE TABLE Aula (
+CREATE TABLE IF NOT EXISTS Aula (
     id_aula INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(50),
     numero INT,
@@ -60,7 +60,7 @@ CREATE TABLE Aula (
 -- =========================
 -- CURSO
 -- =========================
-CREATE TABLE Curso (
+CREATE TABLE IF NOT EXISTS Curso (
     id_curso INT PRIMARY KEY AUTO_INCREMENT,
     comision VARCHAR(20),
     turno VARCHAR(30),
@@ -75,7 +75,7 @@ CREATE TABLE Curso (
 -- =========================
 -- Alumno
 -- =========================
-CREATE TABLE Alumno (
+CREATE TABLE IF NOT EXISTS Alumno (
     legajo INT PRIMARY KEY AUTO_INCREMENT,
     dni VARCHAR(15) UNIQUE,
     anio_cursado INT,
@@ -91,7 +91,7 @@ CREATE TABLE Alumno (
 -- =========================
 -- TUTOR
 -- =========================
-CREATE TABLE Tutor (
+CREATE TABLE IF NOT EXISTS Tutor (
     id_tutor INT PRIMARY KEY AUTO_INCREMENT,
     legajo_alumno INT,
     parentesco VARCHAR(50),
@@ -104,7 +104,7 @@ CREATE TABLE Tutor (
 -- =========================
 -- PERSONAL ADMINISTRATIVO
 -- =========================
-CREATE TABLE Personal_Administrativo (
+CREATE TABLE IF NOT EXISTS Personal_Administrativo (
     legajo INT PRIMARY KEY AUTO_INCREMENT,
     dni VARCHAR(15) UNIQUE,
     sector VARCHAR(50),
@@ -119,7 +119,7 @@ CREATE TABLE Personal_Administrativo (
 -- =========================
 -- MATERIA
 -- =========================
-CREATE TABLE Materia (
+CREATE TABLE IF NOT EXISTS Materia (
     id_materia INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100),
     descripcion TEXT,
@@ -130,7 +130,7 @@ CREATE TABLE Materia (
 -- =========================
 -- INSCRIPCION
 -- =========================
-CREATE TABLE Inscripcion (
+CREATE TABLE IF NOT EXISTS Inscripcion (
     id_inscripcion INT PRIMARY KEY AUTO_INCREMENT,
     fecha_inscripcion DATE,
     estado VARCHAR(30),
@@ -144,7 +144,7 @@ CREATE TABLE Inscripcion (
 -- =========================
 -- ASISTENCIA
 -- =========================
-CREATE TABLE Asistencia (
+CREATE TABLE IF NOT EXISTS Asistencia (
     id_asistencia INT PRIMARY KEY AUTO_INCREMENT,
     legajo_alumno INT,
     fecha DATE,
@@ -155,7 +155,7 @@ CREATE TABLE Asistencia (
 -- =========================
 -- CALIFICACION
 -- =========================
-CREATE TABLE Calificacion (
+CREATE TABLE IF NOT EXISTS Calificacion (
     id_calificacion INT PRIMARY KEY AUTO_INCREMENT,
     nota DECIMAL(4,2),
     tipo_evaluacion VARCHAR(50),
@@ -170,7 +170,7 @@ CREATE TABLE Calificacion (
 -- =========================
 -- TURNO
 -- =========================
-CREATE TABLE Turno (
+CREATE TABLE IF NOT EXISTS Turno (
     id_turno INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(50),
     hora_inicio TIME,
@@ -180,7 +180,7 @@ CREATE TABLE Turno (
 -- =========================
 -- CUOTA
 -- =========================
-CREATE TABLE Cuota (
+CREATE TABLE IF NOT EXISTS Cuota (
     id_cuota INT PRIMARY KEY AUTO_INCREMENT,
     periodo VARCHAR(20),
     monto DECIMAL(10,2),
@@ -195,7 +195,7 @@ CREATE TABLE Cuota (
 -- =========================
 -- INSTALACION
 -- =========================
-CREATE TABLE Instalacion (
+CREATE TABLE IF NOT EXISTS Instalacion (
     id_instalacion INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100),
     capacidad INT,
@@ -205,7 +205,7 @@ CREATE TABLE Instalacion (
 -- =========================
 -- SOLICITANTE
 -- =========================
-CREATE TABLE Solicitante (
+CREATE TABLE IF NOT EXISTS Solicitante (
     id_solicitante INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100),
     email VARCHAR(100),
@@ -215,7 +215,7 @@ CREATE TABLE Solicitante (
 -- =========================
 -- RESERVA
 -- =========================
-CREATE TABLE Reserva (
+CREATE TABLE IF NOT EXISTS Reserva (
     id_reserva INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100),
     hora_inicio TIME,
@@ -229,7 +229,7 @@ CREATE TABLE Reserva (
 -- =========================
 -- DISCIPLINA DEPORTIVA
 -- =========================
-CREATE TABLE Disciplina_Deportiva (
+CREATE TABLE IF NOT EXISTS Disciplina_Deportiva (
     id_disciplina INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100),
     categoria VARCHAR(50),
@@ -239,7 +239,7 @@ CREATE TABLE Disciplina_Deportiva (
 -- =========================
 -- VEHICULO
 -- =========================
-CREATE TABLE Vehiculo (
+CREATE TABLE IF NOT EXISTS Vehiculo (
     id_vehiculo INT PRIMARY KEY AUTO_INCREMENT,
     patente VARCHAR(20),
     modelo VARCHAR(50),
@@ -250,7 +250,7 @@ CREATE TABLE Vehiculo (
 -- =========================
 -- SOLICITUD VIAJE
 -- =========================
-CREATE TABLE Solicitud_Viaje (
+CREATE TABLE IF NOT EXISTS Solicitud_Viaje (
     id_solicitud INT PRIMARY KEY AUTO_INCREMENT,
     fecha_solicitud DATE,
     estado VARCHAR(50),
@@ -262,7 +262,7 @@ CREATE TABLE Solicitud_Viaje (
 -- =========================
 -- VIAJE
 -- =========================
-CREATE TABLE Viaje (
+CREATE TABLE IF NOT EXISTS Viaje (
     id_viaje INT PRIMARY KEY AUTO_INCREMENT,
     tipo VARCHAR(50),
     fecha_salida DATE,
@@ -276,7 +276,7 @@ CREATE TABLE Viaje (
 -- =========================
 -- NOTICIA
 -- =========================
-CREATE TABLE Noticia (
+CREATE TABLE IF NOT EXISTS Noticia (
     id_noticia INT PRIMARY KEY AUTO_INCREMENT,
     titulo VARCHAR(200),
     contenido TEXT,
@@ -288,7 +288,7 @@ CREATE TABLE Noticia (
 -- =========================
 -- CERTIFICADO
 -- =========================
-CREATE TABLE Certificado (
+CREATE TABLE IF NOT EXISTS Certificado (
     id_certificado INT PRIMARY KEY AUTO_INCREMENT,
     tipo VARCHAR(100),
     fecha_emision DATE,
@@ -301,7 +301,7 @@ CREATE TABLE Certificado (
 -- =========================
 
 
-CREATE TABLE Vehiculo_Viaje (
+CREATE TABLE IF NOT EXISTS Vehiculo_Viaje (
     id_vehiculo INT,
     id_viaje INT,
 
@@ -313,7 +313,7 @@ CREATE TABLE Vehiculo_Viaje (
 );
 
 
-CREATE TABLE Curso_Viaje (
+CREATE TABLE IF NOT EXISTS Curso_Viaje (
     id_curso INT,
     id_viaje INT,
 
@@ -325,7 +325,7 @@ CREATE TABLE Curso_Viaje (
 );
 
 
-CREATE TABLE Reserva_Instalacion (
+CREATE TABLE IF NOT EXISTS Reserva_Instalacion (
     id_reserva INT,
     id_instalacion INT,
     horario DATETIME,
@@ -337,7 +337,7 @@ CREATE TABLE Reserva_Instalacion (
     FOREIGN KEY (id_instalacion) REFERENCES Instalacion(id_instalacion)
 );
 
-CREATE TABLE Curso_Materia (
+CREATE TABLE IF NOT EXISTS Curso_Materia (
     id_curso INT,
     id_materia INT,
     horario DATETIME,
@@ -347,7 +347,7 @@ CREATE TABLE Curso_Materia (
     FOREIGN KEY (id_curso) REFERENCES Curso(id_curso),
     FOREIGN KEY (id_materia) REFERENCES Materia(id_materia)
 );
-CREATE TABLE Alumno_Calificacion (
+CREATE TABLE IF NOT EXISTS Alumno_Calificacion (
     legajo_alumno INT,
     id_calificacion INT,
 
@@ -356,7 +356,7 @@ CREATE TABLE Alumno_Calificacion (
     FOREIGN KEY (legajo_alumno) REFERENCES Alumno(legajo),
     FOREIGN KEY (id_calificacion) REFERENCES Calificacion(id_calificacion)
 );
-CREATE TABLE Docente_Materia (
+CREATE TABLE IF NOT EXISTS Docente_Materia (
     legajo_docente INT,
     id_materia INT,
 
@@ -365,7 +365,7 @@ CREATE TABLE Docente_Materia (
     FOREIGN KEY (legajo_docente) REFERENCES Docente(legajo),
     FOREIGN KEY (id_materia) REFERENCES Materia(id_materia)
 );
-CREATE TABLE Alumno_Cuota (
+CREATE TABLE IF NOT EXISTS Alumno_Cuota (
     legajo_alumno INT,
     id_cuota INT,
 
