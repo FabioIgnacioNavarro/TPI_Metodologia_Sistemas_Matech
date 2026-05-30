@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Educar para Transformar</title>
+  <link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
+</head>
+<body>
+  <div class="page">
+    <div class="blur blur1"></div>
+    <div class="blur blur2"></div>
+    <div class="blur blur3"></div>
+    <div class="blur blur4"></div>
+    <div class="blur blur5"></div>
+
+    <header>
+      <a href="{% url 'index' %}" class="brand">
+        <img src="{% static 'core/img/logo.png' %}">
+        <div>
+          <div class="brand-title">Educar para Transformar</div>
+          <div class="brand-subtitle">Centro Educativo</div>
+        </div>
+      </a>
+
+      <nav>
+        <a href="{% url 'niveles' %}">Niveles educativos</a>
+        <a href="{% url 'bienestar' %}">Bienestar estudiantil</a>
+        <a href="{% url 'noticias' %}">Noticias</a>
+        <a href="{% url 'inscripcion' %}">Inscripción a cursado</a>
+        <a href="{% url 'contacto' %}">Contacto</a>
+      </nav>
+
+      <div class="login">
+        <a href="{% url 'login' %}">Iniciar sesión</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-logo-box">
+          <img src="{% static 'core/img/logo.png' %}" alt="Logotipo Educar para Transformar">
+        </div>
+        <h1>Educar para transformar</h1>
+        <p>
+          Inspiramos, acompañamos y formamos estudiantes seguros, creativos y comprometidos con su futuro,
+          integrando educación, bienestar y oportunidades en una misma comunidad.
+        </p>
+      </section>
+
+      <section class="cards">
+        <div class="card">
+          <div class="card-content">
+            <div class="card-title">
+              <div class="icon icon-blue">◫</div>
+              <span>Niveles educativos</span>
+            </div>
+            <p>Propuesta académica para nivel inicial, primario y secundario con una formación integral.</p>
+          </div>
+          <div class="card-bottom gradient-blue">
+            <div class="inner-box">
+              <div>
+                <strong>Formación académica</strong>
+                <span>Trayectorias educativas pensadas para acompañar cada etapa.</span>
+              </div>
+              <div class="big-icon">◫</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-content">
+            <div class="card-title">
+              <div class="icon icon-green">♡</div>
+              <span>Bienestar estudiantil</span>
+            </div>
+            <p>Espacios de apoyo, orientación y cuidado para fortalecer el desarrollo integral del alumno.</p>
+          </div>
+          <div class="card-bottom gradient-green">
+            <div class="inner-box">
+              <div>
+                <strong>Acompañamiento integral</strong>
+                <span>Servicios que priorizan la salud, la inclusión y el bienestar.</span>
+              </div>
+              <div class="big-icon">♡</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-content">
+            <div class="card-title">
+              <div class="icon icon-pink">✎</div>
+              <span>Inscripción a cursado</span>
+            </div>
+            <p>Acceso ágil a formularios, solicitudes e información de inscripción para nuevos estudiantes.</p>
+          </div>
+          <div class="card-bottom gradient-pink">
+            <div class="inner-box">
+              <div>
+                <strong>Gestión simple</strong>
+                <span>Procesos digitales para facilitar consultas y registros.</span>
+              </div>
+              <div class="big-icon">✎</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
