@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Directivo</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
 </head>
 
 <div class="modal-overlay" id="modalCerrarSesion">
@@ -44,7 +45,7 @@
   }
 
   function confirmarCerrarSesion() {
-    window.location.href = "login.html";
+    window.location.href = "{% url 'login' %}";
   }
 
 </script>
@@ -54,8 +55,8 @@
   <div class="page">
 
     <header>
-      <a href="index.html" class="brand">
-        <img src="IMG/logo.png" alt="Logo">
+      <a href="{% url 'index' %}" class="brand">
+        <img src="{% static 'core/IMG/logo.png' %}" alt="Logo">
 
         <div>
           <div class="brand-title">Educar para Transformar</div>
@@ -84,27 +85,27 @@
 
         <nav class="sidebar-nav">
 
-          <a href="#" class="active" onclick="showPanel('inicio', this)">
+          <a href="{% url 'dashboard-directivo' %}" class="active" onclick="showPanel('inicio', this)">
             <span class="nav-icon">🏠</span> Inicio
           </a>
 
-          <a href="#" onclick="showPanel('institucion', this)">
+          <a href="{% url 'dashboard-directivo' %}?panel=institucion" onclick="showPanel('institucion', this)">
             <span class="nav-icon">🏫</span> Institución
           </a>
 
-          <a href="#" onclick="showPanel('docentes', this)">
+          <a href="{% url 'dashboard-directivo' %}?panel=docentes" onclick="showPanel('docentes', this)">
             <span class="nav-icon">👩‍🏫</span> Docentes
           </a>
 
-          <a href="#" onclick="showPanel('reportes', this)">
+          <a href="{% url 'dashboard-directivo' %}?panel=reportes" onclick="showPanel('reportes', this)">
             <span class="nav-icon">📊</span> Reportes
           </a>
 
-          <a href="#" onclick="showPanel('comunicados', this)">
+          <a href="{% url 'dashboard-directivo' %}?panel=comunicados" onclick="showPanel('comunicados', this)">
             <span class="nav-icon">📢</span> Comunicados
           </a>
 
-          <a href="#" onclick="showPanel('perfil', this)">
+          <a href="{% url 'dashboard-directivo' %}?panel=perfil" onclick="showPanel('perfil', this)">
             <span class="nav-icon">👤</span> Mi perfil
           </a>
 

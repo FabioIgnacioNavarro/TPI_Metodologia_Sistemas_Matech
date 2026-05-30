@@ -1,18 +1,19 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contacto</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
 </head>
 <body>
 
   <div class="page">
 
     <header>
-      <a href="index.html" class="brand">
-        <img src="IMG/logo.png" alt="Logo Educar para Transformar">
+      <a href="{% url 'index' %}" class="brand">
+        <img src="{% static 'core/img/logo.png' %}" alt="Logo Educar para Transformar">
 
         <div>
           <div class="brand-title">Educar para Transformar</div>
@@ -21,15 +22,15 @@
       </a>
 
       <nav>
-        <a href="niveles.html">Niveles educativos</a>
-        <a href="bienestar.html">Bienestar estudiantil</a>
-        <a href="noticias.html">Noticias</a>
-        <a href="inscripcion.html">Inscripción a cursado</a>
-        <a href="contacto.html">Contacto</a>
+        <a href="{% url 'niveles' %}">Niveles educativos</a>
+        <a href="{% url 'bienestar' %}">Bienestar estudiantil</a>
+        <a href="{% url 'noticias' %}">Noticias</a>
+        <a href="{% url 'inscripcion' %}">Inscripción a cursado</a>
+        <a href="{% url 'contacto' %}">Contacto</a>
       </nav>
 
       <div class="login">
-        <a href="login.html">Iniciar sesión</a>
+        <a href="{% url 'login' %}">Iniciar sesión</a>
       </div>
     </header>
 

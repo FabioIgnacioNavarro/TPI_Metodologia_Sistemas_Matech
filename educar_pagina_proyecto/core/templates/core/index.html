@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Educar para Transformar</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
 </head>
 <body>
   <div class="page">
@@ -15,8 +16,8 @@
     <div class="blur blur5"></div>
 
     <header>
-      <a href="index.html" class="brand">
-        <img src="IMG/logo.png" alt="Logo Educar para Transformar">
+      <a href="{% url 'index' %}" class="brand">
+        <img src="{% static 'core/img/logo.png' %}">
         <div>
           <div class="brand-title">Educar para Transformar</div>
           <div class="brand-subtitle">Centro Educativo</div>
@@ -24,35 +25,28 @@
       </a>
 
       <nav>
-        <a href="niveles.html">Niveles educativos</a>
-        <a href="bienestar.html">Bienestar estudiantil</a>
-        <a href="noticias.html">Noticias</a>
-        <a href="inscripcion.html">Inscripción a cursado</a>
-        <a href="contacto.html">Contacto</a>
+        <a href="{% url 'niveles' %}">Niveles educativos</a>
+        <a href="{% url 'bienestar' %}">Bienestar estudiantil</a>
+        <a href="{% url 'noticias' %}">Noticias</a>
+        <a href="{% url 'inscripcion' %}">Inscripción a cursado</a>
+        <a href="{% url 'contacto' %}">Contacto</a>
       </nav>
 
       <div class="login">
-        <a href="login.html">Iniciar sesión</a>
+        <a href="{% url 'login' %}">Iniciar sesión</a>
       </div>
     </header>
 
     <main>
       <section class="hero">
         <div class="hero-logo-box">
-          <img src="IMG/logo.png" alt="Logotipo Educar para Transformar">
+          <img src="{% static 'core/img/logo.png' %}" alt="Logotipo Educar para Transformar">
         </div>
         <h1>Educar para transformar</h1>
         <p>
           Inspiramos, acompañamos y formamos estudiantes seguros, creativos y comprometidos con su futuro,
           integrando educación, bienestar y oportunidades en una misma comunidad.
         </p>
-
-        <ul>
-            {% for u in usuarios %}
-              <li>{{ u.nombre_usuario }}</li>
-            {% endfor %}
-        </ul>
-        
       </section>
 
       <section class="cards">
