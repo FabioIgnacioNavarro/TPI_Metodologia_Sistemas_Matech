@@ -78,13 +78,13 @@ def inscripcion(request):
                 }
             )
             
-        patron_email = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-
+        patron_email = r'^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com)$'
+        
         if not re.match(patron_email, email):
             return render(
                 request,
                 'core/inscripcion.html',
-                {'error': 'Ingrese un correo electrónico válido.'}
+                {'error': 'Ingrese un correo electrónico válido (solo Gmail, Hotmail u Outlook).'}
             )
 
         fecha_nacimiento = date.fromisoformat(fecha)
@@ -167,37 +167,59 @@ def login(request):
     if request.method == 'POST':
         usuario_input = request.POST.get('usuario')
         password = request.POST.get('password')
+        rol_input = request.POST.get('rol')
 
+        if not rol_input:
+            return render(request, 'core/login.html', {
+                'error': 'Debe seleccionar un tipo de usuario.'
+            })
         try:
-            usuario = Usuario.objects.get(
-                nombre_usuario=usuario_input,
-                contrasenia=password
-            )
-
-            request.session['usuario_id'] = usuario.id
+            try:
+                usuario = Usuario.objects.get(
+                    nombre_usuario=usuario_input,
+                    contrasenia=password
+                )
+            except Usuario.DoesNotExist:
+                usuario = Usuario.objects.get(
+                    correo=usuario_input,
+                    contrasenia=password
+                )
 
             # 🔥 DETECTAR ROL POR TABLAS
-            if PersonalAdministrativo.objects.filter(id_persona__id_usuario=usuario).exists():
-                return redirect('dashboard-administrativo')
+            redireccion = 'login'
+            rol_correcto = False
+            
+            if rol_input == 'administrativo' and PersonalAdministrativo.objects.filter(id_persona__id_usuario=usuario).exists():
+                rol_correcto = True
+                redireccion = 'dashboard-administrativo'
+                
+            elif rol_input == 'docente' and Docente.objects.filter(id_persona__id_usuario=usuario).exists():
+                rol_correcto = True
+                redireccion = 'dashboard-docente'
+                
+            elif rol_input == 'padre' and Tutor.objects.filter(id_persona__id_usuario=usuario).exists():
+                rol_correcto = True
+                redireccion = 'dashboard-padres'
+                
+            elif rol_input == 'preceptor' and Preceptor.objects.filter(id_persona__id_usuario=usuario).exists():
+                rol_correcto = True
+                redireccion = 'dashboard-preceptor'
+                
+            elif rol_input == 'directivo' and Directivo.objects.filter(id_persona__id_usuario=usuario).exists():
+                rol_correcto = True
+                redireccion = 'dashboard-directivo'
+                
+            elif rol_input == 'alumno' and Alumno.objects.filter(id_persona__id_usuario=usuario).exists():
+                rol_correcto = True
+                redireccion = 'dashboard-alumno'
 
-            elif Docente.objects.filter(id_persona__id_usuario=usuario).exists():
-                return redirect('dashboard-docente')
+            if not rol_correcto:
+                return render(request, 'core/login.html', {
+                    'error': 'El tipo de usuario seleccionado no corresponde a esta cuenta.'
+                })
 
-            elif Tutor.objects.filter(id_persona__id_usuario=usuario).exists():
-                return redirect('dashboard-padres')
-
-            elif Preceptor.objects.filter(id_persona__id_usuario=usuario).exists():
-                return redirect('dashboard-preceptor')
-
-            elif Directivo.objects.filter(id_persona__id_usuario=usuario).exists():
-                return redirect('dashboard-directivo')
-
-            elif Alumno.objects.filter(id_persona__id_usuario=usuario).exists():
-                return redirect('dashboard-alumno')
-
-            else:
-                return redirect('login')
-
+            request.session['usuario_id'] = usuario.id
+            return redirect(redireccion)
         except Usuario.DoesNotExist:
             return render(request, 'core/login.html', {
                 'error': 'Datos incorrectos'
