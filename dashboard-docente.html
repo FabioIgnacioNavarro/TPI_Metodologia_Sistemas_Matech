@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal del Docente</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
 </head>
 
 <div class="modal-overlay" id="modalCerrarSesion">
@@ -44,16 +45,15 @@
   }
 
   function confirmarCerrarSesion() {
-    window.location.href = "login.html";
+    window.location.href = "{% url 'login' %}";
   }
 
 </script>
-
 <body>
   <div class="page">
     <header>
-      <a href="index.html" class="brand">
-        <img src="IMG/logo.png" alt="Logo">
+      <a href="{% url 'index' %}" class="brand">
+        <img src="{% static 'core/IMG/logo.png' %}" alt="Logo">
         <div>
           <div class="brand-title">Educar para Transformar</div>
           <div class="brand-subtitle">Portal del Docente</div>
@@ -73,22 +73,22 @@
           <span>Matemática · Secundario</span>
         </div>
         <nav class="sidebar-nav">
-          <a href="#" class="active" onclick="showPanel('inicio',this)">
+          <a href="#" class="active" onclick="showPanel('inicio', this); return false;">
             <span class="nav-icon">🏠</span> Inicio
           </a>
-          <a href="#" onclick="showPanel('cursos',this)">
+          <a href="#" onclick="showPanel('cursos', this); return false;">
             <span class="nav-icon">📚</span> Mis cursos
           </a>
-          <a href="#" onclick="showPanel('notas',this)">
+          <a href="#" onclick="showPanel('notas', this); return false;">
             <span class="nav-icon">📝</span> Cargar notas
           </a>
-          <a href="#" onclick="showPanel('tareas',this)">
+          <a href="#" onclick="showPanel('tareas', this); return false;">
             <span class="nav-icon">📋</span> Tareas y evaluaciones
           </a>
-          <a href="#" onclick="showPanel('horario',this)">
+          <a href="#" onclick="showPanel('horario', this); return false;">
             <span class="nav-icon">📅</span> Mi horario
           </a>
-          <a href="#" onclick="showPanel('perfil',this)">
+          <a href="#" onclick="showPanel('perfil', this); return false;">
             <span class="nav-icon">👤</span> Mi perfil
           </a>
         </nav>
@@ -188,7 +188,7 @@
                   <input class="nota-input" value="5">
                 </td>
                 <td>
-                  <button class="btn-small">Guardar</button>
+                  <button class="btn-small" onclick="guardarNota()">Guardar</button>
                 </td>
               </tr>
               <tr>

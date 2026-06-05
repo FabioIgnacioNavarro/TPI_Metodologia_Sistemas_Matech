@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Administrativo</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
 </head>
 
 <div class="modal-overlay" id="modalCerrarSesion">
@@ -44,7 +45,7 @@
   }
 
   function confirmarCerrarSesion() {
-    window.location.href = "login.html";
+   window.location.href = "{% url 'login' %}";
   }
 
 </script>
@@ -54,8 +55,8 @@
   <div class="page">
 
     <header>
-      <a href="index.html" class="brand">
-        <img src="IMG/logo.png" alt="Logo">
+      <a href="{% url 'index' %}" class="brand">
+        <img src="{% static 'core/IMG/logo.png' %}" alt="Logo">
         <div>
           <div class="brand-title">Educar para Transformar</div>
           <div class="brand-subtitle">Portal Administrativo</div>
@@ -79,28 +80,28 @@
         </div>
 
         <nav class="sidebar-nav">
-          <a href="#" class="active" onclick="showPanel('inicio', this)">
+          <a href="#" class="active" onclick="showPanel('inicio', this); return false;">
             <span class="nav-icon">🏠</span> Inicio
           </a>
-          <a href="#" onclick="showPanel('inscripciones', this)">
+          <a href="#" onclick="showPanel('inscripciones', this); return false;">
             <span class="nav-icon">📝</span> Inscripciones
           </a>
-          <a href="#" onclick="showPanel('pagos', this)">
+          <a href="#" onclick="showPanel('pagos', this); return false;">
             <span class="nav-icon">💳</span> Pagos
           </a>
-          <a href="#" onclick="showPanel('documentacion', this)">
+          <a href="#" onclick="showPanel('documentacion', this); return false;">
             <span class="nav-icon">📁</span> Documentación
           </a>
-          <a href="#" onclick="showPanel('reservas', this)">
+          <a href="#" onclick="showPanel('reservas', this); return false;">
             <span class="nav-icon">🏫</span> Reservas
           </a>
-          <a href="#" onclick="showPanel('opiniones', this)">
+          <a href="#" onclick="showPanel('opiniones', this); return false;">
             <span class="nav-icon">💬</span> Opiniones
           </a>
-          <a href="#" onclick="showPanel('usuarios', this)">
+          <a href="#" onclick="showPanel('usuarios', this); return false;">
             <span class="nav-icon">🔐</span> Gestión de usuarios
           </a>
-          <a href="#" onclick="showPanel('perfil', this)">
+          <a href="#" onclick="showPanel('perfil', this); return false;">
             <span class="nav-icon">👤</span> Mi perfil
           </a>
         </nav>

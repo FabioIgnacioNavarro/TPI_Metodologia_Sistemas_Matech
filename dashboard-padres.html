@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal del Tutor</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
 </head>
 
 <div class="modal-overlay" id="modalCerrarSesion">
@@ -44,7 +45,7 @@
   }
 
   function confirmarCerrarSesion() {
-    window.location.href = "login.html";
+    window.location.href = "{% url 'login' %}";
   }
 
 </script>
@@ -54,8 +55,8 @@
   <div class="page">
 
     <header>
-      <a href="index.html" class="brand">
-        <img src="IMG/logo.png" alt="Logo">
+      <a href="{% url 'index' %}" class="brand">
+        <img src="{% static 'core/IMG/logo.png' %}" alt="Logo">
 
         <div>
           <div class="brand-title">Educar para Transformar</div>
@@ -84,27 +85,27 @@
 
         <nav class="sidebar-nav">
 
-          <a href="#" class="active" onclick="showPanel('inicio', this)">
+          <a href="#" class="active" onclick="showPanel('inicio', this); return false;">
             <span class="nav-icon">🏠</span> Inicio
           </a>
 
-          <a href="#" onclick="showPanel('hijos', this)">
+          <a href="#" onclick="showPanel('hijos', this); return false;">
             <span class="nav-icon">👨‍👩‍👧</span> Mi/s hijo/s
           </a>
 
-          <a href="#" onclick="showPanel('calificaciones', this)">
+          <a href="#" onclick="showPanel('calificaciones', this); return false;">
             <span class="nav-icon">📊</span> Calificaciones
           </a>
 
-          <a href="#" onclick="showPanel('asistencias', this)">
+          <a href="#" onclick="showPanel('asistencias', this); return false;">
             <span class="nav-icon">✅</span> Asistencias
           </a>
 
-          <a href="#" onclick="showPanel('mensajes', this)">
+          <a href="#" onclick="showPanel('mensajes', this); return false;">
             <span class="nav-icon">💬</span> Mensajes
           </a>
 
-          <a href="#" onclick="showPanel('perfil', this)">
+          <a href="#" onclick="showPanel('perfil', this); return false;">
             <span class="nav-icon">👤</span> Mi perfil
           </a>
 
