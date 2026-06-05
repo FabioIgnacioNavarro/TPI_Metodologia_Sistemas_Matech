@@ -1,18 +1,19 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bienestar Estudiantil</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
 </head>
 <body>
 
   <div class="page">
 
     <header>
-      <a href="index.html" class="brand">
-        <img src="IMG/logo.png" alt="Logo Educar para Transformar">
+      <a href="{% url 'index' %}" class="brand">
+        <img src="{% static 'core/img/logo.png' %}" alt="Logo Educar para Transformar">
         <div>
           <div class="brand-title">Educar para Transformar</div>
           <div class="brand-subtitle">Centro Educativo</div>
@@ -20,23 +21,22 @@
       </a>
 
       <nav>
-        <a href="niveles.html">Niveles educativos</a>
-        <a href="bienestar.html">Bienestar estudiantil</a>
-        <a href="noticias.html">Noticias</a>
-        <a href="inscripcion.html">Inscripción a cursado</a>
-        <a href="contacto.html">Contacto</a>
+        <a href="{% url 'niveles' %}">Niveles educativos</a>
+        <a href="{% url 'bienestar' %}">Bienestar estudiantil</a>
+        <a href="{% url 'noticias' %}">Noticias</a>
+        <a href="{% url 'inscripcion' %}">Inscripción a cursado</a>
+        <a href="{% url 'contacto' %}">Contacto</a>
       </nav>
 
       <div class="login">
-        <a href="login.html">Iniciar sesión</a>
+        <a href="{% url 'login' %}">Iniciar sesión</a>
       </div>
     </header>
 
     <main>
       <section class="cards">
         <div class="card">
-            <img src="IMG/apoyo.jpg" alt="Apoyo estudiantil" class="card-image">
-
+            <img src="{% static 'core/img/apoyo.jpg' %}" alt="Apoyo estudiantil" class="card-image">
             <div class="card-content">
             <div class="card-title">
                 <div class="icon icon-green">♡</div>
@@ -51,7 +51,7 @@
         </div>
 
         <div class="card">
-            <img src="IMG/idiomas.jpg" alt="Idiomas" class="card-image">
+            <img src="{% static 'core/img/idiomas.jpg' %}" alt="Idiomas" class="card-image">
 
             <div class="card-content">
             <div class="card-title">
@@ -67,7 +67,7 @@
         </div>
 
         <div class="card">
-            <img src="IMG/enfermeria.jpg" alt="Enfermería" class="card-image">
+            <img src="{% static 'core/img/enfermeria.jpg' %}" alt="Enfermería" class="card-image">
 
             <div class="card-content">
             <div class="card-title">
@@ -86,7 +86,7 @@
 
       <section class="cards">
         <div class="card">
-            <img src="IMG/deportes.jpg" alt="Deportes" class="card-image">
+            <img src="{% static 'core/img/deportes.jpg' %}" alt="Deportes" class="card-image">
           <div class="card-content">
             <div class="card-title">
               <div class="icon icon-blue">⚽</div>
@@ -100,7 +100,7 @@
         </div>
 
         <div class="card">
-            <img src="IMG/comedor.jpg" alt="Comedor" class="card-image">
+            <img src="{% static 'core/img/comedor.jpg' %}" alt="Comedor" class="card-image">
           <div class="card-content">
             <div class="card-title">
               <div class="icon icon-green">🍽</div>
@@ -114,7 +114,7 @@
         </div>
 
         <div class="card">
-            <img src="IMG/traslado.jpg" alt="Micros de traslado" class="card-image">
+            <img src="{% static 'core/img/traslado.jpg' %}" alt="Micros de traslado" class="card-image">
           <div class="card-content">
             <div class="card-title">
               <div class="icon icon-pink">🚌</div>

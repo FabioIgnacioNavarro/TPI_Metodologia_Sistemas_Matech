@@ -244,7 +244,7 @@ CREATE TABLE `persona` (
   `dni` varchar(8) NOT NULL,
   `nombre` varchar(50) NOT NULL,
   `apellido` varchar(50) NOT NULL,
-  `fecha_nacimiento` date NOT NULL DEFAULT current_timestamp(),
+  `fecha_nacimiento` date DEFAULT NULL,
   `direccion` varchar(100) DEFAULT NULL,
   `telefono` varchar(20) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL
