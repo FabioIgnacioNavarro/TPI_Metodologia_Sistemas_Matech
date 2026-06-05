@@ -74,22 +74,22 @@
           <span>3° Año B · Secundario</span>
         </div>
         <nav class="sidebar-nav">
-          <a href="{% url 'dashboard-alumno' %}" class="active" onclick="showPanel('inicio', this)">
+          <a href="#" class="active" onclick="showPanel('inicio', this); return false;">
             <span class="nav-icon">🏠</span> Inicio
           </a>
-          <a href="{% url 'dashboard-alumno' %}?panel=notas" onclick="showPanel('notas', this)">
+          <a href="#" onclick="showPanel('notas', this); return false;">
             <span class="nav-icon">📊</span> Mis notas
           </a>
-          <a href="{% url 'dashboard-alumno' %}?panel=horario" onclick="showPanel('horario', this)">
+          <a href="#" onclick="showPanel('horario', this); return false;">
             <span class="nav-icon">📅</span> Horario
           </a>
-          <a href="{% url 'dashboard-alumno' %}?panel=asistencia" onclick="showPanel('asistencia', this)">
+          <a href="#" onclick="showPanel('asistencia', this); return false;">
             <span class="nav-icon">✅</span> Asistencia
           </a>
-          <a href="{% url 'dashboard-alumno' %}?panel=comunicados" onclick="showPanel('comunicados', this)">
+          <a href="#" onclick="showPanel('comunicados', this); return false;">
             <span class="nav-icon">📢</span> Comunicados
           </a>
-          <a href="{% url 'dashboard-alumno' %}?panel=perfil " onclick="showPanel('perfil', this)">
+          <a href="#" onclick="showPanel('perfil', this); return false;">
             <span class="nav-icon">👤</span> Mi perfil
           </a>
         </nav>

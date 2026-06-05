@@ -73,22 +73,22 @@
           <span>Matemática · Secundario</span>
         </div>
         <nav class="sidebar-nav">
-          <a href="{% url 'dashboard-docente' %}" class="active" onclick="showPanel('inicio',this)">
+          <a href="#" class="active" onclick="showPanel('inicio', this); return false;">
             <span class="nav-icon">🏠</span> Inicio
           </a>
-          <a href="{% url 'dashboard-docente' %}?panel=cursos" onclick="showPanel('cursos',this)">
+          <a href="#" onclick="showPanel('cursos', this); return false;">
             <span class="nav-icon">📚</span> Mis cursos
           </a>
-          <a href="{% url 'dashboard-docente' %}?panel=notas" onclick="showPanel('notas',this)">
+          <a href="#" onclick="showPanel('notas', this); return false;">
             <span class="nav-icon">📝</span> Cargar notas
           </a>
-          <a href="{% url 'dashboard-docente' %}?panel=tareas" onclick="showPanel('tareas',this)">
+          <a href="#" onclick="showPanel('tareas', this); return false;">
             <span class="nav-icon">📋</span> Tareas y evaluaciones
           </a>
-          <a href="{% url 'dashboard-docente' %}?panel=horario" onclick="showPanel('horario',this)">
+          <a href="#" onclick="showPanel('horario', this); return false;">
             <span class="nav-icon">📅</span> Mi horario
           </a>
-          <a href="{% url 'dashboard-docente' %}?panel=perfil" onclick="showPanel('perfil',this)">
+          <a href="#" onclick="showPanel('perfil', this); return false;">
             <span class="nav-icon">👤</span> Mi perfil
           </a>
         </nav>
@@ -188,7 +188,7 @@
                   <input class="nota-input" value="5">
                 </td>
                 <td>
-                  <button class="btn-small">Guardar</button>
+                  <button class="btn-small" onclick="guardarNota()">Guardar</button>
                 </td>
               </tr>
               <tr>
