@@ -19,6 +19,8 @@ class Alumno(models.Model):
         managed = False
         db_table = 'alumno'
 
+    def __str__(self):
+        return f"{self.legajo} - {self.id_persona}"
 
 class Asistencia(models.Model):
     id_asistencia = models.AutoField(primary_key=True)
@@ -110,6 +112,7 @@ class CursoParticipaViaje(models.Model):
 
 
 class Directivo(models.Model):
+    id = models.AutoField(primary_key=True)
     id_persona = models.ForeignKey('Persona', models.DO_NOTHING, db_column='id_persona')
 
     class Meta:
@@ -185,7 +188,13 @@ class Noticia(models.Model):
 
 
 class Persona(models.Model):
-    id_usuario = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='id_usuario', blank=True, null=True)
+    id = models.AutoField(primary_key=True)
+    id_usuario = models.ForeignKey(
+        'Usuario', 
+        models.DO_NOTHING, 
+        db_column='id_usuario', 
+        blank=True, 
+        null=True)
     dni = models.CharField(unique=True, max_length=8)
     nombre = models.CharField(max_length=50)
     apellido = models.CharField(max_length=50)
@@ -198,6 +207,8 @@ class Persona(models.Model):
         managed = False
         db_table = 'persona'
 
+    def __str__(self):
+        return f"{self.nombre} {self.apellido}"
 
 class PersonalAdministrativo(models.Model):
     legajo = models.AutoField(primary_key=True)
@@ -248,6 +259,7 @@ class SolicitudViaje(models.Model):
 
 
 class Tutor(models.Model):
+    id = models.AutoField(primary_key=True)
     id_persona = models.ForeignKey(Persona, models.DO_NOTHING, db_column='id_persona')
     telefono_contacto = models.CharField(max_length=20, blank=True, null=True)
     email_contacto = models.CharField(max_length=100, blank=True, null=True)
@@ -268,6 +280,7 @@ class TutorTutoraAlumno(models.Model):
 
 
 class Usuario(models.Model):
+    id = models.AutoField(primary_key=True)
     nombre_usuario = models.CharField(unique=True, max_length=60)
     contrasenia = models.CharField(max_length=20)
     correo = models.CharField(unique=True, max_length=100, blank=True, null=True)
