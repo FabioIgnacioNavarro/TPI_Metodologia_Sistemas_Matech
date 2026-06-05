@@ -56,17 +56,22 @@
             </select>
           </div>
 
-          <div class="form-group full">
-            <label for="usuario">Usuario o correo electrónico</label>
-            <input type="text" id="usuario" name="usuario" placeholder="Ingrese su usuario">
-          </div>
+          <form method="POST">
+            {% csrf_token %}
 
-          <div class="form-group full">
-            <label for="password">Contraseña</label>
-            <input type="password" id="password" name="password" placeholder="Ingrese su contraseña">
-          </div>
+            <div class="form-group full">
+              <label for="usuario">Usuario o correo electrónico</label>
+              <input type="text" name="usuario" placeholder="Ingrese su usuario">
+            </div>
 
-          <button type="button" class="btn-form" onclick="iniciarSesion()">Ingresar</button>
+            <div class="form-group full">
+              <label for="password">Contraseña</label>
+              <input type="password" name="password" placeholder="Ingrese su contraseña">
+            </div>
+
+            <button type="submit" class="btn-form">Ingresar</button>
+
+          </form>
         </div>
       </section>
 
@@ -102,36 +107,6 @@
     </main>
   </div>
 
-  <script>
-    function iniciarSesion() {
-      const rol = document.getElementById('rol').value;
-      const usuario = document.getElementById('usuario').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const err = document.getElementById('error-msg');
 
-      if (!rol || !usuario || !password) {
-        err.textContent = 'Por favor completá todos los campos.';
-        err.style.display = 'block';
-        return;
-      }
-
-      err.style.display = 'none';
-
-      const rutas = {
-        alumno: '{% url "dashboard-alumno" %}',
-        padre: '{% url "dashboard-padres" %}',
-        docente: '{% url "dashboard-docente" %}',
-        preceptor: '{% url "dashboard-preceptor" %}',
-        directivo: '{% url "dashboard-directivo" %}',
-        administrativo: '{% url "dashboard-administrativo" %}'
-      };
-
-      window.location.href = rutas[rol] || '{% url "index" %}';
-    }
-
-    document.getElementById('password').addEventListener('keydown', e => {
-      if (e.key === 'Enter') iniciarSesion();
-    });
-  </script>
 </body>
 </html>

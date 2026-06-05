@@ -73,8 +73,8 @@
       <aside class="sidebar">
         <div class="sidebar-user">
           <div class="avatar">AP</div>
-          <strong>Ana Pereira</strong>
-          <span>Preceptora · 3° Año B</span>
+          <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
+          <span>Preceptor · 3° Año B</span>
         </div>
 
         <nav class="sidebar-nav">
@@ -102,7 +102,7 @@
       <main class="dashboard-main">
 
         <div id="panel-inicio" class="panel active">
-          <p class="section-title">Bienvenida, Ana 👋</p>
+          <p class="section-title">Hola de nuevo, {{ persona.nombre }}</p>
 
           <div class="stat-grid">
             <div class="stat-card">
@@ -333,7 +333,7 @@
               <tr><td style="font-weight:600;color:#64748b">DNI</td><td>29.123.456</td></tr>
               <tr><td style="font-weight:600;color:#64748b">Cargo</td><td>Preceptora</td></tr>
               <tr><td style="font-weight:600;color:#64748b">Cursos asignados</td><td>1° A, 2° A, 3° B y 4° A</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>a.pereira@educarparatransformar.com</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>{{ persona.email }}</td></tr>
               <tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>(362) 4556677</td></tr>
             </tbody>
           </table>

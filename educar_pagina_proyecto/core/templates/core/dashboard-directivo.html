@@ -78,7 +78,7 @@
         <div class="sidebar-user">
           <div class="avatar">DG</div>
 
-          <strong>Daniela Gómez</strong>
+          <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
 
           <span>Equipo Directivo</span>
         </div>
@@ -119,7 +119,7 @@
         <div id="panel-inicio" class="panel active">
 
           <p class="section-title">
-            Bienvenida, Daniela 👋
+            Hola de nuevo, {{ persona.nombre }}
           </p>
 
           <div class="stat-grid">
@@ -330,11 +330,11 @@
 
             <tbody>
 
-              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>Daniela Gómez</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>{{ persona.nombre }} {{ persona.apellido }}</td></tr>
 
               <tr><td style="font-weight:600;color:#64748b">Cargo</td><td>Equipo Directivo</td></tr>
 
-              <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>d.gomez@educarparatransformar.com</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>{{ persona.email }}</td></tr>
 
               <tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>(362) 4558899</td></tr>
 

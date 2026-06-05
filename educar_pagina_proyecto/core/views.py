@@ -4,16 +4,32 @@ import requests
 from django.conf import settings
 from datetime import date
 import re
+from django.shortcuts import render, redirect
+from .models import (
+    Usuario,
+    Persona,
+    Directivo,
+    Docente,
+    Alumno,
+    Preceptor,
+    Tutor,
+    PersonalAdministrativo
+)
 
+def obtener_persona(request):
+    usuario_id = request.session.get('usuario_id')
+
+    if not usuario_id:
+        return None
+
+    usuario = Usuario.objects.get(id=usuario_id)
+    return Persona.objects.filter(id_usuario=usuario).first()
 
 def index(request):
     usuario_datos = Usuario.objects.all()
     return render(request, 'core/index.html', {
         'usuarios': usuario_datos
     })
-    
-def index(request):
-    return render(request, 'core/index.html')
 
 def bienestar(request):
     return render(request, 'core/bienestar.html')
@@ -52,11 +68,14 @@ def inscripcion(request):
             )
             
         telefono = request.POST.get('telefono')
-        if not telefono.isdigit():
+
+        if not telefono or not telefono.isdigit():
             return render(
                 request,
                 'core/inscripcion.html',
-                {'error': 'El teléfono debe contener únicamente números.'}
+                {
+                    'error': 'El teléfono debe contener únicamente números.'
+                }
             )
             
         patron_email = r'^[\w\.-]+@[\w\.-]+\.\w+$'
@@ -145,6 +164,45 @@ def inscripcion(request):
     )
 
 def login(request):
+    if request.method == 'POST':
+        usuario_input = request.POST.get('usuario')
+        password = request.POST.get('password')
+
+        try:
+            usuario = Usuario.objects.get(
+                nombre_usuario=usuario_input,
+                contrasenia=password
+            )
+
+            request.session['usuario_id'] = usuario.id
+
+            # 🔥 DETECTAR ROL POR TABLAS
+            if PersonalAdministrativo.objects.filter(id_persona__id_usuario=usuario).exists():
+                return redirect('dashboard-administrativo')
+
+            elif Docente.objects.filter(id_persona__id_usuario=usuario).exists():
+                return redirect('dashboard-docente')
+
+            elif Tutor.objects.filter(id_persona__id_usuario=usuario).exists():
+                return redirect('dashboard-padres')
+
+            elif Preceptor.objects.filter(id_persona__id_usuario=usuario).exists():
+                return redirect('dashboard-preceptor')
+
+            elif Directivo.objects.filter(id_persona__id_usuario=usuario).exists():
+                return redirect('dashboard-directivo')
+
+            elif Alumno.objects.filter(id_persona__id_usuario=usuario).exists():
+                return redirect('dashboard-alumno')
+
+            else:
+                return redirect('login')
+
+        except Usuario.DoesNotExist:
+            return render(request, 'core/login.html', {
+                'error': 'Datos incorrectos'
+            })
+
     return render(request, 'core/login.html')
 
 def niveles(request):
@@ -154,19 +212,61 @@ def noticias(request):
     return render(request, 'core/noticias.html')
 
 def dashboard_alumno(request):
-    return render(request, 'core/dashboard-alumno.html')
+    persona = obtener_persona(request)
+
+    if not persona:
+        return redirect('login')
+
+    return render(request, 'core/dashboard-alumno.html', {
+        'persona': persona
+    })
 
 def dashboard_docente(request):
-    return render(request, 'core/dashboard-docente.html')
+    persona = obtener_persona(request)
+
+    if not persona:
+        return redirect('login')
+
+    return render(request, 'core/dashboard-docente.html', {
+        'persona': persona
+    })
 
 def dashboard_directivo(request):
-    return render(request, 'core/dashboard-directivo.html')
+    persona = obtener_persona(request)
+
+    if not persona:
+        return redirect('login')
+
+    return render(request, 'core/dashboard-directivo.html', {
+        'persona': persona
+    })
 
 def dashboard_administrativo(request):
-    return render(request, 'core/dashboard-administrativo.html')
+    persona = obtener_persona(request)
+
+    if not persona:
+        return redirect('login')
+
+    return render(request, 'core/dashboard-administrativo.html', {
+        'persona': persona
+    })
 
 def dashboard_padres(request):
-    return render(request, 'core/dashboard-padres.html')
+    persona = obtener_persona(request)
+
+    if not persona:
+        return redirect('login')
+
+    return render(request, 'core/dashboard-padres.html', {
+        'persona': persona
+    })
 
 def dashboard_preceptor(request):
-    return render(request, 'core/dashboard-preceptor.html')
+    persona = obtener_persona(request)
+
+    if not persona:
+        return redirect('login')
+
+    return render(request, 'core/dashboard-preceptor.html', {
+        'persona': persona
+    })
