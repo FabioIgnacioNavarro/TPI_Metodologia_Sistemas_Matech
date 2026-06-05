@@ -70,7 +70,7 @@
       <aside class="sidebar">
         <div class="sidebar-user">
           <div class="avatar">LR</div>
-          <strong>Lucía Ramírez</strong>
+          <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
           <span>3° Año B · Secundario</span>
         </div>
         <nav class="sidebar-nav">
@@ -99,7 +99,7 @@
 
         <!-- INICIO -->
         <div id="panel-inicio" class="panel active">
-          <p class="section-title">Bienvenida, Lucía 👋</p>
+          <p class="section-title">Hola de nuevo, {{ persona.nombre }}</p>
           <div class="stat-grid">
             <div class="stat-card">
               <div class="stat-label">Promedio general</div>
@@ -292,14 +292,14 @@
           <p class="section-title">Mi perfil</p>
           <table class="tabla">
             <tbody>
-              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>Lucía Ramírez</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>{{ persona.nombre }} {{ persona.apellido }}</td></tr>
               <tr><td style="font-weight:600;color:#64748b">DNI</td><td>44.321.100</td></tr>
               <tr><td style="font-weight:600;color:#64748b">Fecha de nacimiento</td><td>12 de marzo de 2010</td></tr>
               <tr><td style="font-weight:600;color:#64748b">Curso</td><td>3° Año B – Nivel Secundario</td></tr>
               <tr><td style="font-weight:600;color:#64748b">Turno</td><td>Mañana</td></tr>
               <tr><td style="font-weight:600;color:#64748b">Tutor responsable</td><td>María Ramírez (madre)</td></tr>
               <tr><td style="font-weight:600;color:#64748b">Teléfono de contacto</td><td>(362) 4112233</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Correo electrónico</td><td>lucia.ramirez@educarparatransformar.com</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Correo electrónico</td><td>{{ persona.email }}</td></tr>
             </tbody>
           </table>
         </div>

@@ -76,11 +76,13 @@
       <aside class="sidebar">
 
         <div class="sidebar-user">
-          <div class="avatar">MR</div>
+          <div class="avatar">
+            {{ persona.nombre|first }}{{ persona.apellido|first }}
+          </div>
 
-          <strong>María Ramírez</strong>
+          <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
 
-          <span>Tutora de Lucía Ramírez</span>
+          <span>Tutor de Lucía Ramírez</span>
         </div>
 
         <nav class="sidebar-nav">
@@ -119,7 +121,7 @@
         <div id="panel-inicio" class="panel active">
 
           <p class="section-title">
-            Bienvenida, María 👋
+            Hola de nuevo, {{ persona.nombre }}
           </p>
 
           <div class="stat-grid">
@@ -127,7 +129,7 @@
             <div class="stat-card">
               <div class="stat-label">Promedio general</div>
               <div class="stat-value" style="color:#16a34a">8.4</div>
-              <div class="stat-sub">Lucía Ramírez</div>
+              <div class="stat-sub">{{ persona.nombre }} {{ persona.apellido }}</div>
             </div>
 
             <div class="stat-card">
@@ -334,7 +336,7 @@
 
               <tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>(362) 4112233</td></tr>
 
-              <tr><td style="font-weight:600;color:#64748b">Correo electrónico</td><td>maria.ramirez@gmail.com</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Correo electrónico</td><td>{{ persona.correo }}</td></tr>
 
             </tbody>
 

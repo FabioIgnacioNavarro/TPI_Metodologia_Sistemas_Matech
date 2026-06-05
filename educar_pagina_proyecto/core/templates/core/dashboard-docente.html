@@ -69,7 +69,7 @@
       <aside class="sidebar">
         <div class="sidebar-user">
           <div class="avatar">MV</div>
-          <strong>Prof. Mario Villalba</strong>
+          <strong>Prof. {{ persona.nombre }} {{ persona.apellido }}</strong>
           <span>Matemática · Secundario</span>
         </div>
         <nav class="sidebar-nav">
@@ -98,7 +98,7 @@
 
         <!-- INICIO -->
         <div id="panel-inicio" class="panel active">
-          <p class="section-title">Bienvenido, Prof. Villalba 👋</p>
+          <p class="section-title">Hola de nuevo, {{ persona.nombre }} {{ persona.apellido }}</p>
           <div class="stat-grid">
             <div class="stat-card">
               <div class="stat-label">Cursos a cargo</div>
@@ -301,12 +301,12 @@
           <p class="section-title">Mi perfil docente</p>
           <table class="tabla">
             <tbody>
-              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>Mario Villalba</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>{{ persona.nombre }} {{ persona.apellido }}</td></tr>
               <tr><td style="font-weight:600;color:#64748b">DNI</td><td>27.450.890</td></tr>
               <tr><td style="font-weight:600;color:#64748b">Materia</td><td>Matemática</td></tr>
               <tr><td style="font-weight:600;color:#64748b">Nivel</td><td>Secundario</td></tr>
               <tr><td style="font-weight:600;color:#64748b">Antigüedad</td><td>8 años en el centro</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>m.villalba@educarparatransformar.com</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>{{ persona.email }}</td></tr>
               <tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>(362) 4445566</td></tr>
             </tbody>
           </table>

@@ -12,7 +12,7 @@
 
   <div class="modal-box">
 
-    <h2>¿Cerrar sesión?</h2>
+    <h2>驴Cerrar sesi贸n?</h2>
 
     <p>
       Vas a salir del portal administrativo.
@@ -25,7 +25,7 @@
       </button>
 
       <button class="btn-cerrar" onclick="confirmarCerrarSesion()">
-        Cerrar sesión
+        Cerrar sesi贸n
       </button>
 
     </div>
@@ -66,7 +66,7 @@
       <nav></nav>
 
       <div class="login">
-        <a href="#" onclick="abrirModalCerrarSesion()">Cerrar sesión</a>
+        <a href="#" onclick="abrirModalCerrarSesion()">Cerrar sesi贸n</a>
       </div>
     </header>
 
@@ -75,34 +75,34 @@
       <aside class="sidebar">
         <div class="sidebar-user">
           <div class="avatar">SL</div>
-          <strong>Sofía López</strong>
-          <span>Área administrativa</span>
+          <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
+          <span>脕rea administrativa</span>
         </div>
 
         <nav class="sidebar-nav">
           <a href="#" class="active" onclick="showPanel('inicio', this); return false;">
-            <span class="nav-icon">🏠</span> Inicio
+            <span class="nav-icon">馃彔</span> Inicio
           </a>
           <a href="#" onclick="showPanel('inscripciones', this); return false;">
-            <span class="nav-icon">📝</span> Inscripciones
+            <span class="nav-icon">馃摑</span> Inscripciones
           </a>
           <a href="#" onclick="showPanel('pagos', this); return false;">
-            <span class="nav-icon">💳</span> Pagos
+            <span class="nav-icon">馃挸</span> Pagos
           </a>
           <a href="#" onclick="showPanel('documentacion', this); return false;">
-            <span class="nav-icon">📁</span> Documentación
+            <span class="nav-icon">馃搧</span> Documentaci贸n
           </a>
           <a href="#" onclick="showPanel('reservas', this); return false;">
-            <span class="nav-icon">🏫</span> Reservas
+            <span class="nav-icon">馃彨</span> Reservas
           </a>
           <a href="#" onclick="showPanel('opiniones', this); return false;">
-            <span class="nav-icon">💬</span> Opiniones
+            <span class="nav-icon">馃挰</span> Opiniones
           </a>
           <a href="#" onclick="showPanel('usuarios', this); return false;">
-            <span class="nav-icon">🔐</span> Gestión de usuarios
+            <span class="nav-icon">馃攼</span> Gesti贸n de usuarios
           </a>
           <a href="#" onclick="showPanel('perfil', this); return false;">
-            <span class="nav-icon">👤</span> Mi perfil
+            <span class="nav-icon">馃懁</span> Mi perfil
           </a>
         </nav>
       </aside>
@@ -110,13 +110,13 @@
       <main class="dashboard-main">
 
         <div id="panel-inicio" class="panel active">
-          <p class="section-title">Bienvenida, Sofía 👋</p>
+          <p class="section-title">Hola de nuevo, {{ persona.nombre }}</p>
 
           <div class="stat-grid">
             <div class="stat-card">
               <div class="stat-label">Inscripciones nuevas</div>
               <div class="stat-value" style="color:#1d66c2">24</div>
-              <div class="stat-sub">Pendientes de revisión</div>
+              <div class="stat-sub">Pendientes de revisi贸n</div>
             </div>
 
             <div class="stat-card">
@@ -135,23 +135,23 @@
           <p class="section-title" style="font-size:18px">Tareas recientes</p>
 
           <div class="notif-item">
-            <div class="notif-icon" style="background:#dbeafe">📝</div>
+            <div class="notif-icon" style="background:#dbeafe">馃摑</div>
             <div class="notif-text">
-              <strong>Nueva solicitud de inscripción</strong>
-              <span>Ingresó una solicitud para Nivel Secundario · 3° Año.</span>
+              <strong>Nueva solicitud de inscripci贸n</strong>
+              <span>Ingres贸 una solicitud para Nivel Secundario 路 3掳 A帽o.</span>
             </div>
           </div>
 
           <div class="notif-item">
-            <div class="notif-icon" style="background:#fef9c3">📁</div>
+            <div class="notif-icon" style="background:#fef9c3">馃搧</div>
             <div class="notif-text">
-              <strong>Documentación incompleta</strong>
+              <strong>Documentaci贸n incompleta</strong>
               <span>Falta DNI del tutor en una solicitud de Nivel Inicial.</span>
             </div>
           </div>
 
           <div class="notif-item">
-            <div class="notif-icon" style="background:#dcfce7">🏫</div>
+            <div class="notif-icon" style="background:#dcfce7">馃彨</div>
             <div class="notif-text">
               <strong>Reserva registrada</strong>
               <span>El gimnasio cubierto fue reservado para una actividad deportiva.</span>
@@ -160,7 +160,7 @@
         </div>
 
         <div id="panel-inscripciones" class="panel">
-          <p class="section-title">Gestión de inscripciones</p>
+          <p class="section-title">Gesti贸n de inscripciones</p>
 
           <table class="tabla">
             <thead>
@@ -175,8 +175,8 @@
 
             <tbody>
               <tr><td>Camila Torres</td><td>Inicial</td><td>Mariana Torres</td><td>08/05/2026</td><td><span class="badge badge-yellow">Pendiente</span></td></tr>
-              <tr><td>Joaquín Núñez</td><td>Primario</td><td>Pedro Núñez</td><td>07/05/2026</td><td><span class="badge badge-green">Aprobada</span></td></tr>
-              <tr><td>Martina Gómez</td><td>Secundario</td><td>Luciana Gómez</td><td>06/05/2026</td><td><span class="badge badge-blue">En revisión</span></td></tr>
+              <tr><td>Joaqu铆n N煤帽ez</td><td>Primario</td><td>Pedro N煤帽ez</td><td>07/05/2026</td><td><span class="badge badge-green">Aprobada</span></td></tr>
+              <tr><td>Martina G贸mez</td><td>Secundario</td><td>Luciana G贸mez</td><td>06/05/2026</td><td><span class="badge badge-blue">En revisi贸n</span></td></tr>
               <tr><td>Thiago Acosta</td><td>Primario</td><td>Andrea Acosta</td><td>05/05/2026</td><td><span class="badge badge-red">Incompleta</span></td></tr>
             </tbody>
           </table>
@@ -197,20 +197,20 @@
             </thead>
 
             <tbody>
-              <tr><td>Ramírez</td><td>Lucía Ramírez</td><td>Cuota mayo</td><td>$85.000</td><td><span class="badge badge-green">Pagado</span></td></tr>
-              <tr><td>González</td><td>Tomás González</td><td>Cuota mayo</td><td>$85.000</td><td><span class="badge badge-red">Pendiente</span></td></tr>
-              <tr><td>López</td><td>Valentina López</td><td>Comedor</td><td>$35.000</td><td><span class="badge badge-yellow">Por vencer</span></td></tr>
-              <tr><td>Herrera</td><td>Mateo Herrera</td><td>Transporte escolar</td><td>$42.000</td><td><span class="badge badge-blue">En revisión</span></td></tr>
+              <tr><td>Ram铆rez</td><td>Luc铆a Ram铆rez</td><td>Cuota mayo</td><td>$85.000</td><td><span class="badge badge-green">Pagado</span></td></tr>
+              <tr><td>Gonz谩lez</td><td>Tom谩s Gonz谩lez</td><td>Cuota mayo</td><td>$85.000</td><td><span class="badge badge-red">Pendiente</span></td></tr>
+              <tr><td>L贸pez</td><td>Valentina L贸pez</td><td>Comedor</td><td>$35.000</td><td><span class="badge badge-yellow">Por vencer</span></td></tr>
+              <tr><td>Herrera</td><td>Mateo Herrera</td><td>Transporte escolar</td><td>$42.000</td><td><span class="badge badge-blue">En revisi贸n</span></td></tr>
             </tbody>
           </table>
         </div>
 
         <div id="panel-documentacion" class="panel">
-          <p class="section-title">Documentación pendiente</p>
+          <p class="section-title">Documentaci贸n pendiente</p>
 
           <div class="tarea-card">
             <div class="tarea-info">
-              <strong>Camila Torres · Nivel Inicial</strong>
+              <strong>Camila Torres 路 Nivel Inicial</strong>
               <span>Falta partida de nacimiento y certificado de vacunas.</span>
             </div>
             <span class="badge badge-red">Incompleta</span>
@@ -218,15 +218,15 @@
 
           <div class="tarea-card">
             <div class="tarea-info">
-              <strong>Martina Gómez · Nivel Secundario</strong>
-              <span>Documentación enviada. Pendiente de validación administrativa.</span>
+              <strong>Martina G贸mez 路 Nivel Secundario</strong>
+              <span>Documentaci贸n enviada. Pendiente de validaci贸n administrativa.</span>
             </div>
             <span class="badge badge-yellow">Pendiente</span>
           </div>
 
           <div class="tarea-card">
             <div class="tarea-info">
-              <strong>Joaquín Núñez · Nivel Primario</strong>
+              <strong>Joaqu铆n N煤帽ez 路 Nivel Primario</strong>
               <span>Legajo completo y aprobado.</span>
             </div>
             <span class="badge badge-green">Aprobado</span>
@@ -249,8 +249,8 @@
 
             <tbody>
               <tr><td>Gimnasio cubierto</td><td>Prof. Mario Villalba</td><td>12/05/2026</td><td>10:00 - 12:00</td><td><span class="badge badge-green">Aprobada</span></td></tr>
-              <tr><td>Laboratorio de computación</td><td>Prof. Laura Benítez</td><td>13/05/2026</td><td>08:00 - 10:00</td><td><span class="badge badge-yellow">Pendiente</span></td></tr>
-              <tr><td>Cancha de fútbol</td><td>Preceptoría</td><td>15/05/2026</td><td>09:00 - 11:00</td><td><span class="badge badge-blue">En revisión</span></td></tr>
+              <tr><td>Laboratorio de computaci贸n</td><td>Prof. Laura Ben铆tez</td><td>13/05/2026</td><td>08:00 - 10:00</td><td><span class="badge badge-yellow">Pendiente</span></td></tr>
+              <tr><td>Cancha de f煤tbol</td><td>Preceptor铆a</td><td>15/05/2026</td><td>09:00 - 11:00</td><td><span class="badge badge-blue">En revisi贸n</span></td></tr>
             </tbody>
           </table>
 
@@ -263,11 +263,11 @@
                   <label for="espacio">Espacio</label>
                   <select id="espacio">
                     <option>Gimnasio cubierto</option>
-                    <option>Laboratorio de computación</option>
-                    <option>Laboratorio de física</option>
-                    <option>Laboratorio de química</option>
-                    <option>Cancha de fútbol</option>
-                    <option>Pileta de natación</option>
+                    <option>Laboratorio de computaci贸n</option>
+                    <option>Laboratorio de f铆sica</option>
+                    <option>Laboratorio de qu铆mica</option>
+                    <option>Cancha de f煤tbol</option>
+                    <option>Pileta de nataci贸n</option>
                   </select>
                 </div>
 
@@ -295,7 +295,7 @@
         <div id="panel-opiniones" class="panel">
 
           <p class="section-title">
-            Opiniones anónimas
+            Opiniones an贸nimas
           </p>
 
           <div id="adminOpiniones"></div>
@@ -305,7 +305,7 @@
         <div id="panel-usuarios" class="panel">
 
           <p class="section-title">
-            Gestión de usuarios del sistema
+            Gesti贸n de usuarios del sistema
           </p>
 
           <div class="form-section">
@@ -341,7 +341,7 @@
                 </div>
 
                 <div class="form-group">
-                  <label>Contraseña provisoria</label>
+                  <label>Contrase帽a provisoria</label>
                   <input type="password">
                 </div>
 
@@ -377,11 +377,11 @@
 
           <table class="tabla">
             <tbody>
-              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>Sofía López</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>{{ persona.nombre }} {{ persona.apellido }}</td></tr>
               <tr><td style="font-weight:600;color:#64748b">Cargo</td><td>Personal administrativo</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Área</td><td>Inscripciones, pagos y documentación</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>s.lopez@educarparatransformar.com</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Teléfono interno</td><td>Interno 204</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">脕rea</td><td>Inscripciones, pagos y documentaci贸n</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>{{ persona.correo }}</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Tel茅fono interno</td><td>Interno 204</td></tr>
             </tbody>
           </table>
         </div>
