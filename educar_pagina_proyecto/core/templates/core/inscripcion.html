@@ -44,13 +44,22 @@
       </section>
 
       <section class="form-section">
-
-        <form 
+        {% if exito %}
+        <div style="background:#d4edda;padding:15px;margin-bottom:20px;border-radius:8px;">
+            Solicitud enviada correctamente.
+        </div>
+        {% endif %}
+        {% if error %}
+        <div style="background:#f8d7da;padding:15px;margin-bottom:20px;border-radius:8px;">
+            <strong>Error:</strong><br>
+            {{ error }}
+        </div>
+        {% endif %}
+        <form
             class="form-card"
-            action="https://formsubmit.co/maquinavirtual328@gmail.com"
             method="POST">
             <input type="hidden" name="_captcha" value="false">
-
+            {% csrf_token %}
           <h2>Datos del estudiante</h2>
 
           <div class="form-grid">

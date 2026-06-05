@@ -130,3 +130,8 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'core' / 'static',
 ]
+
+#Conectar con Airtable
+AIRTABLE_TOKEN = ""
+AIRTABLE_BASE_ID = "appZFfSOhXkYJDNKA"
+AIRTABLE_TABLE_NAME = "Solicitudes" 
