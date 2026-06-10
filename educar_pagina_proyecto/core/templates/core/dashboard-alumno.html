@@ -69,7 +69,9 @@
     <div class="dashboard-layout">
       <aside class="sidebar">
         <div class="sidebar-user">
-          <div class="avatar">LR</div>
+          <div class="avatar">
+            {{ persona.nombre|slice:":1"|upper }}{{ persona.apellido|slice:":1"|upper }}
+          </div>
           <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
           <span>3° Año B · Secundario</span>
         </div>

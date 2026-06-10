@@ -77,12 +77,17 @@
 
         <div class="sidebar-user">
           <div class="avatar">
-            {{ persona.nombre|first }}{{ persona.apellido|first }}
+            {{ persona.nombre|slice:":1"|upper }}{{ persona.apellido|slice:":1"|upper }}
           </div>
 
           <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
 
-          <span>Tutor de Lucía Ramírez</span>
+          <span>
+            Tutor de 
+            {% for hijo in hijos %}
+              {{ hijo.nombre }} {{ hijo.apellido }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </span>
         </div>
 
         <nav class="sidebar-nav">

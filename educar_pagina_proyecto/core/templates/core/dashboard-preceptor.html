@@ -72,7 +72,9 @@
 
       <aside class="sidebar">
         <div class="sidebar-user">
-          <div class="avatar">AP</div>
+          <div class="avatar">
+            {{ persona.nombre|slice:":1"|upper }}{{ persona.apellido|slice:":1"|upper }}
+          </div>
           <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
           <span>Preceptor · 3° Año B</span>
         </div>

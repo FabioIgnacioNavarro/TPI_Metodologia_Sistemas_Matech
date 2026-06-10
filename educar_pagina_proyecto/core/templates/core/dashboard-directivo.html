@@ -76,7 +76,9 @@
       <aside class="sidebar">
 
         <div class="sidebar-user">
-          <div class="avatar">DG</div>
+          <div class="avatar">
+            {{ persona.nombre|slice:":1"|upper }}{{ persona.apellido|slice:":1"|upper }}
+          </div>
 
           <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
 

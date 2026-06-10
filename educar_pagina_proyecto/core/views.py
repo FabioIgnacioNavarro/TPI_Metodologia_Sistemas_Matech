@@ -13,6 +13,7 @@ from .models import (
     Alumno,
     Preceptor,
     Tutor,
+    TutorTutoraAlumno,
     PersonalAdministrativo
 )
 
@@ -279,8 +280,16 @@ def dashboard_padres(request):
     if not persona:
         return redirect('login')
 
+    tutor = Tutor.objects.filter(id_persona=persona).first()
+
+    hijos = []
+    if tutor:
+        relaciones = TutorTutoraAlumno.objects.filter(id_tutor=tutor)
+        hijos = [rel.id_alumno.id_persona for rel in relaciones]
+
     return render(request, 'core/dashboard-padres.html', {
-        'persona': persona
+        'persona': persona,
+        'hijos': hijos
     })
 
 def dashboard_preceptor(request):
