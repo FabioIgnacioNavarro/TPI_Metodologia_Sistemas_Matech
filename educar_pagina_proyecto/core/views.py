@@ -1,4 +1,3 @@
-from .models import Usuario
 import requests
 from django.conf import settings
 from datetime import date
@@ -6,6 +5,7 @@ import re
 from django.core.files.storage import FileSystemStorage
 import os
 from django.shortcuts import render, redirect
+
 from .models import (
     Usuario,
     Persona,
@@ -16,7 +16,9 @@ from .models import (
     Tutor,
     TutorTutoraAlumno,
     PersonalAdministrativo,
-    Noticia
+    Noticia,
+    Calificacion,
+    Asistencia
 )
 
 def obtener_persona(request):
@@ -251,8 +253,43 @@ def dashboard_alumno(request):
     if not persona:
         return redirect('login')
 
+    alumno = Alumno.objects.filter(
+        id_persona=persona
+    ).select_related('id_curso').first()
+
+    noticias = Noticia.objects.all().order_by('-fecha_publicacion')
+    ultimas_noticias = noticias[:3]
+
+    calificaciones = Calificacion.objects.filter(
+        legajo_alumno=alumno
+    ).select_related('id_materia')
+
+    asistencias = Asistencia.objects.filter(
+        legajo_alumno=alumno
+    ).order_by('-fecha')
+
+    presentes = asistencias.filter(
+        observacion__icontains='Presente'
+    ).count()
+
+    ausencias = asistencias.filter(
+        observacion__icontains='Ausente'
+    ).count()
+
+    tardanzas = asistencias.filter(
+        observacion__icontains='Tardanza'
+    ).count()
+
     return render(request, 'core/dashboard-alumno.html', {
-        'persona': persona
+        'persona': persona,
+        'alumno': alumno,
+        'noticias': noticias,
+        'ultimas_noticias': ultimas_noticias,
+        'calificaciones': calificaciones,
+        'asistencias': asistencias,
+        'presentes': presentes,
+        'ausencias': ausencias,
+        'tardanzas': tardanzas
     })
 
 def dashboard_docente(request):

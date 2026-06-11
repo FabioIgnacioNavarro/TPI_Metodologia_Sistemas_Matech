@@ -119,28 +119,18 @@
               <div class="stat-sub">2 en curso</div>
             </div>
           </div>
-          <p class="section-title" style="font-size:18px">Notificaciones recientes</p>
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#dbeafe">📝</div>
-            <div class="notif-text">
-              <strong>Examen de Matemática el viernes 16/5</strong>
-              <span>Temas: álgebra y funciones cuadráticas. Aula 12.</span>
-            </div>
+          {% for noticia in ultimas_noticias %}
+        <div class="notif-item">
+          <div class="notif-icon" style="background:#dbeafe">📢</div>
+
+          <div class="notif-text">
+            <strong>{{ noticia.titulo }}</strong>
+            <span>{{ noticia.contenido|truncatechars:120 }}</span>
           </div>
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#dcfce7">⚽</div>
-            <div class="notif-text">
-              <strong>Jornada deportiva – 22 de mayo</strong>
-              <span>Inscripción abierta hasta el martes. Consultá a tu preceptor.</span>
-            </div>
-          </div>
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#fef9c3">📢</div>
-            <div class="notif-text">
-              <strong>Entrega de boletín – 30 de mayo</strong>
-              <span>Se entregará a los padres o tutores en horario escolar.</span>
-            </div>
-          </div>
+        </div>
+        {% empty %}
+        <p>No hay notificaciones disponibles.</p>
+        {% endfor %}
         </div>
 
         <!-- NOTAS -->
@@ -157,17 +147,18 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td>Matemática</td><td>7</td><td>8</td><td>7.5</td><td><span class="badge badge-green">Regular</span></td></tr>
-              <tr><td>Lengua y Literatura</td><td>9</td><td>9</td><td>9.0</td><td><span class="badge badge-green">Regular</span></td></tr>
-              <tr><td>Historia</td><td>8</td><td>8</td><td>8.0</td><td><span class="badge badge-green">Regular</span></td></tr>
-              <tr><td>Geografía</td><td>6</td><td>7</td><td>6.5</td><td><span class="badge badge-green">Regular</span></td></tr>
-              <tr><td>Física</td><td>5</td><td>–</td><td>–</td><td><span class="badge badge-yellow">En curso</span></td></tr>
-              <tr><td>Química</td><td>4</td><td>–</td><td>–</td><td><span class="badge badge-red">En riesgo</span></td></tr>
-              <tr><td>Biología</td><td>9</td><td>10</td><td>9.5</td><td><span class="badge badge-green">Regular</span></td></tr>
-              <tr><td>Inglés</td><td>10</td><td>9</td><td>9.5</td><td><span class="badge badge-green">Regular</span></td></tr>
-              <tr><td>Ed. Física</td><td>8</td><td>9</td><td>8.5</td><td><span class="badge badge-green">Regular</span></td></tr>
-              <tr><td>Formación Ética</td><td>8</td><td>8</td><td>8.0</td><td><span class="badge badge-green">Regular</span></td></tr>
-              <tr><td>Arte</td><td>9</td><td>9</td><td>9.0</td><td><span class="badge badge-green">Regular</span></td></tr>
+              {% for calificacion in calificaciones %}
+            <tr>
+                <td>{{ calificacion.id_materia.nombre }}</td>
+                <td>{{ calificacion.nota }}</td>
+                <td>{{ calificacion.tipo_evaluacion }}</td>
+                <td>{{ calificacion.fecha }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No hay calificaciones registradas.</td>
+            </tr>
+            {% endfor %}
             </tbody>
           </table>
         </div>
@@ -226,17 +217,17 @@
           <div class="stat-grid">
             <div class="stat-card">
               <div class="stat-label">Días presentes</div>
-              <div class="stat-value" style="color:#16a34a">68</div>
+              <div class="stat-value" style="color:#16a34a">{{ presentes }}</div>
               <div class="stat-sub">Días de clase cursados</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Inasistencias</div>
-              <div class="stat-value" style="color:#dc2626">6</div>
+              <div class="stat-value" style="color:#dc2626">{{ ausencias }}</div>
               <div class="stat-sub">Máximo permitido: 20</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Llegadas tarde</div>
-              <div class="stat-value" style="color:#d97706">3</div>
+              <div class="stat-value" style="color:#d97706">{{ tardanzas }}</div>
               <div class="stat-sub">Este ciclo lectivo</div>
             </div>
           </div>
@@ -245,48 +236,61 @@
               <tr><th>Fecha</th><th>Estado</th><th>Observación</th></tr>
             </thead>
             <tbody>
-              <tr><td>05/05/2026</td><td><span class="badge badge-green">Presente</span></td><td>–</td></tr>
-              <tr><td>06/05/2026</td><td><span class="badge badge-green">Presente</span></td><td>–</td></tr>
-              <tr><td>07/05/2026</td><td><span class="badge badge-red">Ausente</span></td><td>Sin justificar</td></tr>
-              <tr><td>08/05/2026</td><td><span class="badge badge-green">Presente</span></td><td>–</td></tr>
-              <tr><td>28/04/2026</td><td><span class="badge badge-yellow">Tarde</span></td><td>Llegó 15 min tarde</td></tr>
-              <tr><td>25/04/2026</td><td><span class="badge badge-red">Ausente</span></td><td>Justificada (médica)</td></tr>
+              {% for asistencia in asistencias %}
+              <tr>
+                <td>{{ asistencia.fecha|date:"d/m/Y" }}</td>
+
+                <td>
+                  {% if "Presente" in asistencia.observacion %}
+                    <span class="badge badge-green">Presente</span>
+
+                  {% elif "Ausente" in asistencia.observacion %}
+                    <span class="badge badge-red">Ausente</span>
+
+                  {% elif "Tardanza" in asistencia.observacion %}
+                    <span class="badge badge-yellow">Tardanza</span>
+
+                  {% else %}
+                    <span class="badge">{{ asistencia.observacion }}</span>
+                  {% endif %}
+                </td>
+
+                <td>{{ asistencia.observacion }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3">No hay registros de asistencia.</td>
+              </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
 
-        <!-- COMUNICADOS -->
+       <!-- COMUNICADOS -->
         <div id="panel-comunicados" class="panel">
-          <p class="section-title">Comunicados institucionales</p>
-          <div class="img-placeholder">📷 Acá va una imagen de actividades escolares / eventos</div>
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#fce7f3">📋</div>
-            <div class="notif-text">
-              <strong>Reunión de padres – 20 de mayo, 18:00 hs</strong>
-              <span>Se tratarán temas de convivencia y rendimiento académico del segundo bimestre.</span>
+            <p class="section-title">Comunicados institucionales</p>
+
+            <div class="img-placeholder">
+                📷 Acá va una imagen de actividades escolares / eventos
             </div>
-          </div>
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#dbeafe">🏫</div>
-            <div class="notif-text">
-              <strong>Semana de la educación – del 19 al 23 de mayo</strong>
-              <span>Actividades especiales, muestras y eventos en todos los niveles.</span>
+
+            {% for noticia in noticias %}
+            <div class="notif-item">
+                <div class="notif-icon" style="background:#dbeafe">
+                    📢
+                </div>
+
+                <div class="notif-text">
+                    <strong>{{ noticia.titulo }}</strong>
+                    <span>{{ noticia.contenido }}</span>
+                    <br>
+                    <small>{{ noticia.fecha_publicacion }}</small>
+                </div>
             </div>
-          </div>
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#dcfce7">💉</div>
-            <div class="notif-text">
-              <strong>Campaña de vacunación en el colegio – 15 de mayo</strong>
-              <span>Vacuna antigripal para alumnos. Traer libreta sanitaria.</span>
-            </div>
-          </div>
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#fef9c3">📚</div>
-            <div class="notif-text">
-              <strong>Lista de útiles segundo semestre</strong>
-              <span>Disponible para descarga en la secretaría o solicitando al preceptor.</span>
-            </div>
-          </div>
+            {% empty %}
+            <p>No hay comunicados disponibles.</p>
+            {% endfor %}
+
         </div>
 
         <!-- PERFIL -->
@@ -294,14 +298,17 @@
           <p class="section-title">Mi perfil</p>
           <table class="tabla">
             <tbody>
-              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>{{ persona.nombre }} {{ persona.apellido }}</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">DNI</td><td>44.321.100</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Fecha de nacimiento</td><td>12 de marzo de 2010</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Curso</td><td>3° Año B – Nivel Secundario</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Turno</td><td>Mañana</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Tutor responsable</td><td>María Ramírez (madre)</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Teléfono de contacto</td><td>(362) 4112233</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Correo electrónico</td><td>{{ persona.email }}</td></tr>
+            <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>{{ persona.nombre }} {{ persona.apellido }}</td></tr>
+            <tr><td style="font-weight:600;color:#64748b">DNI</td><td>{{ persona.dni }}</td></tr>
+            <tr><td style="font-weight:600;color:#64748b">Fecha de nacimiento</td><td>{{ persona.fecha_nacimiento }}</td></tr>
+            <tr><td style="font-weight:600;color:#64748b">Curso</td><td>{{ alumno.id_curso.comision }}</td></tr>
+            <tr><td style="font-weight:600;color:#64748b">Turno</td><td>{{ alumno.id_curso.turno }}</td></tr>
+            <tr><td style="font-weight:600;color:#64748b">Nivel</td><td>{{ alumno.id_curso.nivel }}</td></tr>
+            <tr><td style="font-weight:600;color:#64748b">Legajo</td><td>{{ alumno.legajo }}</td></tr>
+            <tr><td style="font-weight:600;color:#64748b">Fecha de ingreso</td><td>{{ alumno.fecha_ingreso }}</td></tr>
+            <tr><td style="font-weight:600;color:#64748b">Teléfono de contacto</td><td>{{ persona.telefono }}</td></tr>
+            <tr><td style="font-weight:600;color:#64748b">Correo electrónico</td><td>{{ persona.email }}</td></tr>
+            <tr><td style="font-weight:600;color:#64748b">Dirección</td><td>{{ persona.direccion }}</td></tr>
             </tbody>
           </table>
         </div>
