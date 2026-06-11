@@ -21,6 +21,7 @@ from .models import (
     Calificacion,
     Asistencia,
     CursoCursaMaterias,
+    DocenteDictaMateria, 
 )
 import json
 import os
@@ -502,9 +503,65 @@ def dashboard_directivo(request):
     if not persona:
         return redirect('login')
 
-    return render(request, 'core/dashboard-directivo.html', {
-        'persona': persona
-    })
+    cantidad_alumnos = Alumno.objects.count()
+    cantidad_docentes = Docente.objects.count()
+    cantidad_preceptores = Preceptor.objects.count()
+    cantidad_administrativos = PersonalAdministrativo.objects.count()
+
+    promedio_institucional = (
+        Calificacion.objects.aggregate(
+            promedio=Avg('nota')
+        )['promedio'] or 0
+    )
+
+    ultimas_noticias = Noticia.objects.order_by(
+        '-fecha_publicacion'
+    )[:5]
+    docentes = []
+
+    relaciones = (
+        DocenteDictaMateria.objects
+        .select_related(
+            'id_docente__id_persona',
+            'id_materia'
+        )
+    )
+
+    for relacion in relaciones[:10]:
+        docente = relacion.id_docente
+        materia = relacion.id_materia
+
+        curso_materia = (
+            CursoCursaMaterias.objects
+            .filter(id_materia=materia)
+            .select_related('id_curso')
+            .first()
+        )
+
+        nivel = (
+            curso_materia.id_curso.nivel
+            if curso_materia
+            else '-'
+        )
+        docentes.append({
+        'nombre': f'{docente.id_persona.nombre} {docente.id_persona.apellido}',
+        'materia': materia.nombre,
+        'nivel': nivel,
+        })
+    return render(
+        request,
+        'core/dashboard-directivo.html',
+        {
+            'persona': persona,
+            'cantidad_alumnos': cantidad_alumnos,
+            'cantidad_docentes': cantidad_docentes,
+            'cantidad_preceptores': cantidad_preceptores,
+            'cantidad_administrativos': cantidad_administrativos,
+            'promedio_institucional': round(promedio_institucional, 1),
+            'ultimas_noticias': ultimas_noticias,
+            'docentes': docentes
+        }
+    )
 
 @never_cache
 def dashboard_administrativo(request):

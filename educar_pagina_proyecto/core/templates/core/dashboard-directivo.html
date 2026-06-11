@@ -121,19 +121,19 @@
 
             <div class="stat-card">
               <div class="stat-label">Estudiantes</div>
-              <div class="stat-value" style="color:#1d66c2">842</div>
+              <div class="stat-value" style="color:#1d66c2">{{ cantidad_alumnos }}</div>
               <div class="stat-sub">Todos los niveles</div>
             </div>
 
             <div class="stat-card">
               <div class="stat-label">Docentes</div>
-              <div class="stat-value" style="color:#16a34a">67</div>
+              <div class="stat-value" style="color:#16a34a">{{ cantidad_docentes }}</div>
               <div class="stat-sub">Plantel activo</div>
             </div>
 
             <div class="stat-card">
               <div class="stat-label">Promedio institucional</div>
-              <div class="stat-value" style="color:#e61c92">8.1</div>
+              <div class="stat-value" style="color:#e61c92">{{ promedio_institucional }}</div>
               <div class="stat-sub">Segundo bimestre</div>
             </div>
 
@@ -143,41 +143,37 @@
             Resumen institucional
           </p>
 
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#dbeafe">📚</div>
+          <p class="section-title" style="font-size:18px">
+            Novedades institucionales
+          </p>
 
-            <div class="notif-text">
-              <strong>Entrega de boletines</strong>
-
-              <span>
-                Finalizó la carga de calificaciones del segundo bimestre.
-              </span>
-            </div>
-          </div>
+          {% for noticia in ultimas_noticias %}
 
           <div class="notif-item">
-            <div class="notif-icon" style="background:#dcfce7">🏫</div>
+
+            <div class="notif-icon" style="background:#dbeafe">
+              📢
+            </div>
 
             <div class="notif-text">
-              <strong>Inscripciones abiertas 2027</strong>
+
+              <strong>
+                {{ noticia.titulo }}
+              </strong>
 
               <span>
-                Ya se registraron más de 120 solicitudes nuevas.
+                {{ noticia.contenido|truncatechars:120 }}
               </span>
+
             </div>
+
           </div>
 
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#fef9c3">📢</div>
+          {% empty %}
 
-            <div class="notif-text">
-              <strong>Reunión institucional</strong>
+          <p>No hay novedades institucionales.</p>
 
-              <span>
-                Encuentro de coordinación docente programado para el viernes.
-              </span>
-            </div>
-          </div>
+          {% endfor %}
 
         </div>
 
@@ -189,29 +185,42 @@
           </p>
 
           <table class="tabla">
-
             <tbody>
 
-              <tr><td style="font-weight:600;color:#64748b">Niveles educativos</td><td>Inicial, Primario y Secundario</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Niveles educativos</td>
+                <td>Inicial, Primario y Secundario</td>
+              </tr>
 
-              <tr><td style="font-weight:600;color:#64748b">Estudiantes activos</td><td>842</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Estudiantes activos</td>
+                <td>{{ cantidad_alumnos }}</td>
+              </tr>
 
-              <tr><td style="font-weight:600;color:#64748b">Docentes</td><td>67</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Docentes</td>
+                <td>{{ cantidad_docentes }}</td>
+              </tr>
 
-              <tr><td style="font-weight:600;color:#64748b">Preceptores</td><td>12</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Preceptores</td>
+                <td>{{ cantidad_preceptores }}</td>
+              </tr>
 
-              <tr><td style="font-weight:600;color:#64748b">Personal administrativo</td><td>18</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Personal administrativo</td>
+                <td>{{ cantidad_administrativos }}</td>
+              </tr>
 
-              <tr><td style="font-weight:600;color:#64748b">Promedio general</td><td>8.1</td></tr>
-
-              <tr><td style="font-weight:600;color:#64748b">Asistencia institucional</td><td>91%</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Promedio general</td>
+                <td>{{ promedio_institucional }}</td>
+              </tr>
 
             </tbody>
-
           </table>
 
         </div>
-
         <!-- DOCENTES -->
         <div id="panel-docentes" class="panel">
 
@@ -222,24 +231,27 @@
           <table class="tabla">
 
             <thead>
-              <tr>
-                <th>Docente</th>
-                <th>Materia</th>
-                <th>Nivel</th>
-                <th>Estado</th>
-              </tr>
+                <tr>
+                    <th>Docente</th>
+                    <th>Materia</th>
+                    <th>Nivel</th>
+                </tr>
             </thead>
 
             <tbody>
-
-              <tr><td>Mario Villalba</td><td>Matemática</td><td>Secundario</td><td><span class="badge badge-green">Activo</span></td></tr>
-
-              <tr><td>Laura Benítez</td><td>Lengua</td><td>Secundario</td><td><span class="badge badge-green">Activo</span></td></tr>
-
-              <tr><td>Juan Torres</td><td>Historia</td><td>Primario</td><td><span class="badge badge-yellow">Licencia</span></td></tr>
-
-              <tr><td>Marina López</td><td>Biología</td><td>Secundario</td><td><span class="badge badge-green">Activo</span></td></tr>
-
+                {% for docente in docentes %}
+                <tr>
+                    <td>{{ docente.nombre }}</td>
+                    <td>{{ docente.materia }}</td>
+                    <td>{{ docente.nivel }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">
+                        No hay docentes registrados.
+                    </td>
+                </tr>
+                {% endfor %}
             </tbody>
 
           </table>
@@ -256,18 +268,24 @@
           <div class="stat-grid">
 
             <div class="stat-card">
-              <div class="stat-label">Asistencia institucional</div>
-              <div class="stat-value" style="color:#16a34a">91%</div>
+              <div class="stat-label">Estudiantes</div>
+              <div class="stat-value" style="color:#16a34a">
+                {{ cantidad_alumnos }}
+              </div>
             </div>
 
             <div class="stat-card">
-              <div class="stat-label">Rendimiento académico</div>
-              <div class="stat-value" style="color:#1d66c2">8.1</div>
+              <div class="stat-label">Docentes</div>
+              <div class="stat-value" style="color:#1d66c2">
+                {{ cantidad_docentes }}
+              </div>
             </div>
 
             <div class="stat-card">
-              <div class="stat-label">Inscripciones nuevas</div>
-              <div class="stat-value" style="color:#e61c92">124</div>
+              <div class="stat-label">Promedio institucional</div>
+              <div class="stat-value" style="color:#e61c92">
+                {{ promedio_institucional }}
+              </div>
             </div>
 
           </div>
@@ -283,25 +301,20 @@
 
           <div class="form-section" style="margin-top:20px">
 
-            <form class="form-card">
+            <form method="POST" action="{% url 'crear-noticia' %}" class="form-card">
+              {% csrf_token %}
 
               <div class="form-group full">
-
-                <label for="titulo">Título</label>
-
-                <input type="text" id="titulo" placeholder="Ingrese el título del comunicado">
-
+                <label>Título</label>
+                <input type="text" name="titulo" required>
               </div>
 
               <div class="form-group full">
-
-                <label for="mensaje">Mensaje</label>
-
-                <textarea id="mensaje" rows="6" placeholder="Escriba el comunicado institucional..."></textarea>
-
+                <label>Mensaje</label>
+                <textarea name="contenido" rows="6" required></textarea>
               </div>
 
-              <button type="button" class="btn-form">
+              <button type="submit" class="btn-form">
                 Publicar comunicado
               </button>
 
@@ -310,7 +323,6 @@
           </div>
 
         </div>
-
 
         
 
@@ -325,15 +337,40 @@
 
             <tbody>
 
-              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>{{ persona.nombre }} {{ persona.apellido }}</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Nombre completo</td>
+                <td>{{ persona.nombre }} {{ persona.apellido }}</td>
+              </tr>
 
-              <tr><td style="font-weight:600;color:#64748b">Cargo</td><td>Equipo Directivo</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">DNI</td>
+                <td>{{ persona.dni }}</td>
+              </tr>
 
-              <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>{{ persona.email }}</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Fecha de nacimiento</td>
+                <td>{{ persona.fecha_nacimiento|date:"d/m/Y" }}</td>
+              </tr>
 
-              <tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>(362) 4558899</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Cargo</td>
+                <td>Equipo Directivo</td>
+              </tr>
 
-              <tr><td style="font-weight:600;color:#64748b">Antigüedad</td><td>11 años</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Correo electrónico</td>
+                <td>{{ persona.email|default:"No registrado" }}</td>
+              </tr>
+
+              <tr>
+                <td style="font-weight:600;color:#64748b">Teléfono</td>
+                <td>{{ persona.telefono|default:"No registrado" }}</td>
+              </tr>
+
+              <tr>
+                <td style="font-weight:600;color:#64748b">Dirección</td>
+                <td>{{ persona.direccion|default:"No registrada" }}</td>
+              </tr>
 
             </tbody>
 
