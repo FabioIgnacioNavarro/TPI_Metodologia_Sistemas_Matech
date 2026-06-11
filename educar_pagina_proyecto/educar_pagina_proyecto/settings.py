@@ -135,3 +135,7 @@ STATICFILES_DIRS = [
 AIRTABLE_TOKEN = "patXqBRQT7VKBJ4ho.ca0978a60586b75d7dbbbd048718e3787d8d6bfcad3b9b85469507b0115e68d6"
 AIRTABLE_BASE_ID = "appZFfSOhXkYJDNKA"
 AIRTABLE_TABLE_NAME = "Solicitudes" 
+
+#Guardar imagenes de noticias:
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

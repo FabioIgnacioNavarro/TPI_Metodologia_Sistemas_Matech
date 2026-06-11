@@ -50,6 +50,26 @@
 
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const textarea = document.querySelector('textarea[name="contenido"]');
+    const contador = document.getElementById("contador-caracteres");
+
+    if (textarea && contador) {
+
+        textarea.addEventListener("input", function() {
+
+            contador.textContent =
+                `${this.value.length} / 350 caracteres`;
+
+        });
+
+    }
+
+});
+</script>
+
 <body>
 
   <div class="page">
@@ -97,6 +117,9 @@
           </a>
           <a href="#" onclick="showPanel('opiniones', this); return false;">
             <span class="nav-icon">💬</span> Opiniones
+          </a>
+          <a href="#" onclick="showPanel('noticias', this); return false;">
+            <span class="nav-icon">📰</span> Noticias
           </a>
           <a href="#" onclick="showPanel('usuarios', this); return false;">
             <span class="nav-icon">🔼</span> Gestión de usuarios
@@ -371,7 +394,79 @@
           </div>
 
         </div>
+        <div id="panel-noticias" class="panel">
 
+          <p class="section-title">
+              Publicar noticia institucional
+          </p>
+
+          <div class="form-section">
+
+              <form
+                  method="POST"
+                  action="{% url 'crear-noticia' %}"
+                  enctype="multipart/form-data"
+                  class="form-card">
+
+                  {% csrf_token %}
+
+                  <div class="form-group">
+
+                      <label>Título</label>
+
+                      <input
+                          type="text"
+                          name="titulo"
+                          required
+                          placeholder="Título de la noticia">
+
+                  </div>
+
+                  <div class="form-group">
+
+                      <label>Contenido</label>
+
+                      <textarea
+                          name="contenido"
+                          rows="8"
+                          maxlength="350"
+                          required
+                          placeholder="Escriba la noticia... (máximo 350 caracteres)"></textarea>
+
+                      <small id="contador-caracteres">
+                          0 / 350 caracteres
+                      </small>
+
+                  </div>
+
+                  <div class="form-group">
+
+                      <label>Imagen</label>
+
+                      <input
+                          type="file"
+                          name="imagen"
+                          accept=".jpg,.jpeg,.png,.webp">
+
+                      <small>
+                          Formatos permitidos: JPG, PNG y WEBP
+                      </small>
+
+                  </div>
+
+                  <button
+                      type="submit"
+                      class="btn-form">
+
+                      Publicar noticia
+
+                  </button>
+
+              </form>
+
+          </div>
+
+        </div>
         <div id="panel-perfil" class="panel">
           <p class="section-title">Mi perfil</p>
 

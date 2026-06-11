@@ -225,13 +225,13 @@ CREATE TABLE `materia` (
 --
 
 CREATE TABLE `noticia` (
-  `id_noticia` int(11) NOT NULL,
+  `id_noticia` int(11),
   `titulo` varchar(200) NOT NULL,
   `contenido` text NOT NULL,
   `fecha_publicacion` date NOT NULL,
-  `legajo_personal` int(11) NOT NULL
+  `legajo_personal` int(11) NOT NULL,
+  `imagen` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 -- --------------------------------------------------------
 
 --

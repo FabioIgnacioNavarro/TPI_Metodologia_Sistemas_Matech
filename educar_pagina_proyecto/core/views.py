@@ -1,9 +1,10 @@
-from django.shortcuts import render
 from .models import Usuario
 import requests
 from django.conf import settings
 from datetime import date
 import re
+from django.core.files.storage import FileSystemStorage
+import os
 from django.shortcuts import render, redirect
 from .models import (
     Usuario,
@@ -14,7 +15,8 @@ from .models import (
     Preceptor,
     Tutor,
     TutorTutoraAlumno,
-    PersonalAdministrativo
+    PersonalAdministrativo,
+    Noticia
 )
 
 def obtener_persona(request):
@@ -232,7 +234,16 @@ def niveles(request):
     return render(request, 'core/niveles.html')
 
 def noticias(request):
-    return render(request, 'core/noticias.html')
+
+    noticias = Noticia.objects.all().order_by('-fecha_publicacion')
+    
+    return render(
+        request,
+        'core/noticias.html',
+        {
+            'noticias': noticias
+        }
+    )
 
 def dashboard_alumno(request):
     persona = obtener_persona(request)
@@ -301,3 +312,56 @@ def dashboard_preceptor(request):
     return render(request, 'core/dashboard-preceptor.html', {
         'persona': persona
     })
+
+
+
+def crear_noticia(request):
+
+    if request.method == 'POST':
+
+        titulo = request.POST.get('titulo')
+        contenido = request.POST.get('contenido')
+        imagen = request.FILES.get('imagen')
+
+        persona = obtener_persona(request)
+
+        administrativo = PersonalAdministrativo.objects.filter(
+            id_persona=persona
+        ).first()
+
+        if len(contenido) > 350:
+            return render(
+                request,
+                'core/dashboard-administrativo.html',
+                {
+                    'error': 'La noticia no puede superar los 350 caracteres.'
+                }
+            )
+
+        ruta_imagen = None
+
+        if imagen:
+
+            if imagen:
+
+                fs = FileSystemStorage(
+                    location=os.path.join(settings.MEDIA_ROOT, 'noticias')
+                )
+
+                nombre_archivo = fs.save(
+                    imagen.name,
+                    imagen
+                )
+
+                ruta_imagen = f'noticias/{nombre_archivo}'
+
+        Noticia.objects.create(
+            titulo=titulo,
+            contenido=contenido,
+            fecha_publicacion=date.today(),
+            legajo_personal=administrativo,
+            imagen=ruta_imagen
+        )
+        return redirect('dashboard-administrativo')
+
+    return redirect('dashboard-administrativo')

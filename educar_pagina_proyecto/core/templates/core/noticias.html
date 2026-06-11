@@ -45,66 +45,39 @@
         </p>
       </section>
 
-      <section class="cards">
+    <section class="cards">
+
+        {% for noticia in noticias %}
 
         <div class="card">
 
-          <img src="{% static 'core/IMG/noticia1.jpg' %}" alt="Inicio de inscripciones" class="card-image">
+          <img
+            src="/media/{{ noticia.imagen }}"
+            alt="Noticia institucional"
+            class="card-image">
 
-          <div class="card-content">
+            <div class="card-content">
 
-            <div class="card-title">
-              <div class="icon icon-blue">📰</div>
-              <span>Inscripciones 2027</span>
+                <div class="card-title">
+                    <div class="icon icon-blue">📰</div>
+                    <span>{{ noticia.titulo }}</span>
+                </div>
+
+                <p>
+                    {{ noticia.contenido }}
+                </p>
+
+                <small class="fecha-noticia">
+                    {{ noticia.fecha_publicacion|date:"d F Y" }}
+                </small>
+
             </div>
 
-            <p>
-              Ya se encuentran abiertas las inscripciones para el ciclo lectivo 2027
-              en nivel inicial, primario y secundario.
-            </p>
-
-          </div>
         </div>
 
-        <div class="card">
+        {% endfor %}
 
-          <img src="{% static 'core/IMG/noticia2.jpg' %}" alt="Evento deportivo" class="card-image">
-
-          <div class="card-content">
-
-            <div class="card-title">
-              <div class="icon icon-green">⚽</div>
-              <span>Jornada deportiva</span>
-            </div>
-
-            <p>
-              Se realizará una jornada recreativa y deportiva para promover
-              el trabajo en equipo y la vida saludable.
-            </p>
-
-          </div>
-        </div>
-
-        <div class="card">
-
-          <img src="{% static 'core/IMG/noticia3.jpg' %}" alt="Laboratorio" class="card-image">
-
-          <div class="card-content">
-
-            <div class="card-title">
-              <div class="icon icon-pink">💻</div>
-              <span>Nuevos laboratorios</span>
-            </div>
-
-            <p>
-              El centro educativo incorporó nuevos equipos tecnológicos para
-              fortalecer las actividades de informática y ciencias.
-            </p>
-
-          </div>
-        </div>
-
-      </section>
+    </section>
 
     </main>
 

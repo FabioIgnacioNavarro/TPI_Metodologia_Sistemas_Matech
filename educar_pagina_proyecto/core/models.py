@@ -178,9 +178,20 @@ class Materia(models.Model):
 class Noticia(models.Model):
     id_noticia = models.AutoField(primary_key=True)
     titulo = models.CharField(max_length=200)
-    contenido = models.TextField()
+    contenido = models.TextField(max_length=350)
     fecha_publicacion = models.DateField()
-    legajo_personal = models.ForeignKey('PersonalAdministrativo', models.DO_NOTHING, db_column='legajo_personal')
+
+    legajo_personal = models.ForeignKey(
+        'PersonalAdministrativo',
+        models.DO_NOTHING,
+        db_column='legajo_personal'
+    )
+
+    imagen = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
 
     class Meta:
         managed = False
