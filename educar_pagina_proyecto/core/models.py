@@ -140,6 +140,42 @@ class DocenteDictaMateria(models.Model):
         managed = False
         db_table = 'docente_dicta_materia'
 
+class Evaluacion(models.Model):
+    id_evaluacion = models.AutoField(primary_key=True)
+
+    alumno = models.ForeignKey(
+        'Alumno',
+        on_delete=models.CASCADE,
+        db_column='legajo_alumno'
+    )
+
+    docente = models.ForeignKey(
+        'Docente',
+        on_delete=models.CASCADE,
+        db_column='legajo_docente'
+    )
+
+    materia = models.ForeignKey(
+        'Materia',
+        on_delete=models.CASCADE,
+        db_column='id_materia'
+    )
+
+    tipo = models.CharField(max_length=50)  # Ej: Parcial, TP, Examen
+
+    nota = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+    fecha = models.DateField()
+
+    observacion = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.alumno} - {self.materia} - {self.nota}"
 
 class Inscripcion(models.Model):
     id_inscripcion = models.AutoField(primary_key=True)

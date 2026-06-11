@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 from django.db.models import Avg
 import json
 from .models import (
+    Materia,
     Usuario,
     Persona,
     Directivo,
@@ -21,6 +22,7 @@ from .models import (
     Calificacion,
     Asistencia,
     CursoCursaMaterias,
+    Curso
 )
 import json
 import os
@@ -486,13 +488,73 @@ def dashboard_alumno(request):
 
 @never_cache
 def dashboard_docente(request):
+    from django.db.models import Avg
+
     persona = obtener_persona(request)
 
     if not persona:
         return redirect('login')
 
+    docente = Docente.objects.filter(id_persona=persona).first()
+
+    if not docente:
+        return redirect('login')
+
+    materias = Materia.objects.filter(
+        docentedictamateria__id_docente=docente
+    ).distinct()
+
+    cursos = Curso.objects.filter(
+        cursocursamaterias__id_materia__in=materias
+    ).distinct()
+
+    alumnos = Alumno.objects.filter(
+        id_curso__in=cursos
+    ).distinct()
+
+    # 🔥 1. primero calificaciones
+    calificaciones = Calificacion.objects.filter(
+        id_materia__in=materias,
+        legajo_alumno__in=alumnos
+    ).select_related('id_materia', 'legajo_alumno')
+
+    # 🔥 2. ahora sí armamos el diccionario
+    notas_por_alumno = {}
+
+    for c in calificaciones:
+        alumno_id = c.legajo_alumno_id
+
+        if alumno_id not in notas_por_alumno:
+            notas_por_alumno[alumno_id] = []
+
+        notas_por_alumno[alumno_id].append(c)
+
+    # 🔥 3. cursos para la tabla
+    cursos_data = []
+
+    for curso in cursos:
+        alumnos_count = Alumno.objects.filter(id_curso=curso).count()
+
+        promedio = Calificacion.objects.filter(
+            legajo_alumno__id_curso=curso
+        ).aggregate(prom=Avg('nota'))['prom']
+
+        cursos_data.append({
+            'curso': getattr(curso, 'comision', str(curso)),
+            'nivel': getattr(curso, 'nivel', ''),
+            'turno': getattr(curso, 'turno', ''),
+            'alumnos': alumnos_count,
+            'promedio': round(promedio, 1) if promedio else 0,
+        })
+
     return render(request, 'core/dashboard-docente.html', {
-        'persona': persona
+        'persona': persona,
+        'docente': docente,
+        'materias': materias,
+        'cursos': cursos_data,
+        'alumnos': alumnos,
+        'calificaciones': calificaciones,
+        'notas_por_alumno': notas_por_alumno,
     })
 
 @never_cache
@@ -505,7 +567,7 @@ def dashboard_directivo(request):
     return render(request, 'core/dashboard-directivo.html', {
         'persona': persona
     })
-
+    
 @never_cache
 def dashboard_administrativo(request):
     persona = obtener_persona(request)

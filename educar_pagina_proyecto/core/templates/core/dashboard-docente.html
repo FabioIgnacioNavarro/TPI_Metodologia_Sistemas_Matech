@@ -1,4 +1,5 @@
 {% load static %}
+{% load filters %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -72,7 +73,9 @@
             {{ persona.nombre|slice:":1"|upper }}{{ persona.apellido|slice:":1"|upper }}
           </div>
           <strong>Prof. {{ persona.nombre }} {{ persona.apellido }}</strong>
-          <span>Matemática · Secundario</span>
+          <span>
+            {{ docente.especialidad }} · Docente
+          </span>
         </div>
         <nav class="sidebar-nav">
           <a href="#" class="active" onclick="showPanel('inicio', this); return false;">
@@ -104,12 +107,16 @@
           <div class="stat-grid">
             <div class="stat-card">
               <div class="stat-label">Cursos a cargo</div>
-              <div class="stat-value" style="color:#e61c92">4</div>
+              <div class="stat-value" style="color:#e61c92">
+                {{ cursos|length }}
+              </div>
               <div class="stat-sub">Este ciclo lectivo</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Total de alumnos</div>
-              <div class="stat-value" style="color:#1d66c2">112</div>
+              <div class="stat-value" style="color:#1d66c2">
+                {{ alumnos|length }}
+              </div>
               <div class="stat-sub">En todos los cursos</div>
             </div>
             <div class="stat-card">
@@ -121,13 +128,18 @@
           <p class="section-title" style="font-size:18px">Próximas clases hoy</p>
           <table class="tabla">
             <thead>
-              <tr><th>Horario</th><th>Curso</th><th>Aula</th><th>Estado</th></tr>
+              <tr><th>Horario</th><th>Curso</th><th>Aula</th><th>Estado</th><th>Promedio</th></tr>
             </thead>
             <tbody>
-              <tr><td>7:30 – 8:30</td><td>1° A – Matemática</td><td>Aula 5</td><td><span class="badge badge-green">Confirmada</span></td></tr>
-              <tr><td>8:30 – 9:30</td><td>2° B – Matemática</td><td>Aula 8</td><td><span class="badge badge-green">Confirmada</span></td></tr>
-              <tr><td>10:30 – 11:30</td><td>3° B – Matemática</td><td>Aula 12</td><td><span class="badge badge-yellow">Por comenzar</span></td></tr>
-              <tr><td>11:30 – 12:30</td><td>4° A – Matemática</td><td>Aula 3</td><td><span class="badge badge-blue">Pendiente</span></td></tr>
+              {% for c in cursos %}
+              <tr>
+                <td>{{ c.curso }}</td>
+                <td>{{ c.nivel }}</td>
+                <td>{{ c.turno }}</td>
+                <td>{{ c.alumnos }}</td>
+                <td>{{ c.promedio }}</td>
+              </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
@@ -140,113 +152,64 @@
               <tr><th>Curso</th><th>Nivel</th><th>Turno</th><th>Alumnos</th><th>Promedio</th></tr>
             </thead>
             <tbody>
-              <tr><td>1° Año A</td><td>Secundario</td><td>Mañana</td><td>28</td><td>7.2</td></tr>
-              <tr><td>2° Año B</td><td>Secundario</td><td>Mañana</td><td>30</td><td>6.9</td></tr>
-              <tr><td>3° Año B</td><td>Secundario</td><td>Mañana</td><td>27</td><td>7.8</td></tr>
-              <tr><td>4° Año A</td><td>Secundario</td><td>Mañana</td><td>27</td><td>7.1</td></tr>
+              {% for c in cursos %}
+              <tr>
+                <td>{{ c.curso }}</td>
+                <td>{{ c.nivel }}</td>
+                <td>{{ c.turno }}</td>
+                <td>{{ c.alumnos }}</td>
+                <td>{{ c.promedio }}</td>
+              </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
 
         <!-- NOTAS -->
-        <div id="panel-notas" class="panel">
-          <p class="section-title">Cargar notas – 3° Año B</p>
-          <table class="tabla">
-            <thead>
-              <tr><th>Alumno</th><th>DNI</th><th>1° Bimestre</th><th>2° Bimestre</th><th>Guardar</th></tr>
-            </thead>
+      <div id="panel-notas" class="panel">
+        <p class="section-title">Cargar notas</p>
+
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Alumno</th>
+              <th>DNI</th>
+              <th>1° Bimestre</th>
+              <th>2° Bimestre</th>
+              <th>Guardar</th>
+            </tr>
+          </thead>
+
+          <tbody>
             <tbody>
-               <tr>
-                <td>
-                  Ramírez, Lucía
-                </td>
-                <td>
-                  44.321.100
-                </td>
-                <td>
-                  <input class="nota-input" value="7">
-                </td>
-                <td>
-                  <input class="nota-input" value="8">
-                </td>
-                <td>
-                  <button class="btn-small" onclick="guardarNota()">Guardar</button>
-                </td>
-              </tr>
-              <p id="mensaje-nota" class="mensaje-ok">
-                Nota modificada correctamente ✔
-              </p>
+              {% for alumno in alumnos %}
               <tr>
+                <td>{{ alumno.id_persona.apellido }}, {{ alumno.id_persona.nombre }}</td>
+                <td>{{ alumno.id_persona.dni }}</td>
+
+                {% with notas=notas_por_alumno|get_item:alumno.legajo %}
+
                 <td>
-                  González, Tomás
+                  <input class="nota-input"
+                        value="{% if notas and notas.0.nota %}{{ notas.0.nota }}{% endif %}">
                 </td>
+
                 <td>
-                  44.100.200
+                  <input class="nota-input"
+                        value="{% if notas and notas.1.nota %}{{ notas.1.nota }}{% endif %}">
                 </td>
-                <td>
-                  <input class="nota-input" value="6">
-                </td>
-                <td>
-                  <input class="nota-input" value="5">
-                </td>
-                <td>
-                  <button class="btn-small" onclick="guardarNota()">Guardar</button>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  López, Valentina
-                </td>
-                <td>
-                  44.500.300
-                </td>
-                <td>
-                  <input class="nota-input" value="9">
-                </td>
-                <td>
-                  <input class="nota-input" value="10">
-                </td>
+
+                {% endwith %}
+
                 <td>
                   <button class="btn-small">Guardar</button>
                 </td>
               </tr>
-              <tr>
-                <td>
-                  Herrera, Mateo
-                </td>
-                <td>
-                  44.200.400
-                </td>
-                <td>
-                  <input class="nota-input" value="5">
-                </td>
-                <td>
-                  <input class="nota-input" value="–">
-                </td>
-                <td>
-                  <button class="btn-small">Guardar</button>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  Domínguez, Ana
-                </td>
-                <td>
-                  44.600.500
-                </td>
-                <td>
-                  <input class="nota-input" value="8">
-                </td>
-                <td>  
-                  <input class="nota-input" value="8">
-                </td>
-                <td>
-                  <button class="btn-small">Guardar</button>
-                </td>
-              </tr>
+              {% endfor %}
             </tbody>
-          </table>
-        </div>
+          </tbody>
+        </table>
+      </div>
 
         <!-- TAREAS -->
         <div id="panel-tareas" class="panel">
@@ -304,12 +267,23 @@
           <table class="tabla">
             <tbody>
               <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>{{ persona.nombre }} {{ persona.apellido }}</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">DNI</td><td>27.450.890</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Materia</td><td>Matemática</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Nivel</td><td>Secundario</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Antigüedad</td><td>8 años en el centro</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">DNI</td><td>{{ persona.dni }}</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Título</td>
+                <td>{{ docente.titulo }}</td>
+              </tr>
+
+              <tr>
+                <td style="font-weight:600;color:#64748b">Especialidad</td>
+                <td>{{ docente.especialidad }}</td>
+              </tr>
+
+              <tr>
+                <td style="font-weight:600;color:#64748b">Fecha de ingreso</td>
+                <td>{{ docente.fecha_ingreso }}</td>
+              </tr>
               <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>{{ persona.email }}</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>(362) 4445566</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>{{ persona.telefono }}</td></tr>
             </tbody>
           </table>
         </div>
