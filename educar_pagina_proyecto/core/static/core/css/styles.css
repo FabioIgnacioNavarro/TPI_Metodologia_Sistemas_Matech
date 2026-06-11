@@ -131,6 +131,18 @@
       color: #1d66c2;
       font-size: 14px;
       font-weight: bold;
+      border: 2px solid #1d66c2;
+      padding: 8px 22px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .login a:hover {
+    background: #17539d;
+    color: white;
+    box-shadow: 0 4px 15px rgba(22, 82, 161, 0.2);
+    transform: translateY(-1px);
     }
 
     main {
@@ -656,6 +668,7 @@
 
 .sidebar-nav a {
   color: white;
+  border-radius: 999px;
   text-decoration: none;
 }
 
@@ -900,4 +913,43 @@
   .slider-container {
     height: 280px;
   }
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.user-greeting {
+  font-size: 14.5px;
+  color: #475569;
+  font-weight: 500;
+}
+.user-name {
+  color: #1d66c2;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0px 10px;
+  padding-bottom: 2px;
+  transition: all 0.2s ease;
+}
+
+.login .btn-logout {
+  text-decoration: none;
+  color: #e61c92;            /* Color rosa/magenta en las letras */
+  border: 2px solid #e61c92; /* Borde rosa/magenta */
+  padding: 8px 22px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-block;     /* Asegura que el botón se renderice bien */
+}
+/* Hover exclusivo para cerrar sesión */
+.login .btn-logout:hover {
+  background: #e61c92;       /* Fondo relleno de rosa/magenta */
+  color: white;              /* Letra blanca */
+  border-color: #e61c92;
+  box-shadow: 0 4px 15px rgba(230, 28, 146, 0.2);
+  transform: translateY(-1px);
 }

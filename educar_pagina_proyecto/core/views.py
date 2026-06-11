@@ -25,6 +25,7 @@ from .models import (
 import json
 import os
 from django.db.models import Avg
+from django.views.decorators.cache import never_cache
 
 OPINIONES_FILE = os.path.join(os.path.dirname(__file__), 'opiniones.json')
 
@@ -39,19 +40,38 @@ def obtener_persona(request):
 
 def index(request):
     usuario_datos = Usuario.objects.all()
+    persona, dashboard_url = obtener_datos_sesion(request)
     return render(request, 'core/index.html', {
-        'usuarios': usuario_datos
+        'usuarios': usuario_datos,
+        'persona': persona,
+        'dashboard_url': dashboard_url
     })
 
 def bienestar(request):
-    return render(request, 'core/bienestar.html')
+    persona, dashboard_url = obtener_datos_sesion(request)
+    return render(request, 'core/bienestar.html', {
+        'persona': persona,
+        'dashboard_url': dashboard_url
+    })
+
+def contacto(request):
+    if os.path.exists(OPINIONES_FILE):
+        with open(OPINIONES_FILE, 'r', encoding='utf-8') as f:
+            opiniones = json.load(f)
+    else:
+        opiniones = []
+    persona, dashboard_url = obtener_datos_sesion(request)
+    return render(request, 'core/contacto.html', {
+        'opiniones': opiniones,
+        'persona': persona,
+        'dashboard_url': dashboard_url
+    })
 
 def inscripcion(request):
-
+    # 1. Obtenemos los datos de sesión al inicio de la función
+    persona, dashboard_url = obtener_datos_sesion(request)
     if request.method == 'POST':
-
         url = f"https://api.airtable.com/v0/{settings.AIRTABLE_BASE_ID}/{settings.AIRTABLE_TABLE_NAME}"
-
         headers = {
             "Authorization": f"Bearer {settings.AIRTABLE_TOKEN}",
             "Content-Type": "application/json"
@@ -61,29 +81,37 @@ def inscripcion(request):
         dni = request.POST.get('dni')
         fecha = request.POST.get('fecha')
         email = request.POST.get('email')
-
         if not nombre or not dni or not fecha or not email:
             return render(
                 request,
                 'core/inscripcion.html',
-                {'error': 'Todos los campos obligatorios deben completarse.'}
+                {
+                    'error': 'Todos los campos obligatorios deben completarse.',
+                    'persona': persona,
+                    'dashboard_url': dashboard_url
+                }
             )
             
         if not dni.isdigit():
             return render(
                 request,
                 'core/inscripcion.html',
-                {'error': 'El DNI debe contener únicamente números.'}
+                {
+                    'error': 'El DNI debe contener únicamente números.',
+                    'persona': persona,
+                    'dashboard_url': dashboard_url
+                }
             )
             
         telefono = request.POST.get('telefono')
-
         if not telefono or not telefono.isdigit():
             return render(
                 request,
                 'core/inscripcion.html',
                 {
-                    'error': 'El teléfono debe contener únicamente números.'
+                    'error': 'El teléfono debe contener únicamente números.',
+                    'persona': persona,
+                    'dashboard_url': dashboard_url
                 }
             )
             
@@ -93,43 +121,57 @@ def inscripcion(request):
             return render(
                 request,
                 'core/inscripcion.html',
-                {'error': 'Ingrese un correo electrónico válido (solo Gmail, Hotmail u Outlook).'}
+                {
+                    'error': 'Ingrese un correo electrónico válido (solo Gmail, Hotmail u Outlook).',
+                    'persona': persona,
+                    'dashboard_url': dashboard_url
+                }
             )
-
         fecha_nacimiento = date.fromisoformat(fecha)
-
         if fecha_nacimiento > date.today():
             return render(
                 request,
                 'core/inscripcion.html',
-                {'error': 'La fecha de nacimiento no puede ser futura.'}
+                {
+                    'error': 'La fecha de nacimiento no puede ser futura.',
+                    'persona': persona,
+                    'dashboard_url': dashboard_url
+                }
             )
             
         edad = date.today().year - fecha_nacimiento.year
-        nivel = nivel = request.POST.get('nivel')
+        nivel = request.POST.get('nivel')
         
         if nivel == 'primario' and (edad < 5 or edad > 15):
             return render(
                 request,
                 'core/inscripcion.html',
-                {'error': 'La edad no corresponde al nivel primario.'}
+                {
+                    'error': 'La edad no corresponde al nivel primario.',
+                    'persona': persona,
+                    'dashboard_url': dashboard_url
+                }
             )
-
         if nivel == 'secundario' and (edad < 11 or edad > 20):
             return render(
                 request,
                 'core/inscripcion.html',
-                {'error': 'La edad no corresponde al nivel secundario.'}
+                {
+                    'error': 'La edad no corresponde al nivel secundario.',
+                    'persona': persona,
+                    'dashboard_url': dashboard_url
+                }
             )
-
         if nivel == 'inicial' and edad > 6:
             return render(
                 request,
                 'core/inscripcion.html',
-                {'error': 'La edad no corresponde al nivel inicial.'}
+                {
+                    'error': 'La edad no corresponde al nivel inicial.',
+                    'persona': persona,
+                    'dashboard_url': dashboard_url
+                }
             )
-        
-        
         
         data = {
             "fields": {
@@ -145,31 +187,38 @@ def inscripcion(request):
                 "Estado": "Pendiente"
             }
         }
-
         respuesta = requests.post(
             url,
             headers=headers,
             json=data
         )
-
         if respuesta.status_code in [200, 201]:
             return render(
                 request,
                 'core/inscripcion.html',
-                {'exito': True}
+                {
+                    'exito': True,
+                    'persona': persona,
+                    'dashboard_url': dashboard_url
+                }
             )
-
         return render(
             request,
             'core/inscripcion.html',
             {
-                'error': respuesta.text
+                'error': respuesta.text,
+                'persona': persona,
+                'dashboard_url': dashboard_url
             }
         )
-
+    # 2. Render final para cuando se accede mediante GET normal (reemplaza las líneas 170-173)
     return render(
         request,
-        'core/inscripcion.html'
+        'core/inscripcion.html',
+        {
+            'persona': persona,
+            'dashboard_url': dashboard_url
+        }
     )
 
 def login(request):
@@ -237,20 +286,22 @@ def login(request):
     return render(request, 'core/login.html')
 
 def niveles(request):
-    return render(request, 'core/niveles.html')
+    persona, dashboard_url = obtener_datos_sesion(request)
+    return render(request, 'core/niveles.html', {
+        'persona': persona,
+        'dashboard_url': dashboard_url
+    })
 
 def noticias(request):
-
     noticias = Noticia.objects.all().order_by('-fecha_publicacion')
-    
-    return render(
-        request,
-        'core/noticias.html',
-        {
-            'noticias': noticias
-        }
-    )
+    persona, dashboard_url = obtener_datos_sesion(request)
+    return render(request, 'core/noticias.html', {
+        'noticias': noticias,
+        'persona': persona,
+        'dashboard_url': dashboard_url
+    })
 
+@never_cache
 def dashboard_alumno(request):
     persona = obtener_persona(request)
 
@@ -433,6 +484,7 @@ def dashboard_alumno(request):
         'horario_por_dia': horario_por_dia,
     })
 
+@never_cache
 def dashboard_docente(request):
     persona = obtener_persona(request)
 
@@ -443,6 +495,7 @@ def dashboard_docente(request):
         'persona': persona
     })
 
+@never_cache
 def dashboard_directivo(request):
     persona = obtener_persona(request)
 
@@ -453,6 +506,7 @@ def dashboard_directivo(request):
         'persona': persona
     })
 
+@never_cache
 def dashboard_administrativo(request):
     persona = obtener_persona(request)
 
@@ -463,6 +517,7 @@ def dashboard_administrativo(request):
         'persona': persona
     })
 
+@never_cache
 def dashboard_padres(request):
 
     persona = obtener_persona(request)
@@ -564,6 +619,7 @@ def dashboard_padres(request):
         }
     )
 
+@never_cache
 def dashboard_preceptor(request):
     persona = obtener_persona(request)
 
@@ -664,14 +720,36 @@ def guardar_opinion(request):
 
     return redirect('contacto')
 
-def contacto(request):
-    # Leer opiniones del archivo para mostrarlas
-    if os.path.exists(OPINIONES_FILE):
-        with open(OPINIONES_FILE, 'r', encoding='utf-8') as f:
-            opiniones = json.load(f)
-    else:
-        opiniones = []
+def obtener_datos_sesion(request):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return None, None
+    try:
+        usuario = Usuario.objects.get(id=usuario_id)
+        persona = Persona.objects.filter(id_usuario=usuario).first()
+        if not persona:
+            return None, None
+            
+        # Determinar a que dashboard debe redirigir segun su rol
+        dashboard_url = 'login'
+        if PersonalAdministrativo.objects.filter(id_persona=persona).exists():
+            dashboard_url = 'dashboard-administrativo'
+        elif Docente.objects.filter(id_persona=persona).exists():
+            dashboard_url = 'dashboard-docente'
+        elif Tutor.objects.filter(id_persona=persona).exists():
+            dashboard_url = 'dashboard-padres'
+        elif Preceptor.objects.filter(id_persona=persona).exists():
+            dashboard_url = 'dashboard-preceptor'
+        elif Directivo.objects.filter(id_persona=persona).exists():
+            dashboard_url = 'dashboard-directivo'
+        elif Alumno.objects.filter(id_persona=persona).exists():
+            dashboard_url = 'dashboard-alumno'
+            
+        return persona, dashboard_url
+    except Usuario.DoesNotExist:
+        return None, None
 
-    return render(request, 'core/contacto.html', {
-        'opiniones': opiniones
-    })
+def logout(request):
+    if 'usuario_id' in request.session:
+        del request.session['usuario_id']
+    return redirect('index')

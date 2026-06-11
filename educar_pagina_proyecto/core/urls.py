@@ -17,4 +17,6 @@ urlpatterns = [
     path('padres/', views.dashboard_padres, name='dashboard-padres'),
     path('preceptor/', views.dashboard_preceptor, name='dashboard-preceptor'),
     path('contacto/opinion/', views.guardar_opinion, name='guardar-opinion'),
+    #Cerrar sesión
+    path('logout/', views.logout, name='logout'),
 ]

@@ -45,36 +45,29 @@
   }
 
   function confirmarCerrarSesion() {
-    window.location.href = "{% url 'login' %}";
+    window.location.href = "{% url 'logout' %}";
   }
 
 </script>
 
 <body>
-
   <div class="page">
-
     <header>
       <a href="{% url 'index' %}" class="brand">
         <img src="{% static 'core/IMG/logo.png' %}" alt="Logo">
-
         <div>
           <div class="brand-title">Educar para Transformar</div>
           <div class="brand-subtitle">Portal Directivo</div>
         </div>
       </a>
-
       <nav></nav>
-
       <div class="login">
-        <a href="#" onclick="abrirModalCerrarSesion()">Cerrar sesión</a>
+        <a href="#" onclick="abrirModalCerrarSesion()" class="btn-logout">Cerrar sesión</a>
       </div>
     </header>
 
     <div class="dashboard-layout">
-
       <aside class="sidebar">
-
         <div class="sidebar-user">
           <div class="avatar">
             {{ persona.nombre|slice:":1"|upper }}{{ persona.apellido|slice:":1"|upper }}

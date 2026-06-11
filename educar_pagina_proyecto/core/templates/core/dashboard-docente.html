@@ -45,7 +45,7 @@
   }
 
   function confirmarCerrarSesion() {
-    window.location.href = "{% url 'login' %}";
+    window.location.href = "{% url 'logout' %}";
   }
 
 </script>
@@ -61,7 +61,7 @@
       </a>
       <nav></nav>
       <div class="login">
-        <a href="#" onclick="abrirModalCerrarSesion()">Cerrar sesión</a>
+        <a href="#" onclick="abrirModalCerrarSesion()" class="btn-logout">Cerrar sesión</a>
       </div>
     </header>
 
