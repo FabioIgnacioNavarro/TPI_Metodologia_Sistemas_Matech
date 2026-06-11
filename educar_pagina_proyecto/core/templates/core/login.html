@@ -9,31 +9,7 @@
 </head>
 <body>
   <div class="page">
-    <div class="blur blur1"></div>
-    <div class="blur blur2"></div>
-    <div class="blur blur3"></div>
-    <div class="blur blur4"></div>
-    <div class="blur blur5"></div>
-
-    <header>
-      <a href="{% url 'index' %}" class="brand">
-        <img src="{% static 'core/IMG/logo.png' %} " alt="Logo Educar para Transformar">
-        <div>
-          <div class="brand-title">Educar para Transformar</div>
-          <div class="brand-subtitle">Centro Educativo</div>
-        </div>
-      </a>
-      <nav>
-        <a href="{% url 'niveles' %}">Niveles educativos</a>
-        <a href="{% url 'bienestar' %}">Bienestar estudiantil</a>
-        <a href="{% url 'noticias' %}">Noticias</a>
-        <a href="{% url 'inscripcion' %}">Inscripción a cursado</a>
-        <a href="{% url 'contacto' %}">Contacto</a>
-      </nav>
-      <div class="login">
-        <a href="{% url 'login' %}">Iniciar sesión</a>
-      </div>
-    </header>
+    {% include 'core/plantillas/cabecera.html' %}
 
     <main>
       <section class="hero">
