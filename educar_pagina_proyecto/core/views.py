@@ -293,7 +293,7 @@ def niveles(request):
     })
 
 def noticias(request):
-    noticias = Noticia.objects.all().order_by('-fecha_publicacion')
+    noticias = Noticia.objects.all().order_by('-id_noticia')
     persona, dashboard_url = obtener_datos_sesion(request)
     return render(request, 'core/noticias.html', {
         'noticias': noticias,
