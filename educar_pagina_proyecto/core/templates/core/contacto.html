@@ -7,6 +7,7 @@
   <title>Contacto</title>
   <link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
 </head>
+
 <body>
 
   <div class="page">
@@ -172,26 +173,27 @@
       </section>
 
       <section class="form-section">
-
         <div class="form-card">
-
-          <h2>Dejar una opinion</h2>
-
-          <div class="form-group full">
-            <label for="opinionTexto">Tu opinion</label>
-
-            <textarea
-              id="opinionTexto"
-              rows="5"
-              placeholder="Escribi tu opinion sobre la institucion..."></textarea>
+          <h2>Dejar una opinión</h2>
+          {% if error_opinion %}
+          <div style="background:#fee2e2; color:#991b1b; border-radius:8px; padding:12px; margin-bottom:16px;">
+            {{ error_opinion }}
           </div>
-
-          <button class="btn-form" onclick="agregarOpinion()">
-            Publicar opinion
-          </button>
-
+          {% endif %}
+          <form method="POST" action="{% url 'guardar-opinion' %}">
+            {% csrf_token %}
+            <div class="form-group full">
+              <label for="nombre">Tu nombre</label>
+              <input type="text" id="nombre" name="nombre" placeholder="Ingresá tu nombre (Opcional)" maxlength="100">
+            </div>
+            <div class="form-group full">
+              <label for="opinion">Tu opinión</label>
+              <textarea id="opinion" name="opinion" rows="5"
+                placeholder="Escribí tu opinión sobre la institución..." required maxlength="500"></textarea>
+            </div>
+            <button type="submit" class="btn-form">Publicar opinión</button>
+          </form>
         </div>
-
       </section>
 
       <section class="cards">
@@ -205,7 +207,18 @@
               <span>Opiniones de visitantes</span>
             </div>
 
-            <div id="listaOpiniones"></div>
+          {% if opiniones %}
+            {% for op in opiniones %}
+              <p>
+                <em>"{{ op.texto }}"</em><br>
+                <strong>— {{ op.nombre }}</strong>
+                <small style="color:#999;"> · {{ op.fecha }}</small>
+              </p>
+              {% endfor %}
+            {% else %}
+            <p>Todavía no hay opiniones. ¡Sé el primero en dejar la tuya!</p>
+          {% endif %}
+
 
           </div>
 
@@ -217,5 +230,24 @@
 
   </div>
 
+  <script>
+  function validarOpinion(event) {
+    const opinion = document.getElementById('opinion').value.trim();
+
+    if (!opinion) {
+      alert("Por favor, escribí tu opinión antes de publicar.");
+      event.preventDefault();
+      return false;
+    }
+
+    if (opinion.length > 500) {
+      alert("La opinión no puede superar los 500 caracteres.");
+      event.preventDefault();
+      return false;
+    }
+
+    return true;
+  }
+  </script>
 </body>
 </html>

@@ -20,6 +20,10 @@ from .models import (
     Calificacion,
     Asistencia
 )
+import json
+import os
+
+OPINIONES_FILE = os.path.join(os.path.dirname(__file__), 'opiniones.json')
 
 def obtener_persona(request):
     usuario_id = request.session.get('usuario_id')
@@ -38,9 +42,6 @@ def index(request):
 
 def bienestar(request):
     return render(request, 'core/bienestar.html')
-
-def contacto(request):
-    return render(request, 'core/contacto.html')
 
 def inscripcion(request):
 
@@ -350,8 +351,6 @@ def dashboard_preceptor(request):
         'persona': persona
     })
 
-
-
 def crear_noticia(request):
 
     if request.method == 'POST':
@@ -402,3 +401,54 @@ def crear_noticia(request):
         return redirect('dashboard-administrativo')
 
     return redirect('dashboard-administrativo')
+    
+def guardar_opinion(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip() or 'Anónimo'
+        opinion = request.POST.get('opinion', '').strip()
+
+        # Validaciones básicas
+        if not opinion:
+            return render(request, 'core/contacto.html', {
+                'error_opinion': 'La opinión no puede estar vacía.'
+            })
+
+        if len(opinion) > 500:
+            return render(request, 'core/contacto.html', {
+                'error_opinion': 'La opinión no puede superar los 500 caracteres.'
+            })
+
+        # Leer opiniones existentes
+        if os.path.exists(OPINIONES_FILE):
+            with open(OPINIONES_FILE, 'r', encoding='utf-8') as f:
+                opiniones = json.load(f)
+        else:
+            opiniones = []
+
+        # Agregar la nueva opinión
+        from datetime import datetime
+        opiniones.append({
+            'nombre': nombre,
+            'texto': opinion,
+            'fecha': datetime.now().strftime('%d/%m/%Y %H:%M')
+        })
+
+        # Guardar en el archivo
+        with open(OPINIONES_FILE, 'w', encoding='utf-8') as f:
+            json.dump(opiniones, f, ensure_ascii=False, indent=2)
+
+        return redirect('contacto')
+
+    return redirect('contacto')
+
+def contacto(request):
+    # Leer opiniones del archivo para mostrarlas
+    if os.path.exists(OPINIONES_FILE):
+        with open(OPINIONES_FILE, 'r', encoding='utf-8') as f:
+            opiniones = json.load(f)
+    else:
+        opiniones = []
+
+    return render(request, 'core/contacto.html', {
+        'opiniones': opiniones
+    })

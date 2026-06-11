@@ -16,4 +16,5 @@ urlpatterns = [
     path('administrativo/', views.dashboard_administrativo, name='dashboard-administrativo'),
     path('padres/', views.dashboard_padres, name='dashboard-padres'),
     path('preceptor/', views.dashboard_preceptor, name='dashboard-preceptor'),
+    path('contacto/opinion/', views.guardar_opinion, name='guardar-opinion'),
 ]
