@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_tags %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -82,6 +83,9 @@
           <a href="#" onclick="showPanel('notas', this); return false;">
             <span class="nav-icon">📊</span> Mis notas
           </a>
+          <a href="#" onclick="showPanel('materias', this); return false;">
+            <span class="nav-icon">📚</span> Materias
+          </a>
           <a href="#" onclick="showPanel('horario', this); return false;">
             <span class="nav-icon">📅</span> Horario
           </a>
@@ -105,18 +109,18 @@
           <div class="stat-grid">
             <div class="stat-card">
               <div class="stat-label">Promedio general</div>
-              <div class="stat-value" style="color:#16a34a">8.4</div>
+              <div class="stat-value" style="color:#16a34a">{{ promedio_general }}</div>
               <div class="stat-sub">Sobre 10 puntos</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Asistencia</div>
-              <div class="stat-value" style="color:#1d66c2">92%</div>
+              <div class="stat-value" style="color:#1d66c2">{{ asistencia_pct }}%</div>
               <div class="stat-sub">Este ciclo lectivo</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Materias aprobadas</div>
-              <div class="stat-value">9/11</div>
-              <div class="stat-sub">2 en curso</div>
+              <div class="stat-value">{{ materias_aprobadas }} / {{ total_materias }}</div>
+              <div class="stat-sub">Materias aprobadas / totales</div>
             </div>
           </div>
           {% for noticia in ultimas_noticias %}
@@ -147,68 +151,84 @@
               </tr>
             </thead>
             <tbody>
-              {% for calificacion in calificaciones %}
-            <tr>
-                <td>{{ calificacion.id_materia.nombre }}</td>
-                <td>{{ calificacion.nota }}</td>
-                <td>{{ calificacion.tipo_evaluacion }}</td>
-                <td>{{ calificacion.fecha }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4">No hay calificaciones registradas.</td>
-            </tr>
-            {% endfor %}
+              {% for nota in notas_resumen %}
+              <tr>
+                <td>{{ nota.materia }}</td>
+                <td>{% if nota.trim1 %}{{ nota.trim1 }}{% else %}-{% endif %}</td>
+                <td>{% if nota.trim2 %}{{ nota.trim2 }}{% else %}-{% endif %}</td>
+                <td>{% if nota.promedio %}{{ nota.promedio }}{% else %}-{% endif %}</td>
+                <td>
+                  {% if nota.estado == 'Aprobado' %}
+                    <span class="badge badge-green">Aprobado</span>
+                  {% elif nota.estado == 'En curso' %}
+                    <span class="badge">En curso</span>
+                  {% else %}
+                    <span class="badge">{{ nota.estado }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5">No hay calificaciones registradas.</td>
+              </tr>
+              {% endfor %}
             </tbody>
           </table>
+        </div>
+
+        <!-- MATERIAS -->
+        <div id="panel-materias" class="panel">
+
+          <p class="section-title">Materias del curso</p>
+
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Materia</th>
+                <th>Horario</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              {% for materia in materias %}
+              <tr>
+                <td>{{ materia.id_materia.nombre }}</td>
+                <td>{{ materia.horario_formateado }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="2">No hay materias asignadas.</td>
+              </tr>
+              {% endfor %}
+
+            </tbody>
+          </table>
+
         </div>
 
         <!-- HORARIO -->
         <div id="panel-horario" class="panel">
           <p class="section-title">Horario semanal</p>
-          <div class="horario-table">
-            <div></div>
-            <div class="horario-dia">Lunes</div>
-            <div class="horario-dia">Martes</div>
-            <div class="horario-dia">Miércoles</div>
-            <div class="horario-dia">Jueves</div>
-            <div class="horario-dia">Viernes</div>
-
-            <div class="horario-hora">7:30</div>
-            <div class="horario-celda">Matemática</div>
-            <div class="horario-celda">Lengua</div>
-            <div class="horario-celda">Historia</div>
-            <div class="horario-celda">Inglés</div>
-            <div class="horario-celda">Física</div>
-
-            <div class="horario-hora">8:30</div>
-            <div class="horario-celda">Física</div>
-            <div class="horario-celda">Biología</div>
-            <div class="horario-celda">Matemática</div>
-            <div class="horario-celda">Química</div>
-            <div class="horario-celda">Arte</div>
-
-            <div class="horario-hora">9:30</div>
-            <div class="horario-celda">Geografía</div>
-            <div class="horario-celda libre">–</div>
-            <div class="horario-celda">Inglés</div>
-            <div class="horario-celda">Lengua</div>
-            <div class="horario-celda">Biología</div>
-
-            <div class="horario-hora">10:30</div>
-            <div class="horario-celda">Historia</div>
-            <div class="horario-celda">Ed. Física</div>
-            <div class="horario-celda">Arte</div>
-            <div class="horario-celda">Matemática</div>
-            <div class="horario-celda libre">–</div>
-
-            <div class="horario-hora">11:30</div>
-            <div class="horario-celda">Form. Ética</div>
-            <div class="horario-celda">Química</div>
-            <div class="horario-celda">Geografía</div>
-            <div class="horario-celda">Ed. Física</div>
-            <div class="horario-celda">Historia</div>
-          </div>
+          
+          {% if horario_por_dia %}
+            <div style="display: grid; gap: 15px;">
+              {% for dia, clases in horario_por_dia.items %}
+                {% if clases %}
+                  <div style="padding: 12px; background: #f0f9ff; border-left: 4px solid #1d66c2; border-radius: 4px;">
+                    <strong style="color: #1d66c2; text-transform: capitalize;">{{ dia }}:</strong>
+                    <div style="margin-top: 6px; color: #64748b;">
+                      {% for clase in clases %}
+                        <div>{{ clase.materia }} - {{ clase.hora }}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% else %}
+            <p style="color: #94a3b8;">No hay horarios registrados.</p>
+          {% endif %}
         </div>
 
         <!-- ASISTENCIA -->
@@ -270,10 +290,6 @@
         <div id="panel-comunicados" class="panel">
             <p class="section-title">Comunicados institucionales</p>
 
-            <div class="img-placeholder">
-                📷 Acá va una imagen de actividades escolares / eventos
-            </div>
-
             {% for noticia in noticias %}
             <div class="notif-item">
                 <div class="notif-icon" style="background:#dbeafe">
@@ -304,6 +320,7 @@
             <tr><td style="font-weight:600;color:#64748b">Curso</td><td>{{ alumno.id_curso.comision }}</td></tr>
             <tr><td style="font-weight:600;color:#64748b">Turno</td><td>{{ alumno.id_curso.turno }}</td></tr>
             <tr><td style="font-weight:600;color:#64748b">Nivel</td><td>{{ alumno.id_curso.nivel }}</td></tr>
+            <tr><td style="font-weight:600;color:#64748b">Tutor responsable</td><td>{{ tutor_relacion.id_tutor.id_persona.nombre }} {{ tutor_relacion.id_tutor.id_persona.apellido }} ({{ tutor_relacion.tipo_parentesco }})</td></tr>
             <tr><td style="font-weight:600;color:#64748b">Legajo</td><td>{{ alumno.legajo }}</td></tr>
             <tr><td style="font-weight:600;color:#64748b">Fecha de ingreso</td><td>{{ alumno.fecha_ingreso }}</td></tr>
             <tr><td style="font-weight:600;color:#64748b">Teléfono de contacto</td><td>{{ persona.telefono }}</td></tr>

@@ -5,6 +5,7 @@ import re
 from django.core.files.storage import FileSystemStorage
 import os
 from django.shortcuts import render, redirect
+import json
 
 from .models import (
     Usuario,
@@ -18,10 +19,12 @@ from .models import (
     PersonalAdministrativo,
     Noticia,
     Calificacion,
-    Asistencia
+    Asistencia,
+    CursoCursaMaterias,
 )
 import json
 import os
+from django.db.models import Avg
 
 OPINIONES_FILE = os.path.join(os.path.dirname(__file__), 'opiniones.json')
 
@@ -257,6 +260,75 @@ def dashboard_alumno(request):
     alumno = Alumno.objects.filter(
         id_persona=persona
     ).select_related('id_curso').first()
+    
+    materias = CursoCursaMaterias.objects.filter(
+        id_curso=alumno.id_curso
+    ).select_related('id_materia')
+    
+    # Procesar horarios para mostrar en el panel
+    # Inicializar días en orden
+    horario_por_dia = {
+        'lunes': [],
+        'martes': [],
+        'miércoles': [],
+        'jueves': [],
+        'viernes': []
+    }
+
+    # Función para normalizar nombres de días (maneja variantes sin tilde)
+    def _normalize_dia(dia_raw):
+        d = dia_raw.strip().lower()
+        if d in ('miercoles', 'miercoles'):
+            return 'miércoles'
+        if d == 'miercoles':
+            return 'miércoles'
+        # cubrir otras variantes comunes
+        mapping = {
+            'lunes': 'lunes',
+            'martes': 'martes',
+            'miércoles': 'miércoles',
+            'miercoles': 'miércoles',
+            'jueves': 'jueves',
+            'viernes': 'viernes'
+        }
+        return mapping.get(d, d)
+
+    # Llenar con datos de las materias
+    for materia in materias:
+        if materia.horarios:
+            try:
+                horarios = json.loads(materia.horarios)
+
+                # Crear formato legible
+                horario_items = []
+                for dia, hora in horarios.items():
+                    dia_norm = _normalize_dia(dia)
+                    horario_items.append(f"{dia_norm.capitalize()}: {hora}")
+
+                    # Agregar a la lista de horarios por día si corresponde
+                    if dia_norm in horario_por_dia:
+                        horario_por_dia[dia_norm].append({
+                            'materia': materia.id_materia.nombre,
+                            'hora': hora
+                        })
+
+                materia.horario_formateado = " | ".join(horario_items)
+
+            except Exception:
+                materia.horario_formateado = str(materia.horarios)
+        else:
+            materia.horario_formateado = "Sin horario"
+            
+    alumno = Alumno.objects.filter(
+        id_persona=persona
+    ).select_related('id_curso').first()
+    
+    tutor_relacion = TutorTutoraAlumno.objects.filter(
+        id_alumno=alumno
+    ).select_related(
+        'id_tutor',
+        'id_tutor__id_persona'
+    ).first()
 
     noticias = Noticia.objects.all().order_by('-fecha_publicacion')
     ultimas_noticias = noticias[:3]
@@ -281,6 +353,66 @@ def dashboard_alumno(request):
         observacion__icontains='Tardanza'
     ).count()
 
+    # Porcentaje de asistencia (presente / total registros)
+    total_asistencias = presentes + ausencias + tardanzas
+    if total_asistencias > 0:
+        asistencia_pct = round((presentes / total_asistencias) * 100)
+    else:
+        asistencia_pct = 0
+
+    # Agrupar calificaciones por materia para el panel de notas
+    from collections import OrderedDict
+
+    notas_resumen = []
+    # Iterar por las materias asignadas al curso
+    for curso_materia in materias:
+        mat = curso_materia.id_materia
+        califs_mat = calificaciones.filter(id_materia=mat).order_by('fecha')
+
+        trim1 = ''
+        trim2 = ''
+        numeric_notes = []
+        estado = ''
+
+        for idx, c in enumerate(califs_mat):
+            display_val = ''
+            if c.nota is not None:
+                display_val = float(c.nota)
+            else:
+                display_val = c.tipo_evaluacion or ''
+
+            if idx == 0:
+                trim1 = display_val
+            elif idx == 1:
+                trim2 = display_val
+
+            if c.nota is not None:
+                try:
+                    numeric_notes.append(float(c.nota))
+                except Exception:
+                    pass
+
+            if c.tipo_evaluacion and 'aprob' in c.tipo_evaluacion.lower():
+                estado = 'Aprobado'
+
+        promedio_mat = round(sum(numeric_notes) / len(numeric_notes), 2) if numeric_notes else ''
+
+        notas_resumen.append({
+            'materia': mat.nombre,
+            'trim1': trim1,
+            'trim2': trim2,
+            'promedio': promedio_mat,
+            'estado': estado or 'En curso'
+        })
+
+    # Promedio general del alumno (promedio de todas las calificaciones numéricas)
+    all_numeric = [float(c.nota) for c in calificaciones if c.nota is not None]
+    promedio_general = round(sum(all_numeric) / len(all_numeric), 1) if all_numeric else 0
+
+    # Materias aprobadas: sólo se cuentan si hay un registro cuyo tipo indica 'Aprobado'
+    materias_aprobadas = sum(1 for n in notas_resumen if n.get('estado') == 'Aprobado')
+    total_materias = len(notas_resumen)
+
     return render(request, 'core/dashboard-alumno.html', {
         'persona': persona,
         'alumno': alumno,
@@ -290,7 +422,15 @@ def dashboard_alumno(request):
         'asistencias': asistencias,
         'presentes': presentes,
         'ausencias': ausencias,
-        'tardanzas': tardanzas
+        'tardanzas': tardanzas,
+        'promedio_general': promedio_general,
+        'asistencia_pct': asistencia_pct,
+        'materias_aprobadas': materias_aprobadas,
+        'total_materias': total_materias,
+        'notas_resumen': notas_resumen,
+        'materias': materias,
+        'tutor_relacion': tutor_relacion,
+        'horario_por_dia': horario_por_dia,
     })
 
 def dashboard_docente(request):
