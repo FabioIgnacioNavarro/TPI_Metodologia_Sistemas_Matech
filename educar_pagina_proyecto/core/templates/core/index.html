@@ -107,7 +107,100 @@
           </div>
         </div>
       </section>
+
+    <section class="gallery-section">
+      <h2>Nuestra Institución</h2>
+      <p class="gallery-subtitle">Explorá nuestras instalaciones y los espacios donde transcurre la vida escolar.</p>
+      
+      <div class="slider-container">
+        <!-- Slides -->
+        <div class="slide active">
+          <img src="{% static 'core/IMG/escuela0.jpg' %}" alt="Campus Institucional">
+        </div>
+        <div class="slide">
+          <img src="{% static 'core/IMG/escuela2.jpg' %}" alt="Aulas">
+        </div>
+        <div class="slide">
+          <img src="{% static 'core/IMG/deportes.jpg' %}" alt="Complejo Deportivo">
+        </div>
+        <div class="slide">
+          <img src="{% static 'core/IMG/comedor.jpg' %}" alt="Comedor Escolar">
+        </div>
+        <div class="slide">
+          <img src="{% static 'core/IMG/escuela1.jpg' %}" alt="Acto Escolar">
+        </div>
+        
+        <!-- Flechas de navegación (aparecen al pasar el cursor) -->
+        <button class="slider-arrow prev-arrow" onclick="changeSlide(-1)">&#10094;</button>
+        <button class="slider-arrow next-arrow" onclick="changeSlide(1)">&#10095;</button>
+        
+        <!-- Indicadores (Puntos de control inferiores) -->
+        <div class="slider-dots">
+          <span class="dot active" onclick="setSlide(0)"></span>
+          <span class="dot" onclick="setSlide(1)"></span>
+          <span class="dot" onclick="setSlide(2)"></span>
+          <span class="dot" onclick="setSlide(3)"></span>
+        </div>
+      </div>
+    </section>
+    
     </main>
   </div>
+
+    <script>
+    let currentSlideIndex = 0;
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    let autoSlideInterval;
+    function showSlide(index) {
+      // Control de límites (volver al inicio o ir al final)
+      if (index >= slides.length) {
+        currentSlideIndex = 0;
+      } else if (index < 0) {
+        currentSlideIndex = slides.length - 1;
+      } else {
+        currentSlideIndex = index;
+      }
+      // Activar el slide correspondiente
+      slides.forEach((slide, i) => {
+        if (i === currentSlideIndex) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+      // Activar el punto indicador correspondiente
+      dots.forEach((dot, i) => {
+        if (i === currentSlideIndex) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    }
+    // Cambiar de slide con las flechas
+    function changeSlide(step) {
+      showSlide(currentSlideIndex + step);
+      resetAutoSlide();
+    }
+    // Cambiar de slide con los puntos
+    function setSlide(index) {
+      showSlide(index);
+      resetAutoSlide();
+    }
+    // Iniciar transición automática
+    function startAutoSlide() {
+      autoSlideInterval = setInterval(() => {
+        showSlide(currentSlideIndex + 1);
+      }, 4000); // Cambia de foto cada 4 segundos
+    }
+    // Reiniciar el temporizador al interactuar manualmente
+    function resetAutoSlide() {
+      clearInterval(autoSlideInterval);
+      startAutoSlide();
+    }
+    // Arrancar
+    startAutoSlide();
+  </script>
 </body>
 </html>
