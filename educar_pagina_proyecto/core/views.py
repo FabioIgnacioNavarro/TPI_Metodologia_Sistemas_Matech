@@ -5,8 +5,8 @@ import re
 from django.core.files.storage import FileSystemStorage
 import os
 from django.shortcuts import render, redirect
+from django.db.models import Avg
 import json
-
 from .models import (
     Usuario,
     Persona,
@@ -464,22 +464,105 @@ def dashboard_administrativo(request):
     })
 
 def dashboard_padres(request):
+
     persona = obtener_persona(request)
 
     if not persona:
         return redirect('login')
 
-    tutor = Tutor.objects.filter(id_persona=persona).first()
+    tutor = Tutor.objects.filter(
+        id_persona=persona
+    ).first()
 
     hijos = []
-    if tutor:
-        relaciones = TutorTutoraAlumno.objects.filter(id_tutor=tutor)
-        hijos = [rel.id_alumno.id_persona for rel in relaciones]
 
-    return render(request, 'core/dashboard-padres.html', {
-        'persona': persona,
-        'hijos': hijos
-    })
+    presentes = 0
+    ausencias = 0
+    tardanzas = 0
+
+    suma_promedios = 0
+    cantidad_promedios = 0
+
+    if tutor:
+
+        relaciones = TutorTutoraAlumno.objects.filter(
+            id_tutor=tutor
+        ).select_related(
+            'id_alumno',
+            'id_alumno__id_persona',
+            'id_alumno__id_curso'
+        )
+
+        for relacion in relaciones:
+
+            alumno = relacion.id_alumno
+
+            promedio = Calificacion.objects.filter(
+                legajo_alumno=alumno
+            ).aggregate(
+                promedio=Avg('nota')
+            )['promedio']
+
+            promedio = float(promedio) if promedio else 0
+
+            if promedio:
+                suma_promedios += promedio
+                cantidad_promedios += 1
+
+            pres = Asistencia.objects.filter(
+                legajo_alumno=alumno,
+                observacion__icontains='pres'
+            ).count()
+
+            aus = Asistencia.objects.filter(
+                legajo_alumno=alumno,
+                observacion__icontains='aus'
+            ).count()
+
+            tar = Asistencia.objects.filter(
+                legajo_alumno=alumno,
+                observacion__icontains='tard'
+            ).count()
+
+            presentes += pres
+            ausencias += aus
+            tardanzas += tar
+
+            hijos.append({
+                'persona': alumno.id_persona,
+                'curso': alumno.id_curso,
+                'promedio': promedio,
+                'presentes': pres,
+                'ausencias': aus,
+                'tardanzas': tar
+            })
+
+    promedio_general = round(
+        suma_promedios / cantidad_promedios,
+        2
+    ) if cantidad_promedios else 0
+
+    total_asistencias = presentes + ausencias
+
+    porcentaje_asistencia = round(
+        (presentes / total_asistencias) * 100,
+        0
+    ) if total_asistencias else 0
+    ultimas_noticias = Noticia.objects.all().order_by('-fecha_publicacion')[:3]
+    return render(
+        request,
+        'core/dashboard-padres.html',
+        {
+            'persona': persona,
+            'hijos': hijos,
+            'promedio_general': promedio_general,
+            'porcentaje_asistencia': porcentaje_asistencia,
+            'presentes': presentes,
+            'ausencias': ausencias,
+            'tardanzas': tardanzas,
+            'ultimas_noticias': ultimas_noticias
+        }
+    )
 
 def dashboard_preceptor(request):
     persona = obtener_persona(request)

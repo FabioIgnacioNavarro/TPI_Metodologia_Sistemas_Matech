@@ -83,10 +83,10 @@
           <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
 
           <span>
-            Tutor de 
-            {% for hijo in hijos %}
-              {{ hijo.nombre }} {{ hijo.apellido }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
+              Tutor de
+              {% for hijo in hijos %}
+                  {{ hijo.persona.nombre }} {{ hijo.persona.apellido }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
           </span>
         </div>
 
@@ -133,14 +133,22 @@
 
             <div class="stat-card">
               <div class="stat-label">Promedio general</div>
-              <div class="stat-value" style="color:#16a34a">8.4</div>
-              <div class="stat-sub">{{ persona.nombre }} {{ persona.apellido }}</div>
+              <div class="stat-value" style="color:#16a34a">
+                {{ promedio_general }}
+              </div>
+              <div class="stat-sub">
+                Promedio de {{ hijos|length }} alumno{{ hijos|length|pluralize:"s" }}
+              </div>
             </div>
 
             <div class="stat-card">
               <div class="stat-label">Asistencia</div>
-              <div class="stat-value" style="color:#1d66c2">92%</div>
-              <div class="stat-sub">Ciclo lectivo actual</div>
+              <div class="stat-value" style="color:#1d66c2">
+                {{ porcentaje_asistencia }}%
+              </div>
+              <div class="stat-sub">
+                Ciclo lectivo actual
+              </div>
             </div>
 
             <div class="stat-card">
@@ -151,20 +159,24 @@
 
           </div>
 
-          <p class="section-title" style="font-size:18px">
-            Novedades importantes
-          </p>
+          <div class="section">
+              <p class="section-title">Novedades importantes</p>
 
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#dbeafe">📢</div>
+              {% for noticia in ultimas_noticias %}
+              <div class="notif-item">
+                  <div class="notif-icon" style="background:#dbeafe">
+                      📢
+                  </div>
 
-            <div class="notif-text">
-              <strong>Reunión de padres – 20 de mayo</strong>
+                  <div class="notif-text">
+                      <strong>{{ noticia.titulo }}</strong>
+                      <span>{{ noticia.contenido|truncatechars:120 }}</span>
+                  </div>
+              </div>
 
-              <span>
-                La reunión se realizará a las 18:00 hs en el salón principal.
-              </span>
-            </div>
+              {% empty %}
+              <p>No hay novedades importantes disponibles.</p>
+              {% endfor %}
           </div>
 
           <div class="notif-item">
@@ -211,20 +223,53 @@
               </tr>
             </thead>
 
-            <tbody>
+              <tbody>
 
-              <tr>
-                <td>Lucía Ramírez</td>
-                <td>3° Año B</td>
-                <td>Mañana</td>
+                {% for hijo in hijos %}
+
+                <tr>
+
                 <td>
-                  <span class="badge badge-green">
-                    Regular
-                  </span>
+                {{ hijo.persona.nombre }}
+                {{ hijo.persona.apellido }}
                 </td>
-              </tr>
 
-            </tbody>
+                <td>
+                {{ hijo.curso.nivel }}
+                {{ hijo.curso.comision }}
+                </td>
+
+                <td>
+                {{ hijo.curso.turno }}
+                </td>
+
+                <td>
+
+                {% if hijo.promedio >= 6 %}
+                <span class="badge badge-green">
+                Regular
+                </span>
+                {% else %}
+                <span class="badge badge-red">
+                En riesgo
+                </span>
+                {% endif %}
+
+                </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                <td colspan="4">
+                No hay hijos asociados.
+                </td>
+                </tr>
+
+                {% endfor %}
+
+              </tbody>
 
           </table>
 
@@ -234,7 +279,7 @@
         <div id="panel-calificaciones" class="panel">
 
           <p class="section-title">
-            Calificaciones de Lucía Ramírez
+            Calificaciones
           </p>
 
           <table class="tabla">
@@ -249,11 +294,36 @@
 
             <tbody>
 
-              <tr><td>Matemática</td><td>7.5</td><td><span class="badge badge-green">Regular</span></td></tr>
-              <tr><td>Lengua</td><td>9.0</td><td><span class="badge badge-green">Regular</span></td></tr>
-              <tr><td>Historia</td><td>8.0</td><td><span class="badge badge-green">Regular</span></td></tr>
-              <tr><td>Química</td><td>4.0</td><td><span class="badge badge-red">En riesgo</span></td></tr>
-              <tr><td>Biología</td><td>9.5</td><td><span class="badge badge-green">Regular</span></td></tr>
+              {% for hijo in hijos %}
+
+              <tr>
+
+              <td>
+              {{ hijo.persona.nombre }}
+              {{ hijo.persona.apellido }}
+              </td>
+
+              <td>
+              {{ hijo.promedio }}
+              </td>
+
+              <td>
+
+              {% if hijo.promedio >= 6 %}
+              <span class="badge badge-green">
+              Regular
+              </span>
+              {% else %}
+              <span class="badge badge-red">
+              En riesgo
+              </span>
+              {% endif %}
+
+              </td>
+
+              </tr>
+
+              {% endfor %}
 
             </tbody>
 
@@ -265,24 +335,33 @@
         <div id="panel-asistencias" class="panel">
 
           <p class="section-title">
-            Asistencias de Lucía Ramírez
+            Asistencias de
+            {% for hijo in hijos|slice:":3" %}
+              {{ hijo.persona.nombre }} {{ hijo.persona.apellido }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
           </p>
 
           <div class="stat-grid">
 
             <div class="stat-card">
               <div class="stat-label">Presentes</div>
-              <div class="stat-value" style="color:#16a34a">68</div>
+              <div class="stat-value" style="color:#16a34a">
+                {{ presentes }}
+              </div>
             </div>
 
             <div class="stat-card">
               <div class="stat-label">Ausencias</div>
-              <div class="stat-value" style="color:#dc2626">6</div>
+              <div class="stat-value" style="color:#dc2626">
+                {{ ausencias }}
+              </div>
             </div>
 
             <div class="stat-card">
               <div class="stat-label">Tardanzas</div>
-              <div class="stat-value" style="color:#d97706">3</div>
+              <div class="stat-value" style="color:#d97706">
+                {{ tardanzas }}
+              </div>
             </div>
 
           </div>
@@ -333,15 +412,62 @@
 
             <tbody>
 
-              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>María Ramírez</td></tr>
+              <tr>
+              <td style="font-weight:600;color:#64748b">
+              Nombre completo
+              </td>
+              <td>
+              {{ persona.nombre }}
+              {{ persona.apellido }}
+              </td>
+              </tr>
 
-              <tr><td style="font-weight:600;color:#64748b">DNI</td><td>31.456.222</td></tr>
+              <tr>
+              <td style="font-weight:600;color:#64748b">
+              DNI
+              </td>
+              <td>
+              {{ persona.dni }}
+              </td>
+              </tr>
 
-              <tr><td style="font-weight:600;color:#64748b">Alumno asociado</td><td>Lucía Ramírez</td></tr>
+              <tr>
+              <td style="font-weight:600;color:#64748b">
+              Alumno asociado
+              </td>
+              <td>
 
-              <tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>(362) 4112233</td></tr>
+              {% for hijo in hijos %}
 
-              <tr><td style="font-weight:600;color:#64748b">Correo electrónico</td><td>{{ persona.correo }}</td></tr>
+              {{ hijo.persona.nombre }}
+              {{ hijo.persona.apellido }}
+
+              {% if not forloop.last %}
+              ,
+              {% endif %}
+
+              {% endfor %}
+
+              </td>
+              </tr>
+
+              <tr>
+              <td style="font-weight:600;color:#64748b">
+              Teléfono
+              </td>
+              <td>
+              {{ persona.telefono }}
+              </td>
+              </tr>
+
+              <tr>
+              <td style="font-weight:600;color:#64748b">
+              Correo electrónico
+              </td>
+              <td>
+              {{ persona.email }}
+              </td>
+              </tr>
 
             </tbody>
 

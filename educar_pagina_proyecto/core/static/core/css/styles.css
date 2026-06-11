@@ -186,10 +186,10 @@
       max-width: 1180px;
       margin: 70px auto 0;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 24px;
     }
-
+    
     .card {
       background: white;
       border: 1px solid #e2e8f0;
