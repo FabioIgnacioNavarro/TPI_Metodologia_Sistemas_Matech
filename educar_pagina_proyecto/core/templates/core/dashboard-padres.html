@@ -370,35 +370,25 @@
 
         <!-- MENSAJES -->
         <div id="panel-mensajes" class="panel">
+          <p class="section-title">Comunicados institucionales</p>
 
-          <p class="section-title">
-            Mensajes institucionales
-          </p>
-
+          {% for noticia in noticias %}
           <div class="notif-item">
-            <div class="notif-icon" style="background:#fce7f3">👩‍🏫</div>
+
+            <div class="notif-icon" style="background:#dbeafe">
+              📢
+            </div>
 
             <div class="notif-text">
-              <strong>Mensaje de la profesora de Matemática</strong>
-
-              <span>
-                Lucía mostró una gran mejora en sus últimas evaluaciones.
-              </span>
+              <strong>{{ noticia.titulo }}</strong>
+              <span>{{ noticia.contenido }}</span>
+              <small>{{ noticia.fecha_publicacion|date:"d M. Y" }}</small>
             </div>
+
           </div>
-
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#dbeafe">🏫</div>
-
-            <div class="notif-text">
-              <strong>Comunicado institucional</strong>
-
-              <span>
-                El lunes próximo no habrá actividades por jornada docente.
-              </span>
-            </div>
-          </div>
-
+          {% empty %}
+          <p>No hay comunicados disponibles.</p>
+          {% endfor %}
         </div>
 
         <!-- PERFIL -->

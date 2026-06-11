@@ -578,6 +578,8 @@ def dashboard_padres(request):
                 legajo_alumno=alumno,
                 observacion__icontains='tard'
             ).count()
+            
+            noticias = Noticia.objects.all().order_by('-fecha_publicacion')
 
             presentes += pres
             ausencias += aus
@@ -615,7 +617,8 @@ def dashboard_padres(request):
             'presentes': presentes,
             'ausencias': ausencias,
             'tardanzas': tardanzas,
-            'ultimas_noticias': ultimas_noticias
+            'ultimas_noticias': ultimas_noticias,
+            'noticias': noticias
         }
     )
 
