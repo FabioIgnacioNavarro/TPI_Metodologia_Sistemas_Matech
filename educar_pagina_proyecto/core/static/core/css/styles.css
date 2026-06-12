@@ -1057,3 +1057,18 @@
   box-shadow: 0 4px 15px rgba(230, 28, 146, 0.2);
   transform: translateY(-1px);
 }
+
+##panel-horario {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+#panel-horario .tabla {
+  text-align: center;
+}
+
+#panel-horario th,
+#panel-horario td {
+  text-align: center;
+  vertical-align: middle;
+}

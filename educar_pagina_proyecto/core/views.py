@@ -558,13 +558,13 @@ def dashboard_docente(request):
         id_curso__in=cursos
     ).distinct()
 
-    # 🔥 1. primero calificaciones
+    # 🔥 1. calificaciones
     calificaciones = Calificacion.objects.filter(
         id_materia__in=materias,
         legajo_alumno__in=alumnos
     ).select_related('id_materia', 'legajo_alumno')
 
-    # 🔥 2. ahora sí armamos el diccionario
+    # 🔥 2. diccionario de notas
     notas_por_alumno = {}
 
     for c in calificaciones:
@@ -575,7 +575,7 @@ def dashboard_docente(request):
 
         notas_por_alumno[alumno_id].append(c)
 
-    # 🔥 3. cursos para la tabla
+    # 🔥 3. cursos
     cursos_data = []
 
     for curso in cursos:
@@ -593,6 +593,39 @@ def dashboard_docente(request):
             'promedio': round(promedio, 1) if promedio else 0,
         })
 
+    # 🔥 4. horarios (CORREGIDO PARA JSON)
+    horarios = CursoCursaMaterias.objects.filter(
+        id_materia__in=materias
+    ).select_related('id_curso', 'id_materia')
+
+    horario_dict = {}
+
+    for h in horarios:
+        data = h.horarios
+
+        if isinstance(data, str):
+            data = json.loads(data)
+
+        for dia, rango in data.items():
+            if rango not in horario_dict:
+                horario_dict[rango] = {
+                    'Lunes': '-',
+                    'Martes': '-',
+                    'Miércoles': '-',
+                    'Jueves': '-',
+                    'Viernes': '-',
+                }
+
+            dia_cap = dia.capitalize()
+
+            if dia_cap == 'Miercoles':
+                dia_cap = 'Miércoles'
+
+            horario_dict[rango][dia_cap] = f"{h.id_curso.anio}° {h.id_curso.nivel} ({h.id_curso.comision}) - {h.id_curso.turno}"
+
+    # 🔥 ordenar
+    horario_ordenado = dict(sorted(horario_dict.items()))
+
     return render(request, 'core/dashboard-docente.html', {
         'persona': persona,
         'docente': docente,
@@ -601,7 +634,61 @@ def dashboard_docente(request):
         'alumnos': alumnos,
         'calificaciones': calificaciones,
         'notas_por_alumno': notas_por_alumno,
+        'horario': horario_dict,
     })
+
+
+def horario_docente(request):
+    persona = obtener_persona(request)
+
+    if not persona:
+        return redirect('login')
+
+    docente = Docente.objects.filter(id_persona=persona).first()
+
+    if not docente:
+        return redirect('login')
+
+    materias = Materia.objects.filter(
+        docentedictamateria__id_docente=docente
+    ).distinct()
+
+    cursos = CursoCursaMaterias.objects.filter(
+        id_materia__in=materias
+    )
+
+    horario = {}
+
+    for c in cursos:
+        data = c.horarios
+
+        if isinstance(data, str):
+            data = json.loads(data)
+
+        for dia, rango in data.items():
+            if rango not in horario:
+                horario[rango] = {
+                    "Lunes": "-",
+                    "Martes": "-",
+                    "Miércoles": "-",
+                    "Jueves": "-",
+                    "Viernes": "-"
+                }
+
+            dia_cap = dia.capitalize()
+
+            if dia_cap == "Miercoles":
+                dia_cap = "Miércoles"
+
+            horario[rango][dia_cap] = c.id_curso.comision
+
+    return render(request, "tu_template.html", {
+        "horario": horario
+    })
+
+
+
+
 
 @never_cache
 def dashboard_directivo(request):
