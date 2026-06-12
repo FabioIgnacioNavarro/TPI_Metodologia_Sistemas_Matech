@@ -1,0 +1,34 @@
+[
+  {
+    "titulo": "hola_prueba_comunicado_Directivo",
+    "contenido": "hola prueba",
+    "autor": "Elena Morales",
+    "rol": "Directivo",
+    "fecha": "11/06/2026 16:18"
+  },
+  {
+    "titulo": "comunicado 2",
+    "contenido": "holaaaaaaaaaaaaaaaaa",
+    "autor": "Elena Morales",
+    "rol": "Directivo",
+    "fecha": "11/06/2026 18:21"
+  },
+  {
+    "titulo": "prueba_preceptor_turno_mañana_1A_Secundario",
+    "contenido": "asdjosiajd\r\ncdsncds.,",
+    "autor": "Andrea Sánchez",
+    "rol": "Preceptor",
+    "fecha": "11/06/2026 23:30",
+    "curso_id": 1,
+    "curso": "Secundario 1° A"
+  },
+  {
+    "titulo": "prueba_preceptor_turno_mañana_1B_Secundario",
+    "contenido": "holaaa\r\nxsian",
+    "autor": "Andrea Sánchez",
+    "rol": "Preceptor",
+    "fecha": "11/06/2026 23:53",
+    "curso_id": 2,
+    "curso": "Secundario 2° B"
+  }
+]
