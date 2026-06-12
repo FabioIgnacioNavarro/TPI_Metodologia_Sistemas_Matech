@@ -1058,7 +1058,7 @@
   transform: translateY(-1px);
 }
 
-##panel-horario {
+#panel-horario {
   max-width: 900px;
   margin: 0 auto;
 }
