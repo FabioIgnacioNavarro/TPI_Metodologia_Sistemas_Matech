@@ -11,6 +11,109 @@
       overflow-x: hidden;
     }
 
+    /*Niveles educativos*/
+
+    .niveles-section{
+    max-width:1200px;
+    margin:80px auto;
+    padding:0 20px;
+    text-align:center;
+    }
+
+    .niveles-slider{
+        position:relative;
+    }
+
+    .nivel-slide{
+        display:none;
+    }
+
+    .nivel-slide.active{
+        display:block;
+    }
+
+    .nivel-slide img{
+      width:100%;
+      height:300px; /* o el alto que uses */
+      object-fit:cover;
+      border-radius:20px;
+    }
+
+    .nivel-content{
+        background:white;
+        margin-top:20px;
+        padding:30px;
+        border-radius:20px;
+        box-shadow:0 10px 25px rgba(0,0,0,.08);
+    }
+
+    .nivel-info{
+        margin-top:25px;
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+        gap:20px;
+    }
+
+    .nivel-info div{
+        background:#f8fafc;
+        padding:20px;
+        border-radius:15px;
+    }
+
+    .nivel-dot{
+        height:12px;
+        width:12px;
+        margin:0 4px;
+        border-radius:50%;
+        background:#cbd5e1;
+        display:inline-block;
+        cursor:pointer;
+    }
+
+    .nivel-dot.active{
+        background:#2563eb;
+    }
+
+    .niveles-slider{
+        position:relative;
+    }
+
+    .nivel-arrow{
+    position:absolute;
+    top:250px;
+    transform:translateY(-50%);
+
+    width:50px;
+    height:50px;
+
+    border:none;
+    border-radius:50%;
+
+    background:rgba(255,255,255,.95);
+    color:#1e293b;
+
+    font-size:24px;
+    font-weight:bold;
+
+    cursor:pointer;
+    z-index:1000;
+
+    box-shadow:0 4px 15px rgba(0,0,0,.2);
+    transition:.3s;
+    }
+
+    .nivel-arrow:hover{
+        transform:translateY(-50%) scale(1.1);
+    }
+
+    .nivel-prev{
+        left:20px;
+    }
+
+    .nivel-next{
+        right:20px;
+    }
+
     .page {
       width: 100%;
       min-height: 100vh;
