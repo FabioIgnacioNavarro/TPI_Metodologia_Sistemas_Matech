@@ -139,39 +139,7 @@
 
           </div>
 
-          <p class="section-title" style="font-size:18px">
-            Novedades institucionales
-          </p>
 
-          {% for noticia in ultimas_noticias %}
-
-          <div class="notif-item">
-
-            <div class="notif-icon" style="background:#dbeafe">
-              📢
-            </div>
-
-            <div class="notif-text">
-
-              <strong>
-                {{ noticia.titulo }}
-              </strong>
-
-              <span>
-                {{ noticia.contenido|truncatechars:120 }}
-              </span>
-
-            </div>
-
-          </div>
-
-          {% empty %}
-
-          <p>No hay novedades institucionales.</p>
-
-          {% endfor %}
-
-        </div>
 
         <!-- INSTITUCIÓN -->
         <div id="panel-institucion" class="panel">
