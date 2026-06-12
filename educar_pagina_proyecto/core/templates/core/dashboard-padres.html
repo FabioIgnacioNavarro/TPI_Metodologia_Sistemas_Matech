@@ -159,50 +159,6 @@
 
           </div>
 
-          <div class="section">
-              <p class="section-title">Novedades importantes</p>
-
-              {% for noticia in ultimas_noticias %}
-              <div class="notif-item">
-                  <div class="notif-icon" style="background:#dbeafe">
-                      📢
-                  </div>
-
-                  <div class="notif-text">
-                      <strong>{{ noticia.titulo }}</strong>
-                      <span>{{ noticia.contenido|truncatechars:120 }}</span>
-                  </div>
-              </div>
-
-              {% empty %}
-              <p>No hay novedades importantes disponibles.</p>
-              {% endfor %}
-          </div>
-
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#dcfce7">📝</div>
-
-            <div class="notif-text">
-              <strong>Nuevo boletín disponible</strong>
-
-              <span>
-                Ya se encuentra cargado el boletín correspondiente al segundo bimestre.
-              </span>
-            </div>
-          </div>
-
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#fef9c3">⚽</div>
-
-            <div class="notif-text">
-              <strong>Jornada deportiva escolar</strong>
-
-              <span>
-                Se realizará el viernes 22 de mayo con participación de todos los niveles.
-              </span>
-            </div>
-          </div>
-
         </div>
 
         <!-- hijos -->
