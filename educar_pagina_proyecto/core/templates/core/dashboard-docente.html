@@ -87,9 +87,6 @@
           <a href="#" onclick="showPanel('notas', this); return false;">
             <span class="nav-icon">📝</span> Cargar notas
           </a>
-          <a href="#" onclick="showPanel('tareas', this); return false;">
-            <span class="nav-icon">📋</span> Tareas y evaluaciones
-          </a>
           <a href="#" onclick="showPanel('horario', this); return false;">
             <span class="nav-icon">📅</span> Mi horario
           </a>
@@ -118,11 +115,6 @@
                 {{ alumnos|length }}
               </div>
               <div class="stat-sub">En todos los cursos</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Evaluaciones pendientes</div>
-              <div class="stat-value" style="color:#d97706">3</div>
-              <div class="stat-sub">Por corregir</div>
             </div>
           </div>
 
@@ -195,38 +187,6 @@
         </table>
       </div>
 
-        <!-- TAREAS -->
-        <div id="panel-tareas" class="panel">
-          <p class="section-title">Tareas y evaluaciones</p>
-          <div class="tarea-card">
-            <div class="tarea-info">
-              <strong>Evaluación integradora – 3° Año B</strong>
-              <span>Álgebra y funciones · Viernes 16/5 · Aula 12</span>
-            </div>
-            <span class="badge badge-yellow">Pendiente</span>
-          </div>
-          <div class="tarea-card">
-            <div class="tarea-info">
-              <strong>Trabajo práctico – 2° Año B</strong>
-              <span>Geometría euclidiana · Entrega 20/5</span>
-            </div>
-            <span class="badge badge-blue">Publicado</span>
-          </div>
-          <div class="tarea-card">
-            <div class="tarea-info">
-              <strong>Evaluación recuperatoria – 1° Año A</strong>
-              <span>Números enteros · Jueves 22/5 · Aula 5</span>
-            </div>
-            <span class="badge badge-pink">Por programar</span>
-          </div>
-          <div class="tarea-card">
-            <div class="tarea-info">
-              <strong>Quiz rápido – 4° Año A</strong>
-              <span>Estadística básica · Martes 13/5</span>
-            </div>
-            <span class="badge badge-green">Corregido</span>
-          </div>
-        </div>
 
         <!-- HORARIOS DEL DOCENTE EN BASE AL VIEWS.PY -->
         <div id="panel-horario" class="panel">
