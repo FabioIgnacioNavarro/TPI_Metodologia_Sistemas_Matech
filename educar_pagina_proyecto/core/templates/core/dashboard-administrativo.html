@@ -138,46 +138,20 @@ document.addEventListener("DOMContentLoaded", function() {
           <div class="stat-grid">
             <div class="stat-card">
               <div class="stat-label">Inscripciones nuevas</div>
-              <div class="stat-value" style="color:#1d66c2">24</div>
+              <div class="stat-value" style="color:#1d66c2">1</div>
               <div class="stat-sub">Pendientes de revisión</div>
             </div>
 
             <div class="stat-card">
               <div class="stat-label">Cuotas pendientes</div>
-              <div class="stat-value" style="color:#dc2626">17</div>
+              <div class="stat-value" style="color:#dc2626">{{ cuotas_pendientes }}</div>
               <div class="stat-sub">Este mes</div>
             </div>
 
             <div class="stat-card">
               <div class="stat-label">Documentos</div>
-              <div class="stat-value" style="color:#d97706">9</div>
+              <div class="stat-value" style="color:#d97706">1</div>
               <div class="stat-sub">Por validar</div>
-            </div>
-          </div>
-
-          <p class="section-title" style="font-size:18px">Tareas recientes</p>
-
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#dbeafe">📝</div>
-            <div class="notif-text">
-              <strong>Nueva solicitud de inscripción</strong>
-              <span>Ingresó una solicitud para Nivel Secundario · 3° Año.</span>
-            </div>
-          </div>
-
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#fef9c3">📄</div>
-            <div class="notif-text">
-              <strong>Documentación incompleta</strong>
-              <span>Falta DNI del tutor en una solicitud de Nivel Inicial.</span>
-            </div>
-          </div>
-
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#dcfce7">🏨</div>
-            <div class="notif-text">
-              <strong>Reserva registrada</strong>
-              <span>El gimnasio cubierto fue reservado para una actividad deportiva.</span>
             </div>
           </div>
         </div>
@@ -197,10 +171,8 @@ document.addEventListener("DOMContentLoaded", function() {
             </thead>
 
             <tbody>
-              <tr><td>Camila Torres</td><td>Inicial</td><td>Mariana Torres</td><td>08/05/2026</td><td><span class="badge badge-yellow">Pendiente</span></td></tr>
-              <tr><td>Joaquín Núñez</td><td>Primario</td><td>Pedro Núñez</td><td>07/05/2026</td><td><span class="badge badge-green">Aprobada</span></td></tr>
-              <tr><td>Martina Gómez</td><td>Secundario</td><td>Luciana Gómez</td><td>06/05/2026</td><td><span class="badge badge-blue">En revisión</span></td></tr>
-              <tr><td>Thiago Acosta</td><td>Primario</td><td>Andrea Acosta</td><td>05/05/2026</td><td><span class="badge badge-red">Incompleta</span></td></tr>
+              <tr><td>Juan Gómez</td><td>Secundario</td><td>Roberto Pérez</td><td>08/05/2026</td><td><span class="badge badge-yellow">Pendiente</span></td></tr>
+              <tr><td>Joaquín Núñez</td><td>Primario</td><td>Nora Díaz</td><td>07/05/2026</td><td><span class="badge badge-green">Aprobada</span></td></tr>
             </tbody>
           </table>
         </div>
@@ -220,10 +192,80 @@ document.addEventListener("DOMContentLoaded", function() {
             </thead>
 
             <tbody>
-              <tr><td>Ramírez</td><td>Lucía Ramírez</td><td>Cuota mayo</td><td>$85.000</td><td><span class="badge badge-green">Pagado</span></td></tr>
-              <tr><td>González</td><td>Tomás González</td><td>Cuota mayo</td><td>$85.000</td><td><span class="badge badge-red">Pendiente</span></td></tr>
-              <tr><td>López</td><td>Valentina López</td><td>Comedor</td><td>$35.000</td><td><span class="badge badge-yellow">Por vencer</span></td></tr>
-              <tr><td>Herrera</td><td>Mateo Herrera</td><td>Transporte escolar</td><td>$42.000</td><td><span class="badge badge-blue">En revisión</span></td></tr>
+              {% for cuota in cuotas %}
+
+              <tr>
+
+                <td>
+                  {{ cuota.id_tutor.id_persona.apellido }}
+                </td>
+
+                <td>
+                  {{ cuota.id_legajo_alumno.id_persona.nombre }}
+                  {{ cuota.id_legajo_alumno.id_persona.apellido }}
+                </td>
+
+                <td>
+                  {{ cuota.periodo }}
+                </td>
+
+                <td>
+                  ${{ cuota.monto }}
+                </td>
+
+                <td>
+
+                  {% if cuota.estado == 'Pagada' %}
+                    <span class="badge badge-green">
+                      Pagada
+                    </span>
+
+                  {% elif cuota.estado == 'Pendiente' %}
+                    <span class="badge badge-red">
+                      Pendiente
+                    </span>
+
+                  {% else %}
+                    <span class="badge badge-yellow">
+                      {{ cuota.estado }}
+                    </span>
+                  {% endif %}
+
+                  <th>Acción</th>
+                  <td>
+
+                    {% if cuota.estado != 'Pagada' %}
+
+                    <form method="POST"
+                          action="{% url 'aprobar-cuota' cuota.id_cuota %}">
+
+                        {% csrf_token %}
+
+                        <button type="submit"
+                                class="btn-form">
+                            Marcar como pagada
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+                  </td>
+
+                </td>
+
+              </tr>
+
+              {% empty %}
+
+              <tr>
+                <td colspan="5">
+                  No hay cuotas registradas.
+                </td>
+              </tr>
+
+              {% endfor %}
+
             </tbody>
           </table>
         </div>
@@ -233,15 +275,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
           <div class="tarea-card">
             <div class="tarea-info">
-              <strong>Camila Torres · Nivel Inicial</strong>
-              <span>Falta partida de nacimiento y certificado de vacunas.</span>
-            </div>
-            <span class="badge badge-red">Incompleta</span>
-          </div>
-
-          <div class="tarea-card">
-            <div class="tarea-info">
-              <strong>Martina Gómez · Nivel Secundario</strong>
+              <strong>Juan Gómez · Nivel Secundario</strong>
               <span>Documentación enviada. Pendiente de validación administrativa.</span>
             </div>
             <span class="badge badge-yellow">Pendiente</span>
@@ -249,7 +283,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
           <div class="tarea-card">
             <div class="tarea-info">
-              <strong>Joaquín Núñez · Nivel Primario</strong>
+              <strong>María Rodriguez · Nivel Secundario</strong>
               <span>Legajo completo y aprobado.</span>
             </div>
             <span class="badge badge-green">Aprobado</span>
@@ -271,46 +305,77 @@ document.addEventListener("DOMContentLoaded", function() {
             </thead>
 
             <tbody>
-              <tr><td>Gimnasio cubierto</td><td>Prof. Mario Villalba</td><td>12/05/2026</td><td>10:00 - 12:00</td><td><span class="badge badge-green">Aprobada</span></td></tr>
-              <tr><td>Laboratorio de computación</td><td>Prof. Laura Benítez</td><td>13/05/2026</td><td>08:00 - 10:00</td><td><span class="badge badge-yellow">Pendiente</span></td></tr>
-              <tr><td>Cancha de fútbol</td><td>Preceptoría</td><td>15/05/2026</td><td>09:00 - 11:00</td><td><span class="badge badge-blue">En revisión</span></td></tr>
+              {% for reserva in reservas %}
+              <tr>
+                <td>{{ reserva.id_instalacion.nombre }}</td>
+
+                <td>
+                  {{ reserva.id_persona_solicitante.nombre }}
+                  {{ reserva.id_persona_solicitante.apellido }}
+                </td>
+
+                <td>{{ reserva.fecha|date:"d/m/Y" }}</td>
+
+                <td>
+                  {{ reserva.hora_inicio|time:"H:i" }}
+                  -
+                  {{ reserva.hora_fin|time:"H:i" }}
+                </td>
+
+                <td>
+                  <span class="badge badge-green">
+                    Registrada
+                  </span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5">No hay reservas registradas.</td>
+              </tr>
+              {% endfor %}
             </tbody>
           </table>
 
           <div class="form-section" style="margin-top:30px">
-            <form class="form-card">
+            <form method="POST"
+            action="{% url 'crear-reserva' %}"
+            class="form-card">
+            {% csrf_token %}
               <h2>Nueva reserva</h2>
 
               <div class="form-grid">
                 <div class="form-group">
                   <label for="espacio">Espacio</label>
-                  <select id="espacio">
-                    <option>Gimnasio cubierto</option>
-                    <option>Laboratorio de computación</option>
-                    <option>Laboratorio de física</option>
-                    <option>Laboratorio de química</option>
-                    <option>Cancha de fútbol</option>
-                    <option>Pileta de natación</option>
+                  <select id="espacio" name="espacio" required>
+                    <option value="">Seleccione un espacio</option>
+
+                    {% for instalacion in instalaciones %}
+                        <option value="{{ instalacion.id }}">
+                            {{ instalacion.nombre }}
+                        </option>
+                    {% endfor %}
                   </select>
                 </div>
 
                 <div class="form-group">
                   <label for="fecha">Fecha</label>
-                  <input type="date" id="fecha">
+                  <input type="date" id="fecha" name="fecha">
                 </div>
 
                 <div class="form-group">
                   <label for="horario">Horario</label>
-                  <input type="text" id="horario" placeholder="Ej: 10:00 - 12:00">
+                  <input type="text" id="horario" name="horario" placeholder="Ej: 10:00 - 12:00">
                 </div>
 
                 <div class="form-group">
                   <label for="responsable">Responsable</label>
-                  <input type="text" id="responsable" placeholder="Nombre del solicitante">
+                  <input type="text" id="responsable" name="responsable" placeholder="Nombre del solicitante">
                 </div>
               </div>
 
-              <button type="button" class="btn-form">Registrar reserva</button>
+              <button type="submit" class="btn-form">
+                Registrar reserva
+              </button>
             </form>
           </div>
         </div>
@@ -321,7 +386,33 @@ document.addEventListener("DOMContentLoaded", function() {
             Opiniones anónimas
           </p>
 
-          <div id="adminOpiniones"></div>
+          {% for opinion in opiniones %}
+          <div class="notif-item">
+
+              <div class="notif-icon" style="background:#dbeafe">
+                  💬
+              </div>
+
+              <div class="notif-text">
+                  <strong>{{ opinion.nombre }}</strong>
+                  <span>{{ opinion.texto }}</span>
+                  <br>
+                  <small>{{ opinion.fecha }}</small>
+              </div>
+
+              <form method="POST" action="{% url 'eliminar-opinion' forloop.counter0 %}" style="margin-top:10px;">
+                {% csrf_token %}
+
+                <button type="submit" class="btn-form">
+                    Eliminar
+                </button>
+
+              </form>
+
+          </div>
+          {% empty %}
+          <p>No hay opiniones registradas.</p>
+          {% endfor %}
 
         </div>
 
@@ -333,55 +424,39 @@ document.addEventListener("DOMContentLoaded", function() {
 
           <div class="form-section">
 
-            <form class="form-card">
+            <form method="POST"action="{% url 'crear-usuario' %}"class="form-card">
+              {% csrf_token %}
 
               <h2>Habilitar acceso</h2>
 
               <div class="form-grid">
 
                 <div class="form-group">
-
-                  <label>Tipo de usuario</label>
-
-                  <select>
-                    <option>Alumno</option>
-                    <option>Tutor</option>
-                    <option>Docente</option>
-                    <option>Autoridad</option>
-                    <option>Administrativo</option>
-                  </select>
-
-                </div>
-
-                <div class="form-group">
                   <label>DNI</label>
-                  <input type="text">
+                  <input type="text" name="dni">
                 </div>
 
                 <div class="form-group">
                   <label>Nombre de usuario</label>
-                  <input type="text">
+                  <input type="text" name="nombre_usuario">
                 </div>
 
                 <div class="form-group">
                   <label>Contraseña provisoria</label>
-                  <input type="password">
+                  <input type="password" name="contrasenia">
                 </div>
 
                 <div class="form-group">
-
-                  <label>Estado</label>
-
-                  <select>
-                    <option>Activo</option>
-                    <option>Bloqueado</option>
-                  </select>
-
+                  <label>Correo institucional</label>
+                  <input
+                      type="email"
+                      name="correo"
+                      placeholder="ejemplo@colegio.edu.ar">
                 </div>
 
               </div>
 
-              <button type="button" class="btn-form">
+              <button type="submit" class="btn-form">
                 Crear usuario
               </button>
 
@@ -472,11 +547,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
           <table class="tabla">
             <tbody>
-              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>{{ persona.nombre }} {{ persona.apellido }}</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Cargo</td><td>Personal administrativo</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Área</td><td>Inscripciones, pagos y documentación</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>{{ persona.correo }}</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Teléfono interno</td><td>Interno 204</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Legajo</td><td>{{ administrativo.legajo }}</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Cargo</td><td>{{ administrativo.cargo }}</td></tr><tr><td style="font-weight:600;color:#64748b">Sector</td><td>{{ administrativo.sector }}</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Fecha de ingreso</td><td>{{ administrativo.fecha_ingreso }}</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Correo electrónico</td><td>{{ persona.email }}</td></tr><tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>{{ persona.telefono }}</td></tr>
+              <tr><td style="font-weight:600;color:#64748b">Dirección</td><td>{{ persona.direccion }}</td></tr>
             </tbody>
           </table>
         </div>

@@ -283,11 +283,29 @@ class Preceptor(models.Model):
 
 class Reserva(models.Model):
     nombre = models.CharField(max_length=100)
+
+    fecha = models.DateField()
+
     hora_inicio = models.TimeField()
     hora_fin = models.TimeField()
-    legajo_personal_evaluador = models.ForeignKey(PersonalAdministrativo, models.DO_NOTHING, db_column='legajo_personal_evaluador')
-    id_persona_solicitante = models.ForeignKey(Persona, models.DO_NOTHING, db_column='id_persona_solicitante')
-    id_instalacion = models.ForeignKey(Instalacion, models.DO_NOTHING, db_column='id_instalacion')
+
+    legajo_personal_evaluador = models.ForeignKey(
+        PersonalAdministrativo,
+        models.DO_NOTHING,
+        db_column='legajo_personal_evaluador'
+    )
+
+    id_persona_solicitante = models.ForeignKey(
+        Persona,
+        models.DO_NOTHING,
+        db_column='id_persona_solicitante'
+    )
+
+    id_instalacion = models.ForeignKey(
+        Instalacion,
+        models.DO_NOTHING,
+        db_column='id_instalacion'
+    )
 
     class Meta:
         managed = False

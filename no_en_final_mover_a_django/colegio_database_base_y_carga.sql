@@ -697,16 +697,17 @@ CREATE TABLE `reserva` (
   `hora_fin` time NOT NULL,
   `legajo_personal_evaluador` int(11) NOT NULL,
   `id_persona_solicitante` int(11) NOT NULL,
-  `id_instalacion` int(11) NOT NULL
+  `id_instalacion` int(11) NOT NULL,
+  `fecha` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `reserva`
 --
 
-INSERT INTO `reserva` (`id`, `nombre`, `hora_inicio`, `hora_fin`, `legajo_personal_evaluador`, `id_persona_solicitante`, `id_instalacion`) VALUES
-(1, 'Acto escolar Día del Maestro', '08:00:00', '12:00:00', 1, 10, 2),
-(2, 'Clase de Educación Física 1A', '10:00:00', '11:30:00', 1, 4, 1);
+INSERT INTO `reserva` (`id`, `nombre`, `hora_inicio`, `hora_fin`, `legajo_personal_evaluador`, `id_persona_solicitante`, `id_instalacion`, `fecha`) VALUES
+(1, 'Acto escolar Día del Maestro', '08:00:00', '12:00:00', 1, 10, 2, '2024-09-11'),
+(2, 'Clase de Educación Física 1A', '10:00:00', '11:30:00', 1, 4, 1, '2024-09-12');
 
 -- --------------------------------------------------------
 
