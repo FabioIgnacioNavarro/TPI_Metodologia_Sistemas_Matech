@@ -49,6 +49,21 @@
 
 </script>
 
+<script>
+document.querySelectorAll('.nota-input').forEach(input => {
+    input.addEventListener('focus', () => {
+        input.dataset.placeholder = input.placeholder;
+        input.placeholder = '';
+    });
+
+    input.addEventListener('blur', () => {
+        if (input.value === '') {
+            input.placeholder = input.dataset.placeholder;
+        }
+    });
+});
+</script>
+
 <body>
   <div class="page">
 
@@ -76,7 +91,11 @@
             {{ persona.nombre|slice:":1"|upper }}{{ persona.apellido|slice:":1"|upper }}
           </div>
           <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
-          <span>Preceptor · 3° Año B</span>
+          <span>Preceptor ·
+            {% for curso in cursos %}
+              {{ curso.anio }}° {{ curso.comision }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </span>
         </div>
 
         <nav class="sidebar-nav">
@@ -86,7 +105,9 @@
           <a href="#" onclick="showPanel('cursos', this); return false;">
             <span class="nav-icon">📚</span> Cursos
           </a>
-          <a href="#" onclick="showPanel('asistencias', this); return false;">
+          <a id="menu-asistencias"
+            href="#"
+            onclick="showPanel('asistencias', this); return false;">
             <span class="nav-icon">✅</span> Asistencias
           </a>
           <a href="#" onclick="showPanel('justificaciones', this); return false;">
@@ -109,13 +130,19 @@
           <div class="stat-grid">
             <div class="stat-card">
               <div class="stat-label">Alumnos presentes</div>
-              <div class="stat-value" style="color:#16a34a">124</div>
+              <div class="stat-value" style="color:#16a34a">
+                {{ total_alumnos }}
+              </div>
               <div class="stat-sub">Registrados hoy</div>
             </div>
 
             <div class="stat-card">
-              <div class="stat-label">Ausentes</div>
-              <div class="stat-value" style="color:#dc2626">12</div>
+              <div class="stat-label">
+                Cursos asignados
+              </div>
+              <div class="stat-value" style="color:#dc4a26">
+                {{ cantidad_cursos }}
+              </div>
               <div class="stat-sub">Entre cursos asignados</div>
             </div>
 
@@ -128,30 +155,17 @@
 
           <p class="section-title" style="font-size:18px">Avisos del día</p>
 
+          {% for noticia in noticias %}
           <div class="notif-item">
-            <div class="notif-icon" style="background:#dbeafe">📋</div>
+            <div class="notif-icon" style="background:#dbeafe">📰</div>
             <div class="notif-text">
-              <strong>Control de asistencia pendiente</strong>
-              <span>Registrar asistencia de 2° Año A antes de las 10:00 hs.</span>
+              <strong>{{ noticia.titulo }}</strong>
+              <span>{{ noticia.contenido }}</span>
             </div>
           </div>
-
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#dcfce7">👨‍👩‍👧</div>
-            <div class="notif-text">
-              <strong>Reunión con tutores</strong>
-              <span>Familia de Lucía Ramírez solicitó entrevista por seguimiento académico.</span>
-            </div>
-          </div>
-
-          <div class="notif-item">
-            <div class="notif-icon" style="background:#fef9c3">📢</div>
-            <div class="notif-text">
-              <strong>Comunicado institucional</strong>
-              <span>Recordar a los estudiantes la jornada deportiva del viernes.</span>
-            </div>
-          </div>
-        </div>
+          {% empty %}
+          <p style="color:#64748b">No hay noticias recientes.</p>
+          {% endfor %}
 
         <div id="panel-cursos" class="panel">
           <p class="section-title">Cursos asignados</p>
@@ -166,130 +180,137 @@
                 <th>Estado</th>
               </tr>
             </thead>
-
             <tbody>
-              <tr><td>1° Año A</td><td>Secundario</td><td>Mañana</td><td>28</td><td><span class="badge badge-green">Activo</span></td></tr>
-              <tr><td>2° Año A</td><td>Secundario</td><td>Mañana</td><td>31</td><td><span class="badge badge-green">Activo</span></td></tr>
-              <tr><td>3° Año B</td><td>Secundario</td><td>Mañana</td><td>27</td><td><span class="badge badge-green">Activo</span></td></tr>
-              <tr><td>4° Año A</td><td>Secundario</td><td>Tarde</td><td>30</td><td><span class="badge badge-yellow">Revisar</span></td></tr>
+              {% for curso in cursos %}
+              <tr>
+                <td>{{ curso.anio }}° {{ curso.comision }}</td>
+                <td>{{ curso.nivel }}</td>
+                <td>{{ curso.turno }}</td>
+                <td>{{ curso.cantidad_alumnos }}</td>
+                <td>
+                  <span class="badge badge-green">Activo</span>
+                </td>
+              </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
 
         <div id="panel-asistencias" class="panel">
-  <p class="section-title">Tomar asistencia</p>
+          <p class="section-title">Tomar asistencia</p>
 
-  <div class="stat-grid">
+          <div class="stat-grid">
+            {% for curso in cursos %}
+            <div class="stat-card">
+              <div class="stat-label">
+                {{ curso.anio }}° {{ curso.comision }}
+              </div>
 
-    <div class="stat-card">
-      <div class="stat-label">1° Año A</div>
-      <div class="stat-value" style="color:#e61c92">28</div>
-      <div class="stat-sub">Alumnos</div>
-      <button class="btn-small" onclick="showPanel('asistencia-curso', this)">Tomar asistencia</button>
-    </div>
+              <div class="stat-value" style="color:#e61c92">
+                {{ curso.cantidad_alumnos }}
+              </div>
 
-    <div class="stat-card">
-      <div class="stat-label">2° Año A</div>
-      <div class="stat-value" style="color:#e61c92">31</div>
-      <div class="stat-sub">Alumnos</div>
-      <button class="btn-small" onclick="showPanel('asistencia-curso', this)">Tomar asistencia</button>
-    </div>
+              <div class="stat-sub">
+                Alumnos
+              </div>
 
-    <div class="stat-card">
-      <div class="stat-label">3° Año B</div>
-      <div class="stat-value" style="color:#e61c92">27</div>
-      <div class="stat-sub">Alumnos</div>
-      <button class="btn-small" onclick="showPanel('asistencia-curso', this)">Tomar asistencia</button>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-label">4° Año A</div>
-      <div class="stat-value" style="color:#e61c92">30</div>
-      <div class="stat-sub">Alumnos</div>
-      <button class="btn-small" onclick="showPanel('asistencia-curso', this)">Tomar asistencia</button>
-    </div>
-
-  </div>
-</div>
-
-        <div id="panel-asistencia-curso" class="panel">
-        <p class="section-title">Asistencia · 3° Año B</p>
-
-        <table class="tabla">
-            <thead>
-            <tr>
-                <th>Alumno</th>
-                <th>Presente</th>
-                <th>Ausente</th>
-                <th>Tarde</th>
-                <th>Observación</th>
-            </tr>
-            </thead>
-
-            <tbody>
-            <tr>
-                <td>Lucía Ramírez</td>
-                <td><input type="radio" name="lucia" checked></td>
-                <td><input type="radio" name="lucia"></td>
-                <td><input type="radio" name="lucia"></td>
-                <td><input class="nota-input" placeholder="Sin observación"></td>
-            </tr>
-
-            <tr>
-                <td>Tomás González</td>
-                <td><input type="radio" name="tomas"></td>
-                <td><input type="radio" name="tomas" checked></td>
-                <td><input type="radio" name="tomas"></td>
-                <td><input class="nota-input" placeholder="Sin justificar"></td>
-            </tr>
-
-            <tr>
-                <td>Valentina López</td>
-                <td><input type="radio" name="valentina"></td>
-                <td><input type="radio" name="valentina"></td>
-                <td><input type="radio" name="valentina" checked></td>
-                <td><input class="nota-input" placeholder="Llegó 15 min tarde"></td>
-            </tr>
-
-            <tr>
-                <td>Mateo Herrera</td>
-                <td><input type="radio" name="mateo" checked></td>
-                <td><input type="radio" name="mateo"></td>
-                <td><input type="radio" name="mateo"></td>
-                <td><input class="nota-input" placeholder="Sin observación"></td>
-            </tr>
-            </tbody>
-        </table>
-
-        <button type="button" class="btn-form">Guardar asistencia</button>
+              <a href="?curso_id={{ curso.id_curso }}" class="btn-small">
+                Tomar asistencia
+              </a>
+            </div>
+            {% empty %}
+            <p>No tenés cursos asignados.</p>
+            {% endfor %}
+          </div>
         </div>
+
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="curso_id" value="{{ curso_seleccionado.id_curso }}">
+
+          <div id="panel-asistencia-curso" class="panel">
+            <p class="section-title">Registro de asistencia</p>
+
+            <table class="tabla">
+              <thead>
+                <tr>
+                  <th>Alumno</th>
+                  <th>Presente</th>
+                  <th>Ausente</th>
+                  <th>Tardanza</th>
+                  <th>Observación</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {% for alumno in alumnos %}
+                <tr>
+                  <td>
+                    {{ alumno.id_persona.nombre }}
+                    {{ alumno.id_persona.apellido }}
+                  </td>
+
+                  <td>
+                    <input type="radio"
+                          name="estado_{{ alumno.legajo }}"
+                          value="Presente"
+                          checked>
+                  </td>
+
+                  <td>
+                    <input type="radio"
+                          name="estado_{{ alumno.legajo }}"
+                          value="Ausente">
+                  </td>
+
+                  <td>
+                    <input type="radio"
+                          name="estado_{{ alumno.legajo }}"
+                          value="Tardanza">
+                  </td>
+
+                  <td>
+                    <input type="text"
+                          class="nota-input"
+                          name="obs_{{ alumno.legajo }}"
+                          placeholder="Motivo"
+                          onfocus="this.placeholder=''"
+                          onblur="if(this.value==='') this.placeholder='Motivo'">
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5">No hay alumnos disponibles.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+            <button type="submit" class="btn-form">
+              Guardar asistencia
+            </button>
+          </div>
+        </form>
 
         <div id="panel-justificaciones" class="panel">
           <p class="section-title">Justificaciones pendientes</p>
 
           <div class="tarea-card">
             <div class="tarea-info">
-              <strong>Tomás González · 3° Año B</strong>
-              <span>Ausencia del 07/05/2026 · Certificado médico presentado</span>
+              <strong>Alumno legajo 2 · Curso 1° A</strong>
+              <span>08/04/2024 · Ausente con aviso</span>
             </div>
             <span class="badge badge-yellow">Pendiente</span>
           </div>
 
           <div class="tarea-card">
             <div class="tarea-info">
-              <strong>Martina Suárez · 2° Año A</strong>
-              <span>Retiro anticipado · Solicitud del tutor</span>
-            </div>
-            <span class="badge badge-blue">En revisión</span>
-          </div>
-
-          <div class="tarea-card">
-            <div class="tarea-info">
-              <strong>Joaquín Núñez · 4° Año A</strong>
-              <span>Llegada tarde reiterada · Requiere seguimiento</span>
+              <strong>Alumno legajo 3 · Curso 2° B</strong>
+              <span>10/04/2024 · Llegó 15 minutos tarde</span>
             </div>
             <span class="badge badge-red">Urgente</span>
           </div>
+
         </div>
 
         <!-- COMUNICADOS -->
@@ -360,12 +381,36 @@
 
           <table class="tabla">
             <tbody>
-              <tr><td style="font-weight:600;color:#64748b">Nombre completo</td><td>Ana Pereira</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">DNI</td><td>29.123.456</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Cargo</td><td>Preceptora</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Cursos asignados</td><td>1° A, 2° A, 3° B y 4° A</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Correo institucional</td><td>{{ persona.email }}</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>(362) 4556677</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Nombre completo</td>
+                <td>{{ persona.nombre }} {{ persona.apellido }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">DNI</td>
+                <td>{{ persona.dni }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Cargo</td>
+                <td>Preceptor/a</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Cursos asignados</td>
+                <td>
+                  {% for curso in cursos %}
+                    {{ curso.anio }}° {{ curso.comision }}{% if not forloop.last %}, {% endif %}
+                  {% empty %}
+                    Sin cursos asignados
+                  {% endfor %}
+                </td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Correo institucional</td>
+                <td>{{ persona.email }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Teléfono</td>
+                <td>{{ persona.telefono }}</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -380,8 +425,30 @@
       document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
       document.getElementById('panel-' + id).classList.add('active');
       el.classList.add('active');
+
+      // Limpia el ?curso_id=... de la URL sin recargar la página
+      history.replaceState(null, '', window.location.pathname);
     }
   </script>
+  <script>
+      window.onload = function() {
+          const cursoSeleccionado = "{{ curso_seleccionado|default:'' }}";
 
+          if (cursoSeleccionado) {
+
+              document.querySelectorAll('.panel')
+                  .forEach(p => p.classList.remove('active'));
+
+              document.querySelectorAll('.sidebar-nav a')
+                  .forEach(a => a.classList.remove('active'));
+
+              document.getElementById('panel-asistencia-curso')
+                  .classList.add('active');
+
+              document.getElementById('menu-asistencias')
+                  .classList.add('active');
+          }
+      };
+  </script>
 </body>
 </html>

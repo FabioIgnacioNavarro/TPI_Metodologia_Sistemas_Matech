@@ -24,9 +24,28 @@ class Alumno(models.Model):
 
 class Asistencia(models.Model):
     id_asistencia = models.AutoField(primary_key=True)
-    legajo_alumno = models.ForeignKey(Alumno, models.DO_NOTHING, db_column='legajo_alumno')
+
+    legajo_alumno = models.ForeignKey(
+        Alumno,
+        models.DO_NOTHING,
+        db_column='legajo_alumno'
+    )
+
     fecha = models.DateField(blank=True, null=True)
-    observacion = models.TextField(blank=True, null=True)
+
+    tipo_asistencia = models.CharField(
+        max_length=10,
+        choices=[
+            ('Presente', 'Presente'),
+            ('Ausente', 'Ausente'),
+            ('Tardanza', 'Tardanza')
+        ]
+    )
+
+    observacion = models.TextField(
+        blank=True,
+        null=True
+    )
 
     class Meta:
         managed = False

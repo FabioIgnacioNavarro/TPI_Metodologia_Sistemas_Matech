@@ -938,8 +938,11 @@ def dashboard_padres(request):
 
 @never_cache
 def dashboard_preceptor(request):
+
     persona = obtener_persona(request)
 
+    curso_id = request.POST.get('curso_id') or request.GET.get('curso_id')
+    
     if not persona:
         return redirect('login')
 
@@ -951,10 +954,97 @@ def dashboard_preceptor(request):
         legajo_preceptor=preceptor
     )
 
-    return render(request, 'core/dashboard-preceptor.html', {
+    curso_seleccionado = None
+
+    if curso_id:
+        curso_seleccionado = Curso.objects.filter(
+            id_curso=curso_id,
+            legajo_preceptor=preceptor
+        ).first()
+
+    if curso_seleccionado:
+        alumnos = Alumno.objects.filter(
+            id_curso=curso_seleccionado
+        )
+
+    else:
+        alumnos = Alumno.objects.filter(
+            id_curso=cursos.first()
+        ) if cursos.exists() else []
+        
+    total_alumnos = 0
+    
+    if request.method == 'POST':
+
+        fecha_hoy = date.today()
+
+        Asistencia.objects.filter(
+            fecha=fecha_hoy,
+            legajo_alumno__in=alumnos
+        ).delete()
+
+        for alumno in alumnos:
+
+            estado = request.POST.get(
+                f'estado_{alumno.legajo}',
+                'Presente'
+            )
+
+            observacion = request.POST.get(
+                f'obs_{alumno.legajo}',
+                ''
+            )
+
+            Asistencia.objects.create(
+                legajo_alumno=alumno,
+                fecha=fecha_hoy,
+                tipo_asistencia=estado.capitalize(),
+                observacion=observacion
+            )
+            return redirect('dashboard-preceptor') 
+        
+    for curso in cursos:
+        curso.cantidad_alumnos = Alumno.objects.filter(
+            id_curso=curso
+        ).count()
+
+        total_alumnos += curso.cantidad_alumnos
+
+    hoy = date.today()
+
+    presentes = Asistencia.objects.filter(
+        fecha=hoy,
+        tipo_asistencia='Presente'
+    ).count()
+
+    ausentes = Asistencia.objects.filter(
+        fecha=hoy,
+        tipo_asistencia='Ausente'
+    ).count()
+
+    tardanzas = Asistencia.objects.filter(
+        fecha=hoy,
+        tipo_asistencia='Tardanza'
+    ).count()
+
+    context = {
         'persona': persona,
-        'cursos': cursos
-    })
+        'cursos': cursos,
+        'total_alumnos': total_alumnos,
+        'alumnos': alumnos,
+        'cantidad_cursos': cursos.count(),
+        'presentes': presentes,
+        'ausentes': ausentes,
+        'tardanzas': tardanzas,
+        'curso_seleccionado': curso_seleccionado,
+        'noticias': Noticia.objects.order_by('-fecha_publicacion')[:5],
+    }
+
+    return render(
+        request,
+        'core/dashboard-preceptor.html',
+        context
+    )
 
 def crear_noticia(request):
 

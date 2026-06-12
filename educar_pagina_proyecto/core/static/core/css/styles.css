@@ -718,11 +718,29 @@
       padding: 6px 8px; font-size: 14px; text-align: center;
     }
     .btn-small {
-      padding: 7px 16px; border-radius: 999px; border: none;
-      background: #e61c92; color: white; font-size: 13px;
-      font-weight: bold; cursor: pointer; transition: 0.2s;
+        display: inline-block;
+
+        padding: 7px 16px;
+        margin-top: 15px;
+
+        border-radius: 999px;
+        border: none;
+
+        background: #e61c92;
+        color: white;
+
+        font-size: 13px;
+        font-weight: bold;
+
+        text-decoration: none;
+
+        cursor: pointer;
+        transition: 0.2s;
     }
-    .btn-small:hover { background: #be185d; }
+
+    .btn-small:hover {
+        background: #be185d;
+    }
     .tarea-card {
       background: white; border: 1px solid #e2e8f0; border-radius: 14px;
       padding: 16px 20px; margin-bottom: 12px;
