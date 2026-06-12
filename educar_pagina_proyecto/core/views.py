@@ -1001,7 +1001,7 @@ def dashboard_preceptor(request):
                 tipo_asistencia=estado.capitalize(),
                 observacion=observacion
             )
-            return redirect('dashboard-preceptor') 
+        return redirect('dashboard-preceptor') 
         
     for curso in cursos:
         curso.cantidad_alumnos = Alumno.objects.filter(

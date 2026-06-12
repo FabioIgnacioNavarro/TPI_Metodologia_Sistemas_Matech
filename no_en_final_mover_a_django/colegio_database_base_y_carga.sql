@@ -58,6 +58,7 @@ CREATE TABLE `asistencia` (
   `id_asistencia` int(11) NOT NULL,
   `legajo_alumno` int(11) NOT NULL,
   `fecha` date DEFAULT NULL,
+  `tipo_asistencia` enum('Presente','Ausente','Tardanza') NOT NULL,
   `observacion` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -65,13 +66,15 @@ CREATE TABLE `asistencia` (
 -- Volcado de datos para la tabla `asistencia`
 --
 
-INSERT INTO `asistencia` (`id_asistencia`, `legajo_alumno`, `fecha`, `observacion`) VALUES
-(1, 1, '2024-04-08', 'Presente'),
-(2, 2, '2024-04-08', 'Ausente con aviso'),
-(3, 3, '2024-04-08', 'Presente'),
-(4, 1, '2024-04-10', 'Presente'),
-(5, 2, '2024-04-10', 'Presente'),
-(6, 3, '2024-04-10', 'Tardanza');
+INSERT INTO `asistencia`
+(`id_asistencia`, `legajo_alumno`, `fecha`, `tipo_asistencia`, `observacion`)
+VALUES
+(1, 1, '2024-04-08', 'Presente', NULL),
+(2, 2, '2024-04-08', 'Ausente', 'Ausente con aviso'),
+(3, 3, '2024-04-08', 'Presente', NULL),
+(4, 1, '2024-04-10', 'Presente', NULL),
+(5, 2, '2024-04-10', 'Presente', NULL),
+(6, 3, '2024-04-10', 'Tardanza', 'Llegó 15 minutos tarde');
 
 -- --------------------------------------------------------
 
@@ -601,10 +604,60 @@ CREATE TABLE `noticia` (
 -- Volcado de datos para la tabla `noticia`
 --
 
-INSERT INTO `noticia` (`id_noticia`, `titulo`, `contenido`, `fecha_publicacion`, `legajo_personal`, `imagen`) VALUES
-(1, 'Inicio del ciclo lectivo 2024', 'Se informa a la comunidad educativa que el ciclo lectivo 2024 comenzará el 4 de marzo. Los alumnos deberán presentarse con el uniforme reglamentario.', '2024-02-28', 1, NULL),
-(2, 'Entrega de boletines — 1er trimestre', 'El viernes 28 de junio se realizará la entrega de boletines correspondientes al primer trimestre. Se cita a los tutores a las 17:00 hs.', '2024-06-20', 1, NULL);
+--
+-- Volcado de datos para la tabla `noticia`
+--
 
+INSERT INTO `noticia`
+(
+    `id_noticia`,
+    `titulo`,
+    `contenido`,
+    `fecha_publicacion`,
+    `legajo_personal`,
+    `imagen`
+)
+VALUES
+(
+    1,
+    'Inicio del ciclo lectivo 2024',
+    'Se informa a la comunidad educativa que el ciclo lectivo 2024 comenzará el 4 de marzo. Los alumnos deberán presentarse con el uniforme reglamentario.',
+    '2024-02-28',
+    1,
+    'noticias/noticia4.jpg'
+),
+(
+    2,
+    'Entrega de boletines — 1er trimestre',
+    'El viernes 28 de junio se realizará la entrega de boletines correspondientes al primer trimestre. Se cita a los tutores a las 17:00 hs.',
+    '2024-06-20',
+    1,
+    'noticias/noticia5.jpg'
+),
+(
+    3,
+    'Jornada deportiva',
+    'Se realizará una jornada recreativa y deportiva para promover el trabajo en equipo y la vida saludable.',
+    '2024-09-10',
+    1,
+    'noticias/noticia2.jpg'
+),
+(
+    4,
+    'Nuevos laboratorios',
+    'El centro educativo incorporó nuevos equipos tecnológicos para fortalecer las actividades de informática y ciencias.',
+    '2024-09-15',
+    1,
+    'noticias/noticia3.jpg'
+),
+(
+    5,
+    'Inscripciones 2027',
+    'Ya se encuentran abiertas las inscripciones para el ciclo lectivo 2027 en nivel inicial, primario y secundario.',
+    '2024-10-01',
+    1,
+    'noticias/noticia1.jpg'
+);
 -- --------------------------------------------------------
 
 --
@@ -689,24 +742,26 @@ INSERT INTO `preceptor` (`legajo`, `id_persona`, `turno`, `fecha_ingreso`) VALUE
 -- Estructura de tabla para la tabla `reserva`
 --
 
-DROP TABLE IF EXISTS `reserva`;
-CREATE TABLE `reserva` (
-  `id` int(11) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `hora_inicio` time NOT NULL,
-  `hora_fin` time NOT NULL,
-  `legajo_personal_evaluador` int(11) NOT NULL,
-  `id_persona_solicitante` int(11) NOT NULL,
-  `id_instalacion` int(11) NOT NULL
+DROP TABLE IF EXISTS reserva;
+CREATE TABLE reserva (
+  id int(11) NOT NULL,
+  nombre varchar(100) NOT NULL,
+  hora_inicio time NOT NULL,
+  hora_fin time NOT NULL,
+  legajo_personal_evaluador int(11) NOT NULL,
+  id_persona_solicitante int(11) NOT NULL,
+  id_instalacion int(11) NOT NULL,
+  fecha date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+
 --
--- Volcado de datos para la tabla `reserva`
+-- Volcado de datos para la tabla reserva
 --
 
-INSERT INTO `reserva` (`id`, `nombre`, `hora_inicio`, `hora_fin`, `legajo_personal_evaluador`, `id_persona_solicitante`, `id_instalacion`) VALUES
-(1, 'Acto escolar Día del Maestro', '08:00:00', '12:00:00', 1, 10, 2),
-(2, 'Clase de Educación Física 1A', '10:00:00', '11:30:00', 1, 4, 1);
+INSERT INTO reserva (id, nombre, hora_inicio, hora_fin, legajo_personal_evaluador, id_persona_solicitante, id_instalacion, fecha) VALUES
+(1, 'Acto escolar Día del Maestro', '08:00:00', '12:00:00', 1, 10, 2, '2024-09-11'),
+(2, 'Clase de Educación Física 1A', '10:00:00', '11:30:00', 1, 4, 1, '2024-09-12');
 
 -- --------------------------------------------------------
 
