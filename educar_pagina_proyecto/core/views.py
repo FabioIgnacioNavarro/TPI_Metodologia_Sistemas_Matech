@@ -230,7 +230,12 @@ def inscripcion(request):
         }
     )
 
+@never_cache
 def login(request):
+    persona, dashboard_url = obtener_datos_sesion(request)
+    if persona and dashboard_url and dashboard_url != 'login':
+        return redirect(dashboard_url)
+
     if request.method == 'POST':
         usuario_input = request.POST.get('usuario')
         password = request.POST.get('password')
@@ -664,7 +669,6 @@ def dashboard_directivo(request):
             'docentes': docentes
         }
     )
-
     
 @never_cache
 def dashboard_administrativo(request):
