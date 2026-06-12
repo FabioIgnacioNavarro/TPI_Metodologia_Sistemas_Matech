@@ -1058,10 +1058,7 @@
   transform: translateY(-1px);
 }
 
-#panel-horario {
-  max-width: 900px;
-  margin: 0 auto;
-}
+
 
 #panel-horario .tabla {
   text-align: center;
