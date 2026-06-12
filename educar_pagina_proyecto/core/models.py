@@ -79,8 +79,9 @@ class Cuota(models.Model):
 
 
 class Curso(models.Model):
-    id_curso = models.AutoField(primary_key=True)
+    id_curso = models.AutoField(primary_key=True, db_column='id')
     comision = models.CharField(max_length=20)
+    anio = models.IntegerField()  # 👈 ESTE FALTA
     turno = models.CharField(max_length=30)
     nivel = models.CharField(max_length=30)
     cupo_maximo = models.IntegerField(blank=True, null=True)
