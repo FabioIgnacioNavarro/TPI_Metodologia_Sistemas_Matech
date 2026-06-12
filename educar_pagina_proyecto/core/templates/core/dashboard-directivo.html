@@ -140,10 +140,6 @@
           </div>
 
           <p class="section-title" style="font-size:18px">
-            Resumen institucional
-          </p>
-
-          <p class="section-title" style="font-size:18px">
             Novedades institucionales
           </p>
 
@@ -296,22 +292,36 @@
         <div id="panel-comunicados" class="panel">
 
           <p class="section-title">
-            Publicar comunicado institucional
+            Comunicados institucionales
           </p>
 
           <div class="form-section" style="margin-top:20px">
 
-            <form method="POST" action="{% url 'crear-noticia' %}" class="form-card">
+            <form method="POST" action="{% url 'crear-comunicado' %}" class="form-card">
               {% csrf_token %}
 
+              <h2>Nuevo comunicado</h2>
+
               <div class="form-group full">
-                <label>Título</label>
-                <input type="text" name="titulo" required>
+                <label for="titulo">Título</label>
+                <input
+                  type="text"
+                  id="titulo"
+                  name="titulo"
+                  placeholder="Ej: Suspensión de actividades"
+                  required
+                >
               </div>
 
               <div class="form-group full">
-                <label>Mensaje</label>
-                <textarea name="contenido" rows="6" required></textarea>
+                <label for="contenido">Mensaje</label>
+                <textarea
+                  id="contenido"
+                  name="contenido"
+                  rows="5"
+                  placeholder="Escriba el comunicado institucional..."
+                  required
+                ></textarea>
               </div>
 
               <button type="submit" class="btn-form">

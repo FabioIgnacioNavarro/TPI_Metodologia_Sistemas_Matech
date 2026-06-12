@@ -292,38 +292,67 @@
           </div>
         </div>
 
+        <!-- COMUNICADOS -->
         <div id="panel-comunicados" class="panel">
-          <p class="section-title">Comunicados para cursos</p>
+
+          <p class="section-title">
+            Comunicados para cursos
+          </p>
 
           <div class="form-section" style="margin-top:20px">
-            <form class="form-card">
+
+            <form method="POST" action="{% url 'crear-comunicado' %}" class="form-card">
+              {% csrf_token %}
+
               <h2>Nuevo comunicado</h2>
 
               <div class="form-grid">
                 <div class="form-group">
                   <label for="curso">Curso</label>
-                  <select id="curso" name="curso">
-                    <option>1° Año A</option>
-                    <option>2° Año A</option>
-                    <option>3° Año B</option>
-                    <option>4° Año A</option>
+                  <select id="curso" name="curso" required>
+
+                    {% for curso in cursos %}
+                      <option value="{{ curso.id_curso }}">
+                        {{ curso.nivel }} {{ curso.anio }}° {{ curso.comision }} - {{ curso.turno }}
+                      </option>
+                    {% empty %}
+                      <option disabled>No tenés cursos asignados</option>
+                    {% endfor %}
+
                   </select>
                 </div>
 
                 <div class="form-group">
-                  <label for="asunto">Asunto</label>
-                  <input type="text" id="asunto" name="asunto" placeholder="Ej: Reunión de tutores">
+                  <label for="titulo">Asunto</label>
+                  <input
+                    type="text"
+                    id="titulo"
+                    name="titulo"
+                    placeholder="Ej: Reunión de tutores"
+                    required
+                  >
                 </div>
               </div>
 
               <div class="form-group full">
-                <label for="mensaje">Mensaje</label>
-                <textarea id="mensaje" name="mensaje" rows="5" placeholder="Escriba el comunicado..."></textarea>
+                <label for="contenido">Mensaje</label>
+                <textarea
+                  id="contenido"
+                  name="contenido"
+                  rows="5"
+                  placeholder="Escriba el comunicado..."
+                  required
+                ></textarea>
               </div>
 
-              <button type="button" class="btn-form">Publicar comunicado</button>
+              <button type="submit" class="btn-form">
+                Publicar comunicado
+              </button>
+
             </form>
+
           </div>
+
         </div>
 
         <div id="panel-perfil" class="panel">

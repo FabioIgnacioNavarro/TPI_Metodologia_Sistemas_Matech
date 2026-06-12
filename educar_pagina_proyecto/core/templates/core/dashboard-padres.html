@@ -370,6 +370,7 @@
 
         <!-- MENSAJES -->
         <div id="panel-mensajes" class="panel">
+
           <p class="section-title">Comunicados institucionales</p>
 
           {% for noticia in noticias %}
@@ -381,14 +382,24 @@
 
             <div class="notif-text">
               <strong>{{ noticia.titulo }}</strong>
+
+              {% if noticia.curso %}
+                <small style="display:block; font-weight:600; color:#64748b;">
+                  Curso: {{ noticia.curso }}
+                </small>
+              {% endif %}
+
               <span>{{ noticia.contenido }}</span>
-              <small>{{ noticia.fecha_publicacion|date:"d M. Y" }}</small>
+
+              <small>{{ noticia.fecha }}</small>
             </div>
 
           </div>
+
           {% empty %}
           <p>No hay comunicados disponibles.</p>
           {% endfor %}
+
         </div>
 
         <!-- PERFIL -->

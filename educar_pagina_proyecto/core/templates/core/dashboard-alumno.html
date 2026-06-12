@@ -123,19 +123,7 @@
               <div class="stat-sub">Materias aprobadas / totales</div>
             </div>
           </div>
-          {% for noticia in ultimas_noticias %}
-        <div class="notif-item">
-          <div class="notif-icon" style="background:#dbeafe">📢</div>
-
-          <div class="notif-text">
-            <strong>{{ noticia.titulo }}</strong>
-            <span>{{ noticia.contenido|truncatechars:120 }}</span>
-          </div>
-        </div>
-        {% empty %}
-        <p>No hay notificaciones disponibles.</p>
-        {% endfor %}
-        </div>
+        </div> 
 
         <!-- NOTAS -->
         <div id="panel-notas" class="panel">
@@ -290,17 +278,17 @@
         <div id="panel-comunicados" class="panel">
             <p class="section-title">Comunicados institucionales</p>
 
-            {% for noticia in noticias %}
+            {% for comunicado in comunicados %}
             <div class="notif-item">
                 <div class="notif-icon" style="background:#dbeafe">
                     📢
                 </div>
 
                 <div class="notif-text">
-                    <strong>{{ noticia.titulo }}</strong>
-                    <span>{{ noticia.contenido }}</span>
+                    <strong>{{ comunicado.titulo }}</strong>
+                    <span>{{ comunicado.contenido }}</span>
                     <br>
-                    <small>{{ noticia.fecha_publicacion }}</small>
+                    <small>{{ comunicado.fecha }}</small>
                 </div>
             </div>
             {% empty %}

@@ -19,4 +19,5 @@ urlpatterns = [
     path('contacto/opinion/', views.guardar_opinion, name='guardar-opinion'),
     #Cerrar sesión
     path('logout/', views.logout, name='logout'),
+    path('crear-comunicado/',views.crear_comunicado,name='crear-comunicado'),
 ]

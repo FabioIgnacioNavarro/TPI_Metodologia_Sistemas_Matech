@@ -1,6 +1,7 @@
 import requests
 from django.conf import settings
 from datetime import date
+from datetime import datetime
 import re
 from django.core.files.storage import FileSystemStorage
 import os
@@ -16,6 +17,7 @@ from .models import (
     Docente,
     Alumno,
     Preceptor,
+    Curso,
     Tutor,
     TutorTutoraAlumno,
     PersonalAdministrativo,
@@ -24,6 +26,10 @@ from .models import (
     Asistencia,
     CursoCursaMaterias,
     DocenteDictaMateria,
+)
+COMUNICADOS_FILE = os.path.join(
+    os.path.dirname(__file__),
+    'comunicados.json'
 )
 import json
 import os
@@ -314,6 +320,8 @@ def dashboard_alumno(request):
     alumno = Alumno.objects.filter(
         id_persona=persona
     ).select_related('id_curso').first()
+
+    curso_alumno = f"{alumno.id_curso.nivel} {alumno.id_curso.anio}° {alumno.id_curso.comision}"
     
     materias = CursoCursaMaterias.objects.filter(
         id_curso=alumno.id_curso
@@ -384,9 +392,7 @@ def dashboard_alumno(request):
         'id_tutor__id_persona'
     ).first()
 
-    noticias = Noticia.objects.all().order_by('-fecha_publicacion')
-    ultimas_noticias = noticias[:3]
-
+    
     calificaciones = Calificacion.objects.filter(
         legajo_alumno=alumno
     ).select_related('id_materia')
@@ -466,12 +472,46 @@ def dashboard_alumno(request):
     # Materias aprobadas: sólo se cuentan si hay un registro cuyo tipo indica 'Aprobado'
     materias_aprobadas = sum(1 for n in notas_resumen if n.get('estado') == 'Aprobado')
     total_materias = len(notas_resumen)
+    COMUNICADOS_FILE = os.path.join(
+        settings.BASE_DIR,
+        "core",
+        "comunicados.json"
+    )
 
+    comunicados_alumno = []
+    ultimos_comunicados = []
+
+    if os.path.exists(COMUNICADOS_FILE):
+        try:
+            with open(COMUNICADOS_FILE, 'r', encoding='utf-8') as f:
+                file_content = f.read().strip()
+                comunicados = json.loads(file_content) if file_content else []
+
+                comunicados_alumno = [
+                    c for c in comunicados
+                    if (
+                        c.get('rol') == 'Directivo'
+                        or (
+                            c.get('rol') == 'Preceptor'
+                            and c.get('curso', '').strip().lower() == curso_alumno.strip().lower()
+                        )
+                    )
+                ]
+
+                # 🔥 ORDEN MÁS NUEVOS PRIMERO
+                comunicados_alumno.reverse()
+
+            # 🔥 últimos 3 ya ordenados
+            ultimos_comunicados = comunicados_alumno[:3]
+
+        except json.JSONDecodeError:
+            comunicados_alumno = []
+            ultimos_comunicados = []
     return render(request, 'core/dashboard-alumno.html', {
         'persona': persona,
         'alumno': alumno,
-        'noticias': noticias,
-        'ultimas_noticias': ultimas_noticias,
+        'comunicados': comunicados_alumno,
+        'ultimas_noticias': ultimos_comunicados,
         'calificaciones': calificaciones,
         'asistencias': asistencias,
         'presentes': presentes,
@@ -698,8 +738,6 @@ def dashboard_padres(request):
                 legajo_alumno=alumno,
                 observacion__icontains='tard'
             ).count()
-            
-            noticias = Noticia.objects.all().order_by('-fecha_publicacion')
 
             presentes += pres
             ausencias += aus
@@ -714,6 +752,7 @@ def dashboard_padres(request):
                 'tardanzas': tar
             })
 
+    # 📊 promedio general
     promedio_general = round(
         suma_promedios / cantidad_promedios,
         2
@@ -725,7 +764,70 @@ def dashboard_padres(request):
         (presentes / total_asistencias) * 100,
         0
     ) if total_asistencias else 0
-    ultimas_noticias = Noticia.objects.all().order_by('-fecha_publicacion')[:3]
+
+    # 📢 COMUNICADOS (JSON) SOLO DIRECTIVOS
+    COMUNICADOS_FILE = os.path.join(
+        settings.BASE_DIR,
+        "core",
+        "comunicados.json"
+    )
+
+
+
+    comunicados_filtrados = []
+    vistos = set()
+
+    def parse_fecha(c):
+        try:
+            return datetime.strptime(c.get("fecha", ""), '%d/%m/%Y %H:%M')
+        except:
+            return datetime.min
+
+    if os.path.exists(COMUNICADOS_FILE):
+
+        try:
+            with open(COMUNICADOS_FILE, 'r', encoding='utf-8') as f:
+                file_content = f.read().strip()
+                comunicados = json.loads(file_content) if file_content else []
+
+            for relacion in relaciones:
+
+                alumno = relacion.id_alumno
+                curso_alumno = f"{alumno.id_curso.nivel} {alumno.id_curso.anio}° {alumno.id_curso.comision}"
+
+                for c in comunicados:
+
+                    clave = (
+                        c.get('titulo'),
+                        c.get('fecha'),
+                        c.get('rol')
+                    )
+
+                    if clave in vistos:
+                        continue
+
+                    # Directivo siempre
+                    if c.get('rol') == 'Directivo':
+                        comunicados_filtrados.append(c)
+                        vistos.add(clave)
+
+                    # Preceptor solo si coincide curso
+                    elif (
+                        c.get('rol') == 'Preceptor'
+                        and c.get('curso', '').strip().lower() == curso_alumno.strip().lower()
+                    ):
+                        comunicados_filtrados.append(c)
+                        vistos.add(clave)
+
+            # 🔥 ORDEN CORRECTO (más nuevos primero)
+            comunicados_filtrados.sort(
+                key=parse_fecha,
+                reverse=True
+            )
+
+        except json.JSONDecodeError:
+            comunicados_filtrados = []
+
     return render(
         request,
         'core/dashboard-padres.html',
@@ -737,8 +839,9 @@ def dashboard_padres(request):
             'presentes': presentes,
             'ausencias': ausencias,
             'tardanzas': tardanzas,
-            'ultimas_noticias': ultimas_noticias,
-            'noticias': noticias
+
+            # 🔥 ahora esto reemplaza TODO lo de noticias
+            'noticias': comunicados_filtrados,
         }
     )
 
@@ -749,8 +852,17 @@ def dashboard_preceptor(request):
     if not persona:
         return redirect('login')
 
+    preceptor = Preceptor.objects.filter(
+        id_persona=persona
+    ).first()
+
+    cursos = Curso.objects.filter(
+        legajo_preceptor=preceptor
+    )
+
     return render(request, 'core/dashboard-preceptor.html', {
-        'persona': persona
+        'persona': persona,
+        'cursos': cursos
     })
 
 def crear_noticia(request):
@@ -876,3 +988,86 @@ def logout(request):
     if 'usuario_id' in request.session:
         del request.session['usuario_id']
     return redirect('index')
+
+def crear_comunicado(request):
+
+    if request.method == 'POST':
+
+        titulo = request.POST.get('titulo', '').strip()
+        contenido_form = request.POST.get('contenido', '').strip()
+        curso_id = request.POST.get('curso')
+
+        persona = obtener_persona(request)
+
+        rol = "Desconocido"
+
+        if Directivo.objects.filter(id_persona=persona.id).exists():
+            rol = "Directivo"
+        elif Docente.objects.filter(id_persona=persona.id).exists():
+            rol = "Docente"
+        elif Preceptor.objects.filter(id_persona=persona.id).exists():
+            rol = "Preceptor"
+        elif PersonalAdministrativo.objects.filter(id_persona=persona.id).exists():
+            rol = "Administrativo"
+
+        if not titulo or not contenido_form:
+            return redirect('dashboard-directivo')
+
+        if len(contenido_form) > 500:
+            return redirect('dashboard-directivo')
+
+        comunicados = []
+
+        if os.path.exists(COMUNICADOS_FILE):
+            try:
+                with open(COMUNICADOS_FILE, 'r', encoding='utf-8') as f:
+                    file_content = f.read().strip()
+
+                    if file_content:
+                        comunicados = json.loads(file_content)
+
+            except json.JSONDecodeError:
+                comunicados = []
+
+        # 👇 🔥 ACÁ VA LO NUEVO (ANTES DE ARMAR EL OBJETO)
+
+        curso_obj = None
+
+        if rol == "Preceptor" and curso_id:
+            curso_obj = Curso.objects.filter(
+                id_curso=curso_id,
+                legajo_preceptor__id_persona=persona
+            ).first()
+
+        # 🔥 ARMADO DEL OBJETO (BASE)
+        nuevo_comunicado = {
+            'titulo': titulo,
+            'contenido': contenido_form,
+            'autor': f'{persona.nombre} {persona.apellido}',
+            'rol': rol,
+            'fecha': datetime.now().strftime('%d/%m/%Y %H:%M')
+        }
+
+        # 👇 SOLO SI ES PRECEPTOR
+        if rol == "Preceptor" and curso_obj:
+            nuevo_comunicado['curso_id'] = curso_obj.id_curso
+            nuevo_comunicado['curso'] = f"{curso_obj.nivel} {curso_obj.anio}° {curso_obj.comision}"
+
+        comunicados.append(nuevo_comunicado)
+
+        with open(COMUNICADOS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(
+                comunicados,
+                f,
+                ensure_ascii=False,
+                indent=2
+            )
+
+        if rol == "Preceptor":
+            return redirect('dashboard-preceptor')
+        elif rol == "Docente":
+            return redirect('dashboard-docente')
+        elif rol == "Administrativo":
+            return redirect('dashboard-administrativo')
+        else:
+            return redirect('dashboard-directivo')
