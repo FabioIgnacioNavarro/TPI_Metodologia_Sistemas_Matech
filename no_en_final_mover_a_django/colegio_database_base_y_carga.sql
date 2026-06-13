@@ -742,16 +742,16 @@ INSERT INTO `preceptor` (`legajo`, `id_persona`, `turno`, `fecha_ingreso`) VALUE
 -- Estructura de tabla para la tabla `reserva`
 --
 
-DROP TABLE IF EXISTS reserva;
-CREATE TABLE reserva (
-  id int(11) NOT NULL,
-  nombre varchar(100) NOT NULL,
-  hora_inicio time NOT NULL,
-  hora_fin time NOT NULL,
-  legajo_personal_evaluador int(11) NOT NULL,
-  id_persona_solicitante int(11) NOT NULL,
-  id_instalacion int(11) NOT NULL,
-  fecha date NOT NULL
+DROP TABLE IF EXISTS `reserva`;
+CREATE TABLE `reserva` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `hora_inicio` time NOT NULL,
+  `hora_fin` time NOT NULL,
+  `legajo_personal_evaluador` int(11) NOT NULL,
+  `id_persona_solicitante` int(11) NOT NULL,
+  `id_instalacion` int(11) NOT NULL,
+  `fecha` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
@@ -759,7 +759,7 @@ CREATE TABLE reserva (
 -- Volcado de datos para la tabla reserva
 --
 
-INSERT INTO reserva (id, nombre, hora_inicio, hora_fin, legajo_personal_evaluador, id_persona_solicitante, id_instalacion, fecha) VALUES
+INSERT INTO `reserva` (`id`, `nombre`, `hora_inicio`, `hora_fin`, `legajo_personal_evaluador`, `id_persona_solicitante`, `id_instalacion`, `fecha`) VALUES
 (1, 'Acto escolar Día del Maestro', '08:00:00', '12:00:00', 1, 10, 2, '2024-09-11'),
 (2, 'Clase de Educación Física 1A', '10:00:00', '11:30:00', 1, 4, 1, '2024-09-12');
 

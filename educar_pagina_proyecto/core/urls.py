@@ -20,4 +20,8 @@ urlpatterns = [
     #Cerrar sesión
     path('logout/', views.logout, name='logout'),
     path('crear-comunicado/',views.crear_comunicado,name='crear-comunicado'),
+    path('crear-reserva/',views.crear_reserva,name='crear-reserva'),
+    path('eliminar-opinion/<int:indice>/',views.eliminar_opinion,name='eliminar-opinion'),
+    path('crear-usuario/',views.crear_usuario,name='crear-usuario'),
+    path('aprobar-cuota/<int:id_cuota>/',views.aprobar_cuota,name='aprobar-cuota'),
 ]

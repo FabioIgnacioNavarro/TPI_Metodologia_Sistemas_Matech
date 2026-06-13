@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect
 from django.db.models import Avg
 import json
 from .models import (
+    Inscripcion,
     Materia,
     Curso,
     Usuario,
@@ -26,6 +27,10 @@ from .models import (
     Asistencia,
     CursoCursaMaterias,
     DocenteDictaMateria,
+    Reserva,
+    Instalacion,
+    Persona,
+    Cuota
 )
 COMUNICADOS_FILE = os.path.join(
     os.path.dirname(__file__),
@@ -299,6 +304,7 @@ def login(request):
 
     return render(request, 'core/login.html')
 
+@never_cache
 def niveles(request):
     persona, dashboard_url = obtener_datos_sesion(request)
     return render(request, 'core/niveles.html', {
@@ -764,9 +770,172 @@ def dashboard_administrativo(request):
     if not persona:
         return redirect('login')
 
+    administrativo = PersonalAdministrativo.objects.filter(
+        id_persona=persona
+    ).first()
+
+    instalaciones = Instalacion.objects.all()
+    
+    reservas = Reserva.objects.select_related(
+        'id_instalacion',
+        'id_persona_solicitante'
+    ).all()
+    
+    if os.path.exists(OPINIONES_FILE):
+        with open(OPINIONES_FILE, 'r', encoding='utf-8') as f:
+            opiniones = json.load(f)
+    else:
+        opiniones = []
+    
+    cuotas = Cuota.objects.select_related(
+        'id_tutor__id_persona',
+        'id_legajo_alumno__id_persona'
+    )
+    
+    cuotas_pendientes = Cuota.objects.filter(
+        estado='Vencida'
+    ).count()
+    
+
     return render(request, 'core/dashboard-administrativo.html', {
-        'persona': persona
+        'persona': persona,
+        'administrativo': administrativo,
+        'instalaciones': instalaciones,
+        'reservas': reservas,
+        'opiniones': opiniones,
+        'cuotas': cuotas,
+        'cuotas_pendientes': cuotas_pendientes,
     })
+    
+@never_cache
+def aprobar_cuota(request, id_cuota):
+
+    cuota = Cuota.objects.get(
+        id_cuota=id_cuota
+    )
+
+    cuota.estado = "Pagada"
+    cuota.pagada = 1
+
+    cuota.save()
+
+    return redirect('dashboard-administrativo')    
+
+@never_cache
+def crear_reserva(request):
+    print(request.POST)
+
+    if request.method == "POST":
+
+        id_instalacion = request.POST.get("espacio")
+        fecha = request.POST.get("fecha")
+        horario = request.POST.get("horario")
+        responsable = request.POST.get("responsable")
+
+        hora_inicio, hora_fin = horario.split("-")
+        
+        instalacion = Instalacion.objects.get(pk=id_instalacion)
+
+        partes = responsable.strip().split()
+
+        nombre = partes[0]
+        apellido = partes[1]
+
+        persona = Persona.objects.filter(
+            nombre__iexact=nombre,
+            apellido__iexact=apellido
+        ).first()
+
+        print("PERSONA ENCONTRADA:", persona)
+
+        if not persona:
+            print("No se encontró la persona")
+            return redirect('dashboard-administrativo')
+
+        persona = Persona.objects.filter(
+            nombre__iexact=nombre,
+            apellido__iexact=apellido
+        ).first()
+
+        print("PERSONA ENCONTRADA:", persona)
+
+        administrativo = PersonalAdministrativo.objects.first()
+
+        Reserva.objects.create(
+            nombre=f"Reserva {instalacion.nombre}",
+            fecha=fecha,
+            hora_inicio=hora_inicio.strip(),
+            hora_fin=hora_fin.strip(),
+            legajo_personal_evaluador=administrativo,
+            id_persona_solicitante=persona,
+            id_instalacion=instalacion
+        )
+
+    return redirect('dashboard-administrativo')
+
+@never_cache
+def eliminar_opinion(request, indice):
+
+    if request.method == "POST":
+
+        if os.path.exists(OPINIONES_FILE):
+
+            with open(OPINIONES_FILE, 'r', encoding='utf-8') as f:
+                opiniones = json.load(f)
+
+            if 0 <= indice < len(opiniones):
+                opiniones.pop(indice)
+
+            with open(OPINIONES_FILE, 'w', encoding='utf-8') as f:
+                json.dump(opiniones, f, ensure_ascii=False, indent=2)
+
+    return redirect('dashboard-administrativo')
+
+@never_cache
+def crear_usuario(request):
+
+    if request.method == "POST":
+
+        dni = request.POST.get("dni")
+        nombre_usuario = request.POST.get("nombre_usuario")
+        contrasenia = request.POST.get("contrasenia")
+
+        persona = Persona.objects.filter(
+            dni=dni
+        ).first()
+
+        if not persona:
+            print("No existe una persona con ese DNI")
+            return redirect('dashboard-administrativo')
+
+        if persona.id_usuario:
+            print("La persona ya tiene usuario")
+            return redirect('dashboard-administrativo')
+
+        if Usuario.objects.filter(
+            nombre_usuario=nombre_usuario
+        ).exists():
+            print("El nombre de usuario ya existe")
+            return redirect('dashboard-administrativo')
+        
+        correo = request.POST.get("correo")
+        
+        if Usuario.objects.filter(correo=correo).exists():
+            print("Ese correo ya existe")
+            return redirect('dashboard-administrativo')
+
+        usuario = Usuario.objects.create(
+            nombre_usuario=nombre_usuario,
+            contrasenia=contrasenia,
+            correo=correo
+        )
+
+        persona.id_usuario = usuario
+        persona.save()
+
+        print("Usuario creado correctamente")
+
+    return redirect('dashboard-administrativo')
 
 @never_cache
 def dashboard_padres(request):
