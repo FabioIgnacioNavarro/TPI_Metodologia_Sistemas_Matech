@@ -1,4 +1,7 @@
 import requests
+import re
+from django.core.files.storage import FileSystemStorage
+from datetime import datetime
 from django.conf import settings
 from datetime import date
 from datetime import datetime
@@ -8,6 +11,7 @@ import os
 from django.shortcuts import render, redirect
 from django.db.models import Avg
 import json
+from django.core.mail import EmailMessage
 from .models import (
     Inscripcion,
     Materia,
@@ -30,7 +34,8 @@ from .models import (
     Reserva,
     Instalacion,
     Persona,
-    Cuota
+    Cuota,
+    PostulacionLaboral
 )
 COMUNICADOS_FILE = os.path.join(
     os.path.dirname(__file__),
@@ -763,6 +768,121 @@ def dashboard_directivo(request):
         }
     )
     
+def postulacion(request):
+    return render(request, 'postulacion.html')
+
+@never_cache
+def enviar_postulacion(request):
+    from django.contrib import messages
+    
+    nombre = request.POST.get("nombre", "").strip()
+    apellido = request.POST.get("apellido", "").strip()
+    dni = request.POST.get("dni", "").strip()
+    correo_postulante = request.POST.get("correo", "").strip()
+    telefono = request.POST.get("telefono", "").strip()
+
+    if request.method == "POST":
+
+        nombre = request.POST.get("nombre")
+        apellido = request.POST.get("apellido")
+        dni = request.POST.get("dni")
+        correo = request.POST.get("correo")
+        telefono = request.POST.get("telefono")
+        puesto = request.POST.get("puesto")
+        mensaje = request.POST.get("mensaje")
+
+        cv = request.FILES.get("cv")
+
+        ruta_cv = None
+        
+        print("CORREO RECIBIDO:", repr(correo))
+        
+        print(
+            "VALIDACION:",
+            bool(re.match(r"^[^@]+@[^@]+\.[^@]+$", correo))
+)
+        
+        if not nombre.replace(" ", "").isalpha():
+            print("Nombre inválido")
+            return redirect('postulacion')
+
+        if not apellido.replace(" ", "").isalpha():
+            print("Apellido inválido")
+            return redirect('postulacion')
+
+        if not dni.isdigit():
+            print("DNI inválido")
+            return redirect('postulacion')
+
+        if len(dni) < 7 or len(dni) > 8:
+            print("DNI inválido")
+            return redirect('postulacion')
+
+        if not re.match(r"^[^@]+@[^@]+\.[^@]+$", correo):
+            print("Correo inválido")
+            messages.error(request, "Ingrese un correo electrónico válido.")
+            print("MENSAJE AGREGADO")
+            return redirect('postulacion')
+
+        if not telefono.isdigit():
+            print("Teléfono inválido")
+            return redirect('postulacion')
+
+        if cv:
+            fs = FileSystemStorage()
+            nombre_archivo = fs.save(cv.name, cv)
+            ruta_cv = fs.url(nombre_archivo)
+            
+
+        PostulacionLaboral.objects.create(
+            nombre=nombre,
+            apellido=apellido,
+            dni=dni,
+            correo=correo,
+            telefono=telefono,
+            puesto=puesto,
+            mensaje=mensaje,
+            cv=ruta_cv,
+            fecha_postulacion=datetime.now()
+        )
+
+        print("Postulación guardada correctamente")
+        
+        correo = EmailMessage(
+            subject=f"Nueva postulación - {nombre} {apellido}",
+            body=f"""
+        Nueva postulación recibida
+
+        Nombre: {nombre}
+        Apellido: {apellido}
+        DNI: {dni}
+        Correo: {correo}
+        Teléfono: {telefono}
+        Puesto: {puesto}
+
+        Mensaje:
+        {mensaje}
+        """,
+            from_email='educarparatransformarcolegio@gmail.com',
+            to=['educarparatransformarcolegio@gmail.com']
+        )
+        
+        if cv:
+            correo.attach(
+                cv.name,
+                cv.read(),
+                cv.content_type
+            )
+        
+        correo.send()
+        
+        messages.success(
+            request,
+            "La postulación fue enviada correctamente. Nos pondremos en contacto si tu perfil coincide con una búsqueda."
+        )
+
+    return redirect('postulacion')
+
 @never_cache
 def dashboard_administrativo(request):
     persona = obtener_persona(request)

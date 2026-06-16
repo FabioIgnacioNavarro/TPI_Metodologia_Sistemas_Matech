@@ -411,3 +411,34 @@ class ViajeUtilizaVehiculo(models.Model):
     class Meta:
         managed = False
         db_table = 'viaje_utiliza_vehiculo'
+
+class PostulacionLaboral(models.Model):
+    id = models.AutoField(primary_key=True)
+
+    nombre = models.CharField(max_length=50)
+    apellido = models.CharField(max_length=50)
+
+    dni = models.CharField(max_length=15)
+
+    correo = models.CharField(max_length=100)
+
+    telefono = models.CharField(max_length=30)
+
+    puesto = models.CharField(max_length=50)
+
+    mensaje = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    cv = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
+    fecha_postulacion = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'postulacion_laboral'
