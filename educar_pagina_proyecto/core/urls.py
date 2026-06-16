@@ -28,6 +28,7 @@ urlpatterns = [
     path('aprobar-cuota/<int:id_cuota>/',views.aprobar_cuota,name='aprobar-cuota'),
     path('postulacion/',views.postulacion,name='postulacion'),
     path('enviar-postulacion/',views.enviar_postulacion,name='enviar-postulacion'),
+    path('enviar-consulta/',views.enviar_consulta,name='enviar-consulta'),
 ]
 if settings.DEBUG:
     urlpatterns += static(

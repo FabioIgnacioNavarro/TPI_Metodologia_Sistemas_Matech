@@ -79,25 +79,45 @@
 
       <section class="form-section">
 
+        {% if messages %}
+        {% for message in messages %}
+        <div class="mensaje {{ message.tags }}">
+          {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
         <form
-          class="form-card"
-          action="https://formsubmit.co/maquinavirtual328@gmail.com"
-          method="POST">
+        class="form-card"
+        action="{% url 'enviar-consulta' %}"
+        method="POST">
+
+        {% csrf_token %}
 
           <input type="hidden" name="_captcha" value="false">
 
           <h2>Enviar consulta</h2>
 
           <div class="form-grid">
-
             <div class="form-group">
               <label for="nombre">Nombre completo</label>
-              <input type="text" id="nombre" name="nombre" required>
+
+              <input
+                  type="text"
+                  id="nombre"
+                  name="nombre"
+                  required
+                  pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,50}">
             </div>
 
             <div class="form-group">
-              <label for="email">Correo electrónico</label>
-              <input type="email" id="email" name="email" required>
+                <label for="email">Correo electrónico</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required>
             </div>
 
           </div>

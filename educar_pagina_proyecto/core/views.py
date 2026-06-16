@@ -12,6 +12,8 @@ from django.shortcuts import render, redirect
 from django.db.models import Avg
 import json
 from django.core.mail import EmailMessage
+from django.contrib import messages
+from django.views.decorators.cache import never_cache
 from .models import (
     Inscripcion,
     Materia,
@@ -769,7 +771,7 @@ def dashboard_directivo(request):
     )
     
 def postulacion(request):
-    return render(request, 'postulacion.html')
+    return render(request, 'core/postulacion.html')
 
 @never_cache
 def enviar_postulacion(request):
@@ -882,6 +884,66 @@ def enviar_postulacion(request):
         )
 
     return redirect('postulacion')
+
+@never_cache
+def enviar_consulta(request):
+
+    if request.method == "POST":
+
+        nombre = request.POST.get("nombre", "").strip()
+        correo = request.POST.get("email", "").strip()
+        mensaje = request.POST.get("mensaje", "").strip()
+
+        # Nombre
+        if not nombre.replace(" ", "").isalpha():
+            messages.error(
+                request,
+                "El nombre solo puede contener letras."
+            )
+            return redirect('contacto')
+
+        # Correo
+        if not re.match(
+            r"^[^@]+@[^@]+\.[^@]+$",
+            correo
+        ):
+            messages.error(
+                request,
+                "Ingrese un correo electrónico válido."
+            )
+            return redirect('contacto')
+
+        # Mensaje
+        if not mensaje:
+            messages.error(
+                request,
+                "Debe escribir una consulta."
+            )
+            return redirect('contacto')
+
+        email = EmailMessage(
+            subject=f"Consulta desde la web - {nombre}",
+            body=f"""
+Nueva consulta recibida
+
+Nombre: {nombre}
+Correo: {correo}
+
+Mensaje:
+{mensaje}
+""",
+            from_email='educarparatransformarcolegio@gmail.com',
+            to=['educarparatransformarcolegio@gmail.com']
+        )
+
+        email.send()
+
+        messages.success(
+            request,
+            "La consulta fue enviada correctamente."
+        )
+
+    return redirect('contacto')
 
 @never_cache
 def dashboard_administrativo(request):
