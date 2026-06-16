@@ -24,6 +24,14 @@
         </p>
       </section>
 
+            {% if messages %}
+          {% for message in messages %}
+              <div class="mensaje {{ message.tags }}">
+                  {{ message }}
+              </div>
+          {% endfor %}
+      {% endif %}
+
       <section class="cards">
 
         <div class="card">
@@ -78,14 +86,6 @@
       </section>
 
       <section class="form-section">
-
-        {% if messages %}
-        {% for message in messages %}
-        <div class="mensaje {{ message.tags }}">
-          {{ message }}
-        </div>
-        {% endfor %}
-        {% endif %}
 
         <form
         class="form-card"
@@ -194,7 +194,7 @@
         </div>
       </section>
 
-      <section class="cards">
+      <section class="cards" id="opiniones">
 
         <div class="card">
 

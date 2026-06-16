@@ -775,7 +775,6 @@ def postulacion(request):
 
 @never_cache
 def enviar_postulacion(request):
-    from django.contrib import messages
     
     nombre = request.POST.get("nombre", "").strip()
     apellido = request.POST.get("apellido", "").strip()
@@ -1483,9 +1482,12 @@ def guardar_opinion(request):
         with open(OPINIONES_FILE, 'w', encoding='utf-8') as f:
             json.dump(opiniones, f, ensure_ascii=False, indent=2)
 
-        return redirect('contacto')
+        messages.success(
+            request,
+            "Tu opinión fue publicada correctamente. Desplazate hacia abajo para verla en la sección 'Opiniones de visitantes'."
+        )
 
-    return redirect('contacto')
+        return redirect('contacto')
 
 def obtener_datos_sesion(request):
     usuario_id = request.session.get('usuario_id')
