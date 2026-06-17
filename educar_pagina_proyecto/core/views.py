@@ -78,12 +78,21 @@ def bienestar(request):
     })
 
 def contacto(request):
+    opiniones = []
+
     if os.path.exists(OPINIONES_FILE):
-        with open(OPINIONES_FILE, 'r', encoding='utf-8') as f:
-            opiniones = json.load(f)
-    else:
-        opiniones = []
+        try:
+            with open(OPINIONES_FILE, 'r', encoding='utf-8') as f:
+                contenido = f.read().strip()
+
+                if contenido:
+                    opiniones = json.loads(contenido)
+
+        except (json.JSONDecodeError, FileNotFoundError):
+            opiniones = []
+
     persona, dashboard_url = obtener_datos_sesion(request)
+
     return render(request, 'core/contacto.html', {
         'opiniones': opiniones,
         'persona': persona,
@@ -1397,9 +1406,12 @@ def guardar_opinion(request):
             })
 
         # Leer opiniones existentes
-        if os.path.exists(OPINIONES_FILE):
-            with open(OPINIONES_FILE, 'r', encoding='utf-8') as f:
-                opiniones = json.load(f)
+        if os.path.exists(OPINIONES_FILE) and os.path.getsize(OPINIONES_FILE) > 0:
+            try:
+                with open(OPINIONES_FILE, 'r', encoding='utf-8') as f:
+                    opiniones = json.load(f)
+            except json.JSONDecodeError:
+                opiniones = []
         else:
             opiniones = []
 
