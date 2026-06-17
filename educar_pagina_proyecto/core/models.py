@@ -442,3 +442,36 @@ class PostulacionLaboral(models.Model):
     class Meta:
         managed = False
         db_table = 'postulacion_laboral'
+
+class SolicitudInscripcion(models.Model):
+    id_solicitud = models.AutoField(primary_key=True)
+
+    nombre_alumno = models.CharField(max_length=100)
+    dni_alumno = models.CharField(max_length=8)
+
+    fecha_nacimiento = models.DateField()
+
+    nivel = models.CharField(max_length=30)
+    turno = models.CharField(max_length=30)
+
+    nombre_tutor = models.CharField(max_length=100)
+    dni_tutor = models.CharField(max_length=8)
+
+    telefono = models.CharField(max_length=20)
+    email = models.CharField(max_length=100)
+
+    observaciones = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    fecha_solicitud = models.DateTimeField()
+
+    estado = models.CharField(
+        max_length=30,
+        default='Pendiente'
+    )
+
+    class Meta:
+        managed = False
+        db_table = 'solicitud_inscripcion'

@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,29 +46,29 @@
   }
 
   function confirmarCerrarSesion() {
-   window.location.href = "{% url 'logout' %}";
+    window.location.href = "{% url 'logout' %}";
   }
 
 </script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+  document.addEventListener("DOMContentLoaded", function () {
 
     const textarea = document.querySelector('textarea[name="contenido"]');
     const contador = document.getElementById("contador-caracteres");
 
     if (textarea && contador) {
 
-        textarea.addEventListener("input", function() {
+      textarea.addEventListener("input", function () {
 
-            contador.textContent =
-                `${this.value.length} / 350 caracteres`;
+        contador.textContent =
+          `${this.value.length} / 350 caracteres`;
 
-        });
+      });
 
     }
 
-});
+  });
 </script>
 
 <body>
@@ -171,8 +172,70 @@ document.addEventListener("DOMContentLoaded", function() {
             </thead>
 
             <tbody>
-              <tr><td>Juan Gómez</td><td>Secundario</td><td>Roberto Pérez</td><td>08/05/2026</td><td><span class="badge badge-yellow">Pendiente</span></td></tr>
-              <tr><td>Joaquín Núñez</td><td>Primario</td><td>Nora Díaz</td><td>07/05/2026</td><td><span class="badge badge-green">Aprobada</span></td></tr>
+
+              {% for inscripcion in inscripciones %}
+
+              <tr>
+                <td>{{ inscripcion.nombre_alumno }}</td>
+
+                <td>{{ inscripcion.nivel }}</td>
+
+                <td>{{ inscripcion.nombre_tutor }}</td>
+
+                <td>
+                  {{ inscripcion.fecha_solicitud|date:"d/m/Y" }}
+                </td>
+
+                <td>
+
+                  {% if inscripcion.estado == 'Pendiente' %}
+                  <span class="badge badge-yellow">
+                    {{ inscripcion.estado }}
+                  </span>
+
+                  {% elif inscripcion.estado == 'Aprobada' %}
+                  <span class="badge badge-green">
+                    {{ inscripcion.estado }}
+                  </span>
+
+                  {% else %}
+                  <span class="badge badge-red">
+                    {{ inscripcion.estado }}
+                  </span>
+                  {% endif %}
+
+                </td>
+
+                <td>
+
+                  {% if inscripcion.estado == 'Pendiente' %}
+
+                  <form method="POST" action="{% url 'aprobar-inscripcion' inscripcion.id_solicitud %}">
+
+                    {% csrf_token %}
+
+                    <button type="submit" class="btn-form">
+                      Aprobar
+                    </button>
+
+                  </form>
+
+                  {% endif %}
+
+                </td>
+
+              </tr>
+
+              {% empty %}
+
+              <tr>
+                <td colspan="5">
+                  No hay solicitudes de inscripción.
+                </td>
+              </tr>
+
+              {% endfor %}
+
             </tbody>
           </table>
         </div>
@@ -188,6 +251,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 <th>Concepto</th>
                 <th>Monto</th>
                 <th>Estado</th>
+                <th>Acción</th>
               </tr>
             </thead>
 
@@ -216,41 +280,39 @@ document.addEventListener("DOMContentLoaded", function() {
                 <td>
 
                   {% if cuota.estado == 'Pagada' %}
-                    <span class="badge badge-green">
-                      Pagada
-                    </span>
+                  <span class="badge badge-green">
+                    Pagada
+                  </span>
 
                   {% elif cuota.estado == 'Pendiente' %}
-                    <span class="badge badge-red">
-                      Pendiente
-                    </span>
+                  <span class="badge badge-red">
+                    Pendiente
+                  </span>
 
                   {% else %}
-                    <span class="badge badge-yellow">
-                      {{ cuota.estado }}
-                    </span>
+                  <span class="badge badge-yellow">
+                    {{ cuota.estado }}
+                  </span>
                   {% endif %}
 
-                  <th>Acción</th>
-                  <td>
+                <th>Acción</th>
+                <td>
 
-                    {% if cuota.estado != 'Pagada' %}
+                  {% if cuota.estado != 'Pagada' %}
 
-                    <form method="POST"
-                          action="{% url 'aprobar-cuota' cuota.id_cuota %}">
+                  <form method="POST" action="{% url 'aprobar-cuota' cuota.id_cuota %}">
 
-                        {% csrf_token %}
+                    {% csrf_token %}
 
-                        <button type="submit"
-                                class="btn-form">
-                            Marcar como pagada
-                        </button>
+                    <button type="submit" class="btn-form">
+                      Marcar como pagada
+                    </button>
 
-                    </form>
+                  </form>
 
-                    {% endif %}
+                  {% endif %}
 
-                  </td>
+                </td>
 
                 </td>
 
@@ -337,10 +399,8 @@ document.addEventListener("DOMContentLoaded", function() {
           </table>
 
           <div class="form-section" style="margin-top:30px">
-            <form method="POST"
-            action="{% url 'crear-reserva' %}"
-            class="form-card">
-            {% csrf_token %}
+            <form method="POST" action="{% url 'crear-reserva' %}" class="form-card">
+              {% csrf_token %}
               <h2>Nueva reserva</h2>
 
               <div class="form-grid">
@@ -350,9 +410,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     <option value="">Seleccione un espacio</option>
 
                     {% for instalacion in instalaciones %}
-                        <option value="{{ instalacion.id }}">
-                            {{ instalacion.nombre }}
-                        </option>
+                    <option value="{{ instalacion.id }}">
+                      {{ instalacion.nombre }}
+                    </option>
                     {% endfor %}
                   </select>
                 </div>
@@ -389,25 +449,25 @@ document.addEventListener("DOMContentLoaded", function() {
           {% for opinion in opiniones %}
           <div class="notif-item">
 
-              <div class="notif-icon" style="background:#dbeafe">
-                  💬
-              </div>
+            <div class="notif-icon" style="background:#dbeafe">
+              💬
+            </div>
 
-              <div class="notif-text">
-                  <strong>{{ opinion.nombre }}</strong>
-                  <span>{{ opinion.texto }}</span>
-                  <br>
-                  <small>{{ opinion.fecha }}</small>
-              </div>
+            <div class="notif-text">
+              <strong>{{ opinion.nombre }}</strong>
+              <span>{{ opinion.texto }}</span>
+              <br>
+              <small>{{ opinion.fecha }}</small>
+            </div>
 
-              <form method="POST" action="{% url 'eliminar-opinion' forloop.counter0 %}" style="margin-top:10px;">
-                {% csrf_token %}
+            <form method="POST" action="{% url 'eliminar-opinion' forloop.counter0 %}" style="margin-top:10px;">
+              {% csrf_token %}
 
-                <button type="submit" class="btn-form">
-                    Eliminar
-                </button>
+              <button type="submit" class="btn-form">
+                Eliminar
+              </button>
 
-              </form>
+            </form>
 
           </div>
           {% empty %}
@@ -424,7 +484,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
           <div class="form-section">
 
-            <form method="POST"action="{% url 'crear-usuario' %}"class="form-card">
+            <form method="POST" action="{% url 'crear-usuario' %}" class="form-card">
               {% csrf_token %}
 
               <h2>Habilitar acceso</h2>
@@ -448,10 +508,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 <div class="form-group">
                   <label>Correo institucional</label>
-                  <input
-                      type="email"
-                      name="correo"
-                      placeholder="ejemplo@colegio.edu.ar">
+                  <input type="email" name="correo" placeholder="ejemplo@colegio.edu.ar">
                 </div>
 
               </div>
@@ -472,72 +529,55 @@ document.addEventListener("DOMContentLoaded", function() {
         <div id="panel-noticias" class="panel">
 
           <p class="section-title">
-              Publicar noticia institucional
+            Publicar noticia institucional
           </p>
 
           <div class="form-section">
 
-              <form
-                  method="POST"
-                  action="{% url 'crear-noticia' %}"
-                  enctype="multipart/form-data"
-                  class="form-card">
+            <form method="POST" action="{% url 'crear-noticia' %}" enctype="multipart/form-data" class="form-card">
 
-                  {% csrf_token %}
+              {% csrf_token %}
 
-                  <div class="form-group">
+              <div class="form-group">
 
-                      <label>Título</label>
+                <label>Título</label>
 
-                      <input
-                          type="text"
-                          name="titulo"
-                          required
-                          placeholder="Título de la noticia">
+                <input type="text" name="titulo" required placeholder="Título de la noticia">
 
-                  </div>
+              </div>
 
-                  <div class="form-group">
+              <div class="form-group">
 
-                      <label>Contenido</label>
+                <label>Contenido</label>
 
-                      <textarea
-                          name="contenido"
-                          rows="8"
-                          maxlength="350"
-                          required
-                          placeholder="Escriba la noticia... (máximo 350 caracteres)"></textarea>
+                <textarea name="contenido" rows="8" maxlength="350" required
+                  placeholder="Escriba la noticia... (máximo 350 caracteres)"></textarea>
 
-                      <small id="contador-caracteres">
-                          0 / 350 caracteres
-                      </small>
+                <small id="contador-caracteres">
+                  0 / 350 caracteres
+                </small>
 
-                  </div>
+              </div>
 
-                  <div class="form-group">
+              <div class="form-group">
 
-                      <label>Imagen</label>
+                <label>Imagen</label>
 
-                      <input
-                          type="file"
-                          name="imagen"
-                          accept=".jpg,.jpeg,.png,.webp">
+                <input type="file" name="imagen" accept=".jpg,.jpeg,.png,.webp">
 
-                      <small>
-                          Formatos permitidos: JPG, PNG y WEBP
-                      </small>
+                <small>
+                  Formatos permitidos: JPG, PNG y WEBP
+                </small>
 
-                  </div>
+              </div>
 
-                  <button
-                      type="submit"
-                      class="btn-form">
+              <button type="submit" class="btn-form">
 
-                      Publicar noticia
+                Publicar noticia
 
-                  </button>
+              </button>
 
-              </form>
+            </form>
 
           </div>
 
@@ -547,11 +587,34 @@ document.addEventListener("DOMContentLoaded", function() {
 
           <table class="tabla">
             <tbody>
-              <tr><td style="font-weight:600;color:#64748b">Legajo</td><td>{{ administrativo.legajo }}</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Cargo</td><td>{{ administrativo.cargo }}</td></tr><tr><td style="font-weight:600;color:#64748b">Sector</td><td>{{ administrativo.sector }}</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Fecha de ingreso</td><td>{{ administrativo.fecha_ingreso }}</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Correo electrónico</td><td>{{ persona.email }}</td></tr><tr><td style="font-weight:600;color:#64748b">Teléfono</td><td>{{ persona.telefono }}</td></tr>
-              <tr><td style="font-weight:600;color:#64748b">Dirección</td><td>{{ persona.direccion }}</td></tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Legajo</td>
+                <td>{{ administrativo.legajo }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Cargo</td>
+                <td>{{ administrativo.cargo }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Sector</td>
+                <td>{{ administrativo.sector }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Fecha de ingreso</td>
+                <td>{{ administrativo.fecha_ingreso }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Correo electrónico</td>
+                <td>{{ persona.email }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Teléfono</td>
+                <td>{{ persona.telefono }}</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#64748b">Dirección</td>
+                <td>{{ persona.direccion }}</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -575,14 +638,14 @@ document.addEventListener("DOMContentLoaded", function() {
       const contenedor =
         document.getElementById("adminOpiniones");
 
-      if(!contenedor) return;
+      if (!contenedor) return;
 
       const opiniones =
         JSON.parse(localStorage.getItem("opiniones")) || [];
 
       contenedor.innerHTML = "";
 
-      if(opiniones.length === 0) {
+      if (opiniones.length === 0) {
 
         contenedor.innerHTML = `
           <div class="tarea-card">
@@ -641,4 +704,5 @@ document.addEventListener("DOMContentLoaded", function() {
   </script>
 
 </body>
+
 </html>
