@@ -30,27 +30,29 @@
 
         <div class="card">
 
-          <img
-          src="/media/{{ noticia.imagen }}"
-          alt="Noticia institucional"
-          class="card-image">
+        {% if noticia.imagen %}
+            <img
+                src="/media/{{ noticia.imagen }}"
+                alt="Noticia institucional"
+                class="card-image">
+        {% endif %}
 
-            <div class="card-content">
+        <div class="card-content">
 
-                <div class="card-title">
-                    <div class="icon icon-blue">📰</div>
-                    <span>{{ noticia.titulo }}</span>
-                </div>
-
-                <p>
-                    {{ noticia.contenido }}
-                </p>
-
-                <small class="fecha-noticia">
-                    {{ noticia.fecha_publicacion|date:"d F Y" }}
-                </small>
-
+            <div class="card-title">
+                <div class="icon icon-blue">📰</div>
+                <span>{{ noticia.titulo }}</span>
             </div>
+
+            <p>
+                {{ noticia.contenido }}
+            </p>
+
+            <small class="fecha-noticia">
+                {{ noticia.fecha_publicacion|date:"d F Y" }}
+            </small>
+
+        </div>
 
         </div>
 

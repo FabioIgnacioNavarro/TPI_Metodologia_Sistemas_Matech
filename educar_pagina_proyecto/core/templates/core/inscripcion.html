@@ -80,6 +80,18 @@
             </div>
 
             <div class="form-group">
+                <label for="dni_tutor">DNI del tutor</label>
+                <input
+                    type="text"
+                    id="dni_tutor"
+                    name="dni_tutor"
+                    placeholder="Ingrese el DNI del responsable"
+                    required
+                    maxlength="8"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+
+            <div class="form-group">
               <label for="telefono">Teléfono</label>
               <input type="tel" id="telefono" name="telefono" placeholder="Ej: 3624 000000" required
               oninput="this.value = this.value.replace(/[^0-9]/g, '')">
@@ -123,6 +135,7 @@
     const dni = document.getElementById('dni').value.trim();
     const telefono = document.getElementById('telefono').value.trim();
     const email = document.getElementById('email').value.trim();
+    const dniTutor = document.getElementById('dni_tutor').value.trim();
     //Filtro de email
     const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com)$/i;
     if (!dni || !telefono || !email) {
@@ -132,6 +145,11 @@
     }
     if (dni.length < 7 || dni.length > 8) {
       alert("El DNI debe tener 7 u 8 dígitos.");
+      event.preventDefault();
+      return false;
+    }
+    if (dniTutor.length < 7 || dniTutor.length > 8) {
+      alert("El DNI del tutor debe tener 7 u 8 dígitos.");
       event.preventDefault();
       return false;
     }

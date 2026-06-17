@@ -1588,7 +1588,7 @@ ALTER TABLE `viaje_utiliza_vehiculo`
   ADD CONSTRAINT `viaje_utiliza_vehiculo_ibfk_2` FOREIGN KEY (`id_vehiculo`) REFERENCES `vehiculo` (`id_vehiculo`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
---Datos de cv
+-- Datos de cv
 CREATE TABLE postulacion_laboral (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
