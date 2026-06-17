@@ -525,6 +525,7 @@ def dashboard_alumno(request):
         except json.JSONDecodeError:
             comunicados_alumno = []
             ultimos_comunicados = []
+    panel_activo = request.session.pop("panel_activo", "inicio")
     return render(request, 'core/dashboard-alumno.html', {
         'persona': persona,
         'alumno': alumno,
@@ -543,6 +544,7 @@ def dashboard_alumno(request):
         'materias': materias,
         'tutor_relacion': tutor_relacion,
         'horario_por_dia': horario_por_dia,
+        "panel_activo": panel_activo,
     })
 
 @never_cache
@@ -942,7 +944,21 @@ Mensaje:
             "La consulta fue enviada correctamente."
         )
 
+
+    persona = obtener_persona(request)
+
+    if persona:
+
+        if Tutor.objects.filter(id_persona=persona).exists():
+            request.session["panel_activo"] = "contacto"
+            return redirect('dashboard-padres')
+
+        if Alumno.objects.filter(id_persona=persona).exists():
+            request.session["panel_activo"] = "contacto"
+            return redirect('dashboard-alumno')
+
     return redirect('contacto')
+
 
 @never_cache
 def dashboard_administrativo(request):
@@ -1268,7 +1284,7 @@ def dashboard_padres(request):
 
         except json.JSONDecodeError:
             comunicados_filtrados = []
-
+    panel_activo = request.session.pop("panel_activo", "inicio")
     return render(
         request,
         'core/dashboard-padres.html',
@@ -1280,9 +1296,8 @@ def dashboard_padres(request):
             'presentes': presentes,
             'ausencias': ausencias,
             'tardanzas': tardanzas,
-
-            # 🔥 ahora esto reemplaza TODO lo de noticias
             'noticias': comunicados_filtrados,
+            "panel_activo": panel_activo,
         }
     )
 

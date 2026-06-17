@@ -111,7 +111,9 @@
           <a href="#" onclick="showPanel('mensajes', this); return false;">
             <span class="nav-icon">💬</span> Mensajes
           </a>
-
+          <a href="#" onclick="showPanel('contacto', this); return false;">
+            <span class="nav-icon">📞</span> Contacto
+          </a>
           <a href="#" onclick="showPanel('perfil', this); return false;">
             <span class="nav-icon">👤</span> Mi perfil
           </a>
@@ -357,7 +359,103 @@
           {% endfor %}
 
         </div>
+        <!-- CONTACTO -->
+        <div id="panel-contacto" class="panel">
 
+          <p class="section-title">
+            Contacto con Administración
+          </p>
+
+          <div class="stat-grid">
+
+            <div class="stat-card">
+              <div class="stat-label">WhatsApp</div>
+
+              <div class="stat-sub">
+                +54 9 362 4000000
+              </div>
+
+
+             <a
+              href="https://wa.me/5493624000000"
+              target="_blank"
+              class="btn-form"
+              style="margin-left: 0; margin-top: 10px; text-decoration: none; display: inline-block;">
+              Enviar mensaje
+            </a>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Correo electrónico</div>
+
+              <div class="stat-sub">
+                educarparatransformarcolegio@gmail.com
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Redes Sociales</div>
+
+              <div class="stat-sub">
+                Instagram y Facebook:
+                @educarparatransformar
+              </div>
+            </div>
+
+          </div>
+
+          <br>
+
+          <div class="stat-card">
+
+            <h3 style="margin-bottom:20px;">
+              Formulario de consulta
+            </h3>
+            {% if messages %}
+              {% for message in messages %}
+                <div style="
+                  background:#dcfce7;
+                  color:#166534;
+                  padding:12px;
+                  border-radius:8px;
+                  margin-bottom:15px;
+                  font-weight:600;
+                ">
+                  ✅ {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+            <form action="{% url 'enviar-consulta' %}" method="POST">
+
+              {% csrf_token %}
+              <input
+                  type="hidden"
+                  name="nombre"
+                  value="{{ persona.nombre }} {{ persona.apellido }}">
+
+              <input
+                  type="hidden"
+                  name="email"
+                  value="{{ persona.email }}">
+              <div class="form-group">
+
+                <label>Mensaje</label>
+
+                <textarea name="mensaje" rows="5" required placeholder="Escriba aquí su consulta..."></textarea>
+
+              </div>
+
+              <br>
+
+              <button type="submit" class="btn-form">
+                Enviar consulta
+              </button>
+
+            </form>
+
+          </div>
+
+        </div>
         <!-- PERFIL -->
         <div id="panel-perfil" class="panel">
 
@@ -431,7 +529,6 @@
           </table>
 
         </div>
-
       </main>
 
     </div>
@@ -439,12 +536,50 @@
   </div>
 
   <script>
+
     function showPanel(id, el) {
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(
+        p => p.classList.remove('active')
+      );
+
+      document.querySelectorAll('.sidebar-nav a').forEach(
+        a => a.classList.remove('active')
+      );
+
       document.getElementById('panel-' + id).classList.add('active');
-      el.classList.add('active');
+
+      if (el) {
+        el.classList.add('active');
+      }
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+      const panelActivo = "{{ panel_activo|default:'inicio' }}";
+
+      document.querySelectorAll('.panel').forEach(
+        p => p.classList.remove('active')
+      );
+
+      document.querySelectorAll('.sidebar-nav a').forEach(
+        a => a.classList.remove('active')
+      );
+
+      document.getElementById('panel-' + panelActivo)?.classList.add('active');
+
+      document.querySelectorAll('.sidebar-nav a').forEach(link => {
+
+        if (
+          link.getAttribute("onclick") &&
+          link.getAttribute("onclick").includes("'" + panelActivo + "'")
+        ) {
+          link.classList.add("active");
+        }
+
+      });
+
+    });
+
   </script>
 
 </body>
