@@ -119,7 +119,7 @@
             <label for="observaciones">Observaciones</label>
             <textarea id="observaciones" name="observaciones" rows="5" placeholder="Escriba cualquier información adicional"></textarea>
           </div>
-
+          <div id="mensaje-error" class="mensaje error" style="display:none;"></div>
           <button type="submit" class="btn-form">Enviar solicitud</button>
 
         </form>
@@ -136,25 +136,31 @@
     const telefono = document.getElementById('telefono').value.trim();
     const email = document.getElementById('email').value.trim();
     const dniTutor = document.getElementById('dni_tutor').value.trim();
+    const errorDiv = document.getElementById('mensaje-error');
+    errorDiv.style.display = 'none';
     //Filtro de email
     const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com)$/i;
     if (!dni || !telefono || !email) {
-      alert("Por favor, rellene todos los campos obligatorios.");
+      errorDiv.textContent = "Por favor, rellene todos los campos obligatorios.";
+      errorDiv.style.display = "block";
       event.preventDefault();
       return false;
     }
     if (dni.length < 7 || dni.length > 8) {
-      alert("El DNI debe tener 7 u 8 dígitos.");
+      errorDiv.textContent = "El DNI debe tener 7 u 8 dígitos.";
+      errorDiv.style.display = "block";
       event.preventDefault();
       return false;
     }
     if (dniTutor.length < 7 || dniTutor.length > 8) {
-      alert("El DNI del tutor debe tener 7 u 8 dígitos.");
+      errorDiv.textContent = "El DNI del tutor debe tener 7 u 8 dígitos.";
+      errorDiv.style.display = "block";
       event.preventDefault();
       return false;
     }
     if (!emailRegex.test(email)) {
-      alert("El correo electrónico no es válido. Asegúrese de que tenga un formato correcto (ejemplo@dominio.com).");
+      errorDiv.textContent = "El correo electrónico no es válido. Asegúrese de que tenga un formato correcto (ejemplo@dominio.com).";
+      errorDiv.style.display = "block";
       event.preventDefault();
       return false;
     }
