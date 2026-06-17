@@ -26,6 +26,7 @@ urlpatterns = [
     path('eliminar-opinion/<int:indice>/',views.eliminar_opinion,name='eliminar-opinion'),
     path('crear-usuario/',views.crear_usuario,name='crear-usuario'),
     path('aprobar-cuota/<int:id_cuota>/',views.aprobar_cuota,name='aprobar-cuota'),
+    path('aprobar-inscripcion/<int:id_solicitud>/',views.aprobar_inscripcion,name='aprobar-inscripcion'),
     path('postulacion/',views.postulacion,name='postulacion'),
     path('enviar-postulacion/',views.enviar_postulacion,name='enviar-postulacion'),
     path('enviar-consulta/',views.enviar_consulta,name='enviar-consulta'),

@@ -13,6 +13,7 @@ from django.db.models import Avg
 import json
 from django.core.mail import EmailMessage
 from django.contrib import messages
+from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from .models import (
     Inscripcion,
@@ -37,7 +38,8 @@ from .models import (
     Instalacion,
     Persona,
     Cuota,
-    PostulacionLaboral
+    PostulacionLaboral,
+    SolicitudInscripcion
 )
 COMUNICADOS_FILE = os.path.join(
     os.path.dirname(__file__),
@@ -91,148 +93,40 @@ def contacto(request):
 def inscripcion(request):
     # 1. Obtenemos los datos de sesión al inicio de la función
     persona, dashboard_url = obtener_datos_sesion(request)
+
     if request.method == 'POST':
-        url = f"https://api.airtable.com/v0/{settings.AIRTABLE_BASE_ID}/{settings.AIRTABLE_TABLE_NAME}"
-        headers = {
-            "Authorization": f"Bearer {settings.AIRTABLE_TOKEN}",
-            "Content-Type": "application/json"
-        }
-        
-        nombre = request.POST.get('nombre')
-        dni = request.POST.get('dni')
-        fecha = request.POST.get('fecha')
-        email = request.POST.get('email')
-        if not nombre or not dni or not fecha or not email:
-            return render(
-                request,
-                'core/inscripcion.html',
-                {
-                    'error': 'Todos los campos obligatorios deben completarse.',
-                    'persona': persona,
-                    'dashboard_url': dashboard_url
-                }
-            )
-            
-        if not dni.isdigit():
-            return render(
-                request,
-                'core/inscripcion.html',
-                {
-                    'error': 'El DNI debe contener únicamente números.',
-                    'persona': persona,
-                    'dashboard_url': dashboard_url
-                }
-            )
-            
-        telefono = request.POST.get('telefono')
-        if not telefono or not telefono.isdigit():
-            return render(
-                request,
-                'core/inscripcion.html',
-                {
-                    'error': 'El teléfono debe contener únicamente números.',
-                    'persona': persona,
-                    'dashboard_url': dashboard_url
-                }
-            )
-            
-        patron_email = r'^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com)$'
-        
-        if not re.match(patron_email, email):
-            return render(
-                request,
-                'core/inscripcion.html',
-                {
-                    'error': 'Ingrese un correo electrónico válido (solo Gmail, Hotmail u Outlook).',
-                    'persona': persona,
-                    'dashboard_url': dashboard_url
-                }
-            )
-        fecha_nacimiento = date.fromisoformat(fecha)
-        if fecha_nacimiento > date.today():
-            return render(
-                request,
-                'core/inscripcion.html',
-                {
-                    'error': 'La fecha de nacimiento no puede ser futura.',
-                    'persona': persona,
-                    'dashboard_url': dashboard_url
-                }
-            )
-            
-        edad = date.today().year - fecha_nacimiento.year
-        nivel = request.POST.get('nivel')
-        
-        if nivel == 'primario' and (edad < 5 or edad > 15):
-            return render(
-                request,
-                'core/inscripcion.html',
-                {
-                    'error': 'La edad no corresponde al nivel primario.',
-                    'persona': persona,
-                    'dashboard_url': dashboard_url
-                }
-            )
-        if nivel == 'secundario' and (edad < 11 or edad > 20):
-            return render(
-                request,
-                'core/inscripcion.html',
-                {
-                    'error': 'La edad no corresponde al nivel secundario.',
-                    'persona': persona,
-                    'dashboard_url': dashboard_url
-                }
-            )
-        if nivel == 'inicial' and edad > 6:
-            return render(
-                request,
-                'core/inscripcion.html',
-                {
-                    'error': 'La edad no corresponde al nivel inicial.',
-                    'persona': persona,
-                    'dashboard_url': dashboard_url
-                }
-            )
-        
-        data = {
-            "fields": {
-                "Nombre completo": request.POST.get('nombre'),
-                "DNI": request.POST.get('dni'),
-                "Fecha de nacimiento": request.POST.get('fecha'),
-                "Nivel educativo": request.POST.get('nivel'),
-                "Nombre del padre, madre o tutor": request.POST.get('tutor'),
-                "Teléfono": request.POST.get('telefono'),
-                "Correo electrónico": request.POST.get('email'),
-                "Turno preferido": request.POST.get('turno'),
-                "Observaciones": request.POST.get('observaciones'),
-                "Estado": "Pendiente"
-            }
-        }
-        respuesta = requests.post(
-            url,
-            headers=headers,
-            json=data
+
+        SolicitudInscripcion.objects.create(
+            nombre_alumno=request.POST.get('nombre'),
+            dni_alumno=request.POST.get('dni'),
+            fecha_nacimiento=request.POST.get('fecha'),
+
+            nivel=request.POST.get('nivel'),
+            turno=request.POST.get('turno'),
+
+            nombre_tutor=request.POST.get('tutor'),
+            dni_tutor=request.POST.get('dni_tutor'),
+
+            telefono=request.POST.get('telefono'),
+            email=request.POST.get('email'),
+
+            observaciones=request.POST.get('observaciones'),
+
+            fecha_solicitud=timezone.now(),
+
+            estado='Pendiente'
         )
-        if respuesta.status_code in [200, 201]:
-            return render(
-                request,
-                'core/inscripcion.html',
-                {
-                    'exito': True,
-                    'persona': persona,
-                    'dashboard_url': dashboard_url
-                }
-            )
+
         return render(
             request,
             'core/inscripcion.html',
             {
-                'error': respuesta.text,
+                'exito': True,
                 'persona': persona,
                 'dashboard_url': dashboard_url
             }
         )
-    # 2. Render final para cuando se accede mediante GET normal (reemplaza las líneas 170-173)
+
     return render(
         request,
         'core/inscripcion.html',
@@ -935,6 +829,12 @@ Mensaje:
             to=['educarparatransformarcolegio@gmail.com']
         )
 
+        try:
+            email.send()
+        except Exception as e:
+            print("ERROR SMTP:", e)
+            raise
+
         email.send()
 
         messages.success(
@@ -976,6 +876,10 @@ def dashboard_administrativo(request):
     cuotas_pendientes = Cuota.objects.filter(
         estado='Vencida'
     ).count()
+
+    inscripciones = SolicitudInscripcion.objects.all().order_by(
+        '-fecha_solicitud'
+    )
     
 
     return render(request, 'core/dashboard-administrativo.html', {
@@ -986,6 +890,7 @@ def dashboard_administrativo(request):
         'opiniones': opiniones,
         'cuotas': cuotas,
         'cuotas_pendientes': cuotas_pendientes,
+        'inscripciones': inscripciones,
     })
     
 @never_cache
@@ -1001,6 +906,19 @@ def aprobar_cuota(request, id_cuota):
     cuota.save()
 
     return redirect('dashboard-administrativo')    
+
+@never_cache
+def aprobar_inscripcion(request, id_solicitud):
+
+    inscripcion = SolicitudInscripcion.objects.get(
+        id_solicitud=id_solicitud
+    )
+
+    inscripcion.estado = "Aprobada"
+
+    inscripcion.save()
+
+    return redirect('dashboard-administrativo')
 
 @never_cache
 def crear_reserva(request):

@@ -540,6 +540,35 @@ INSERT INTO `inscripcion` (`id_inscripcion`, `fecha_inscripcion`, `estado`, `id_
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `solicitud_inscripcion`
+--
+
+CREATE TABLE solicitud_inscripcion (
+    id_solicitud INT AUTO_INCREMENT PRIMARY KEY,
+
+    nombre_alumno VARCHAR(100) NOT NULL,
+    dni_alumno VARCHAR(8) NOT NULL,
+    fecha_nacimiento DATE NOT NULL,
+
+    nombre_tutor VARCHAR(100) NOT NULL,
+    dni_tutor VARCHAR(8) NOT NULL,
+
+    telefono VARCHAR(20) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+
+    nivel VARCHAR(20) NOT NULL,
+    turno VARCHAR(20) NOT NULL,
+
+    observaciones TEXT,
+
+    fecha_solicitud DATETIME NOT NULL,
+
+    estado VARCHAR(20) DEFAULT 'Pendiente'
+);
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `instalacion`
 --
 
