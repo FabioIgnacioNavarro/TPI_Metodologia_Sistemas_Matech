@@ -636,7 +636,7 @@ CREATE TABLE solicitud_inscripcion (
     parentesco VARCHAR(30) NULL,
 
     direccion_tutor VARCHAR(255) NULL
-) 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 

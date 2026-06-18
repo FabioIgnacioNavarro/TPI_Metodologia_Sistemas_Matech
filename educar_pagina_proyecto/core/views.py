@@ -92,6 +92,7 @@ def contacto(request):
 
                 if contenido:
                     opiniones = json.loads(contenido)
+                    opiniones.reverse()
 
         except (json.JSONDecodeError, FileNotFoundError):
             opiniones = []
@@ -1448,6 +1449,8 @@ def dashboard_preceptor(request):
 
     curso_id = request.POST.get('curso_id') or request.GET.get('curso_id')
     
+    notificaciones = []
+
     if not persona:
         return redirect('login')
 
@@ -1563,6 +1566,40 @@ def dashboard_preceptor(request):
     ).count()
     cursos_pendientes = []
 
+    if os.path.exists(COMUNICADOS_FILE):
+
+        try:
+
+            with open(
+                COMUNICADOS_FILE,
+                'r',
+                encoding='utf-8'
+            ) as f:
+
+                comunicados = json.load(f)
+
+                contador = 0
+
+                for comunicado in reversed(comunicados):
+
+                    if comunicado.get('rol') == 'Directivo':
+
+                        notificaciones.append({
+                            'tipo': 'comunicado',
+                            'icono': '📢',
+                            'color': '#dbeafe',
+                            'titulo': comunicado.get('titulo'),
+                            'mensaje': comunicado.get('contenido'),
+                            'fecha': comunicado.get('fecha')
+                        })
+
+                        contador += 1
+
+                        if contador == 3:
+                            break
+
+        except Exception:
+            pass
     for curso in cursos:
 
         curso.asistencia_tomada = Asistencia.objects.filter(
@@ -1578,6 +1615,17 @@ def dashboard_preceptor(request):
         alumnos_curso = Alumno.objects.filter(
             id_curso=curso
         ).select_related('id_persona')
+
+    for curso in cursos_pendientes:
+
+        notificaciones.append({
+            'icono': '⚠️',
+            'color': '#fef3c7',
+            'titulo': 'Asistencia pendiente',
+            'mensaje': (
+                f'Falta registrar asistencia en el curso {curso}'
+            )
+        })
     justificaciones = Asistencia.objects.filter(
         legajo_alumno__id_curso__in=cursos,
         tipo_asistencia__in=['Ausente', 'Tardanza'],
@@ -1614,6 +1662,8 @@ def dashboard_preceptor(request):
         'cursos_pendientes': cursos_pendientes,
         'cantidad_pendientes': len(cursos_pendientes),
         'justificaciones': justificaciones,
+        'notificaciones': notificaciones,
+        'cantidad_notificaciones': len(notificaciones),
     }
 
     return render(
