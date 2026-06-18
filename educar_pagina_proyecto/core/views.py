@@ -1,10 +1,12 @@
 import requests
 import re
 from django.core.files.storage import FileSystemStorage
-from datetime import datetime
+from datetime import datetime, date
 from django.conf import settings
 from datetime import date
 from datetime import datetime
+from django.shortcuts import redirect
+from django.urls import reverse
 import re
 from django.core.files.storage import FileSystemStorage
 import os
@@ -1021,14 +1023,31 @@ def crear_reserva(request):
 
         id_instalacion = request.POST.get("espacio")
         fecha = request.POST.get("fecha")
-        horario = request.POST.get("horario")
         responsable = request.POST.get("responsable")
-
-        hora_inicio, hora_fin = horario.split("-")
         
-        instalacion = Instalacion.objects.get(pk=id_instalacion)
+        horario = request.POST.get("horario", "").strip()
+
+        if "-" not in horario:
+            messages.error(request, "Debe escribir un horario válido.")
+            return redirect(reverse('dashboard-administrativo') + '#reservas')
+
+        hora_inicio, hora_fin = horario.split("-", 1)
+
+        
+        try:
+            instalacion = Instalacion.objects.get(pk=id_instalacion)
+        except Instalacion.DoesNotExist:
+            messages.error(request, "Debe seleccionar un espacio válido.")
+            return redirect(reverse('dashboard-administrativo') + '#reservas')
 
         partes = responsable.strip().split()
+
+        if len(partes) < 2:
+            messages.error(
+                request,
+                "Debe ingresar el nombre y apellido del solicitante. Ejemplo: Juan Ramírez."
+            )
+            return redirect(reverse('dashboard-administrativo') + '#reservas')
 
         nombre = partes[0]
         apellido = partes[1]
@@ -1038,32 +1057,60 @@ def crear_reserva(request):
             apellido__iexact=apellido
         ).first()
 
-        print("PERSONA ENCONTRADA:", persona)
-
         if not persona:
-            print("No se encontró la persona")
-            return redirect('dashboard-administrativo')
-
-        persona = Persona.objects.filter(
-            nombre__iexact=nombre,
-            apellido__iexact=apellido
-        ).first()
-
-        print("PERSONA ENCONTRADA:", persona)
+            messages.error(
+                request,
+                "No se encontró una persona con ese nombre y apellido."
+            )
+            return redirect(reverse('dashboard-administrativo') + '#reservas')
 
         administrativo = PersonalAdministrativo.objects.first()
+        
+        try:
+            hora_inicio = datetime.strptime(hora_inicio.strip(), "%H:%M").time()
+            hora_fin = datetime.strptime(hora_fin.strip(), "%H:%M").time()
+        except ValueError:
+            messages.error(request, "El horario ingresado no es válido.")
+            return redirect(reverse('dashboard-administrativo') + '#reservas')
+        
+        fecha = request.POST.get("fecha")
+        
+
+        try:
+            fecha = datetime.strptime(fecha, "%Y-%m-%d").date()
+        except (TypeError, ValueError):
+            messages.error(request, "La fecha ingresada no es válida.")
+            return redirect(reverse('dashboard-administrativo') + '#reservas')
+
+        if fecha < date.today():
+            messages.error(request, "No se pueden registrar reservas para días anteriores.")
+            return redirect(reverse('dashboard-administrativo') + '#reservas')
+        
+        if Reserva.objects.filter(
+            id_instalacion=instalacion,
+            fecha=fecha,
+            hora_inicio=hora_inicio,
+            hora_fin=hora_fin
+        ).exists():
+            messages.error(
+                request,
+                "Ya existe una reserva para ese espacio, fecha y horario."
+            )
+            return redirect(reverse('dashboard-administrativo') + '#reservas')
+
 
         Reserva.objects.create(
             nombre=f"Reserva {instalacion.nombre}",
             fecha=fecha,
-            hora_inicio=hora_inicio.strip(),
-            hora_fin=hora_fin.strip(),
+            hora_inicio=hora_inicio,
+            hora_fin=hora_fin,
             legajo_personal_evaluador=administrativo,
             id_persona_solicitante=persona,
             id_instalacion=instalacion
         )
 
-    return redirect('dashboard-administrativo')
+        messages.success(request, "Reserva registrada correctamente.")
+        return redirect(reverse('dashboard-administrativo') + '#reservas')
 
 @never_cache
 def eliminar_opinion(request, indice):
