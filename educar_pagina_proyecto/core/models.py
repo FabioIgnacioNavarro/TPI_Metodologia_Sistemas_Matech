@@ -30,7 +30,10 @@ class Asistencia(models.Model):
         db_column='legajo_alumno'
     )
 
-    fecha = models.DateField(blank=True, null=True)
+    fecha = models.DateField(
+        blank=True,
+        null=True
+    )
 
     tipo_asistencia = models.CharField(
         max_length=10,
@@ -41,6 +44,12 @@ class Asistencia(models.Model):
         ]
     )
 
+    archivo_justificacion = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
     observacion = models.TextField(
         blank=True,
         null=True
@@ -49,6 +58,9 @@ class Asistencia(models.Model):
     class Meta:
         managed = False
         db_table = 'asistencia'
+
+    def __str__(self):
+        return f"{self.legajo_alumno} - {self.fecha} - {self.tipo_asistencia}"
 
 
 class Aula(models.Model):

@@ -147,9 +147,35 @@ document.querySelectorAll('.nota-input').forEach(input => {
             </div>
 
             <div class="stat-card">
-              <div class="stat-label">Justificaciones</div>
-              <div class="stat-value" style="color:#d97706">5</div>
-              <div class="stat-sub">Pendientes de revisión</div>
+
+              <div class="stat-label">
+                Asistencias pendientes
+              </div>
+
+              <div class="stat-value" style="color:#d97706">
+                {{ cantidad_pendientes }}
+              </div>
+
+              <div class="stat-sub">
+
+                {% if cursos_pendientes %}
+
+                  Falta tomar asistencia en:
+
+                  <br><br>
+
+                  {% for curso in cursos_pendientes %}
+                    • {{ curso }}<br>
+                  {% endfor %}
+
+                {% else %}
+
+                  ✓ Todos los cursos tienen asistencia registrada
+
+                {% endif %}
+
+              </div>
+
             </div>
           </div>
         
@@ -167,6 +193,7 @@ document.querySelectorAll('.nota-input').forEach(input => {
           <p style="color:#64748b">No hay noticias recientes.</p>
           {% endfor %}
         </div>
+        <!-- panel-cursos -->
         <div id="panel-cursos" class="panel">
           <p class="section-title">Cursos asignados</p>
 
@@ -178,11 +205,15 @@ document.querySelectorAll('.nota-input').forEach(input => {
                 <th>Turno</th>
                 <th>Alumnos</th>
                 <th>Estado</th>
+                <th></th>
               </tr>
             </thead>
+
             <tbody>
               {% for curso in cursos %}
-              <tr>
+
+              <!-- FILA DEL CURSO -->
+              <tr onclick="toggleCurso('{{ curso.id_curso }}')" style="cursor:pointer;">
                 <td>{{ curso.anio }}° {{ curso.comision }}</td>
                 <td>{{ curso.nivel }}</td>
                 <td>{{ curso.turno }}</td>
@@ -190,12 +221,81 @@ document.querySelectorAll('.nota-input').forEach(input => {
                 <td>
                   <span class="badge badge-green">Activo</span>
                 </td>
+                
+                <td style="text-align:center;">
+                  <span id="flecha-{{ curso.id_curso }}" class="flecha">
+                    ▼
+                  </span>
+                </td>
               </tr>
+
+              <!-- FILA DESPLEGABLE -->
+              <tr id="curso-{{ curso.id_curso }}" class="curso-detalle" style="display:none;">
+                <td colspan="6">
+
+                  <table class="tabla" style="width:100%; margin:10px 0;">
+                    <thead>
+                      <tr>
+                        <th>Alumno</th>
+                        <th>Legajo</th>
+                        <th>Estado</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {% for alumno in curso.alumnos %}
+                      <tr>
+                        <td>
+                          {{ alumno.id_persona.nombre }}
+                          {{ alumno.id_persona.apellido }}
+                        </td>
+
+                        <td>{{ alumno.legajo }}</td>
+
+                        <td>
+                          {% if alumno.estado_hoy == 'Presente' %}
+                            <span class="badge badge-green">
+                              Presente
+                            </span>
+
+                          {% elif alumno.estado_hoy == 'Ausente' %}
+                            <span class="badge badge-red">
+                              Ausente
+                            </span>
+
+                          {% elif alumno.estado_hoy == 'Tardanza' %}
+                            <span class="badge badge-yellow">
+                              Tardanza
+                            </span>
+
+                          {% else %}
+                            <span class="badge">
+                              Sin registrar
+                            </span>
+                          {% endif %}
+
+                        </td>
+                      </tr>
+                      {% empty %}
+                      <tr>
+                        <td colspan="3">
+                          No hay alumnos registrados.
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+
+                  </table>
+
+                </td>
+              </tr>
+
               {% endfor %}
             </tbody>
+
           </table>
         </div>
-
+        <!-- panel-asistencias -->
         <div id="panel-asistencias" class="panel">
           <p class="section-title">Tomar asistencia</p>
 
@@ -214,9 +314,19 @@ document.querySelectorAll('.nota-input').forEach(input => {
                 Alumnos
               </div>
 
+              {% if curso.asistencia_tomada %}
+
+              <span class="badge badge-green">
+                ✓ Asistencia tomada hoy
+              </span>
+
+            {% else %}
+
               <a href="?curso_id={{ curso.id_curso }}" class="btn-small">
                 Tomar asistencia
               </a>
+
+            {% endif %}
             </div>
             {% empty %}
             <p>No tenés cursos asignados.</p>
@@ -286,31 +396,64 @@ document.querySelectorAll('.nota-input').forEach(input => {
               </tbody>
             </table>
 
+            {% if not asistencia_tomada %}
             <button type="submit" class="btn-form">
               Guardar asistencia
             </button>
+            {% else %}
+            <button type="button"
+                    class="btn-form"
+                    disabled
+                    style="opacity:.6; cursor:not-allowed;">
+              Asistencia ya registrada
+            </button>
+            {% endif %}
           </div>
         </form>
 
+        <!-- JUSTIFICACIONES -->
         <div id="panel-justificaciones" class="panel">
-          <p class="section-title">Justificaciones pendientes</p>
+          <p class="section-title">Justificaciones recibidas</p>
 
+          {% for asistencia in justificaciones %}
           <div class="tarea-card">
             <div class="tarea-info">
-              <strong>Alumno legajo 2 · Curso 1° A</strong>
-              <span>08/04/2024 · Ausente con aviso</span>
-            </div>
-            <span class="badge badge-yellow">Pendiente</span>
-          </div>
+              <strong>
+                {{ asistencia.legajo_alumno.id_persona.nombre }}
+                {{ asistencia.legajo_alumno.id_persona.apellido }}
+                · Curso {{ asistencia.legajo_alumno.id_curso.anio }}° {{ asistencia.legajo_alumno.id_curso.comision }}
+              </strong>
 
-          <div class="tarea-card">
-            <div class="tarea-info">
-              <strong>Alumno legajo 3 · Curso 2° B</strong>
-              <span>10/04/2024 · Llegó 15 minutos tarde</span>
-            </div>
-            <span class="badge badge-red">Urgente</span>
-          </div>
+              <span>
+                {{ asistencia.fecha|date:"d/m/Y" }}
+                · {{ asistencia.tipo_asistencia }}
+              </span>
 
+              {% if asistencia.observacion %}
+              <small>{{ asistencia.observacion }}</small>
+              {% endif %}
+
+              {% if asistencia.archivo_existe %}
+                  <a
+                      href="/media/{{ asistencia.archivo_justificacion }}"
+                      target="_blank"
+                  >
+                      📄 Ver justificación
+                  </a>
+              {% else %}
+                  <span style="color:#dc3545;">
+                      ⚠ El archivo no se encuentra
+                  </span>
+              {% endif %}
+            </div>
+
+            <span class="badge badge-yellow">
+              Recibida
+            </span>
+          </div>
+          {% empty %}
+          <p>No hay justificaciones registradas.</p>
+          {% endfor %}
         </div>
 
         <!-- COMUNICADOS -->
@@ -449,6 +592,24 @@ document.querySelectorAll('.nota-input').forEach(input => {
                   .classList.add('active');
           }
       };
+  </script>
+  <script>
+    function toggleCurso(id) {
+
+        const fila = document.getElementById("curso-" + id);
+        const flecha = document.getElementById("flecha-" + id);
+
+        if (fila.style.display === "none") {
+
+            fila.style.display = "table-row";
+            flecha.innerHTML = "▲";
+
+        } else {
+
+            fila.style.display = "none";
+            flecha.innerHTML = "▼";
+        }
+    }
   </script>
 </body>
 </html>
