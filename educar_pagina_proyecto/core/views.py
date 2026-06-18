@@ -14,6 +14,7 @@ import json
 from django.core.mail import EmailMessage
 from django.contrib import messages
 from django.utils import timezone
+from datetime import date
 from django.views.decorators.cache import never_cache
 from .models import (
     Inscripcion,
@@ -107,17 +108,26 @@ def inscripcion(request):
 
         SolicitudInscripcion.objects.create(
             nombre_alumno=request.POST.get('nombre'),
+            apellido_alumno=request.POST.get('apellido'),
             dni_alumno=request.POST.get('dni'),
             fecha_nacimiento=request.POST.get('fecha'),
+            direccion=request.POST.get('direccion'),
+            telefono_alumno=request.POST.get('telefono_alumno'),
+            email_alumno=request.POST.get('email_alumno'),
 
             nivel=request.POST.get('nivel'),
             turno=request.POST.get('turno'),
 
             nombre_tutor=request.POST.get('tutor'),
+            apellido_tutor=request.POST.get('apellido_tutor'),
             dni_tutor=request.POST.get('dni_tutor'),
+
+            parentesco=request.POST.get('parentesco'),
 
             telefono=request.POST.get('telefono'),
             email=request.POST.get('email'),
+            
+            direccion_tutor=request.POST.get("direccion_tutor"),
 
             observaciones=request.POST.get('observaciones'),
 
@@ -862,7 +872,7 @@ Mensaje:
             request.session["panel_activo"] = "contacto"
             return redirect('dashboard-padres')
 
-        if Alumno.objects.filter(id_persona=persona).exists():
+        if Alumno.objects.fifaprlter(id_persona=persona).exists():
             request.session["panel_activo"] = "contacto"
             return redirect('dashboard-alumno')
 
@@ -902,9 +912,7 @@ def dashboard_administrativo(request):
         estado='Vencida'
     ).count()
 
-    inscripciones = SolicitudInscripcion.objects.all().order_by(
-        '-fecha_solicitud'
-    )
+    solicitudes = SolicitudInscripcion.objects.all().order_by('-fecha_solicitud')
     
 
     return render(request, 'core/dashboard-administrativo.html', {
@@ -915,7 +923,7 @@ def dashboard_administrativo(request):
         'opiniones': opiniones,
         'cuotas': cuotas,
         'cuotas_pendientes': cuotas_pendientes,
-        'inscripciones': inscripciones,
+        'solicitudes': solicitudes,
     })
     
 @never_cache
@@ -935,13 +943,68 @@ def aprobar_cuota(request, id_cuota):
 @never_cache
 def aprobar_inscripcion(request, id_solicitud):
 
-    inscripcion = SolicitudInscripcion.objects.get(
+    solicitud = SolicitudInscripcion.objects.get(
         id_solicitud=id_solicitud
     )
 
-    inscripcion.estado = "Aprobada"
+    persona_alumno = Persona.objects.create(
+        dni=solicitud.dni_alumno,
+        nombre=solicitud.nombre_alumno,
+        apellido=solicitud.apellido_alumno,
+        fecha_nacimiento=solicitud.fecha_nacimiento,
+        direccion=solicitud.direccion,
+        telefono=solicitud.telefono_alumno or solicitud.telefono,
+        email=solicitud.email_alumno or solicitud.email
+    )
 
-    inscripcion.save()
+    persona_tutor = Persona.objects.create(
+        dni=solicitud.dni_tutor,
+        nombre=solicitud.nombre_tutor,
+        apellido=solicitud.apellido_tutor,
+        fecha_nacimiento=date(2000, 1, 1),
+        telefono=solicitud.telefono,
+        email=solicitud.email,
+        direccion=solicitud.direccion_tutor,
+    )
+
+    tutor = Tutor.objects.create(
+        id_persona=persona_tutor,
+        telefono_contacto=solicitud.telefono,
+        email_contacto=solicitud.email
+    )
+
+    curso = Curso.objects.filter(
+        nivel__iexact=solicitud.nivel,
+        turno__iexact=solicitud.turno
+    ).first()
+
+    if not curso:
+        solicitud.estado = 'Error'
+        solicitud.save()
+
+        return redirect('dashboard-administrativo')
+
+    alumno = Alumno.objects.create(
+        id_persona=persona_alumno,
+        fecha_ingreso=date.today(),
+        id_curso=curso
+    )
+
+    TutorTutoraAlumno.objects.create(
+        id_tutor=tutor,
+        id_alumno=alumno,
+        tipo_parentesco=solicitud.parentesco,
+    )
+
+    Inscripcion.objects.create(
+        fecha_inscripcion=date.today(),
+        estado='Activa',
+        id_curso=curso,
+        legajo_alumno=alumno
+    )
+
+    solicitud.estado = 'Aprobada'
+    solicitud.save()
 
     return redirect('dashboard-administrativo')
 

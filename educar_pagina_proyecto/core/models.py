@@ -355,9 +355,25 @@ class Tutor(models.Model):
 
 
 class TutorTutoraAlumno(models.Model):
-    id_tutor = models.ForeignKey(Tutor, models.DO_NOTHING, db_column='id_tutor')
-    id_alumno = models.ForeignKey(Alumno, models.DO_NOTHING, db_column='id_alumno')
-    tipo_parentesco = models.CharField(max_length=30, blank=True, null=True)
+    id = models.AutoField(primary_key=True)
+
+    id_tutor = models.ForeignKey(
+        Tutor,
+        models.DO_NOTHING,
+        db_column='id_tutor'
+    )
+
+    id_alumno = models.ForeignKey(
+        Alumno,
+        models.DO_NOTHING,
+        db_column='id_alumno'
+    )
+
+    tipo_parentesco = models.CharField(
+        max_length=30,
+        blank=True,
+        null=True
+    )
 
     class Meta:
         managed = False
@@ -447,6 +463,7 @@ class SolicitudInscripcion(models.Model):
     id_solicitud = models.AutoField(primary_key=True)
 
     nombre_alumno = models.CharField(max_length=100)
+    apellido_alumno = models.CharField(max_length=100)
     dni_alumno = models.CharField(max_length=8)
 
     fecha_nacimiento = models.DateField()
@@ -455,10 +472,24 @@ class SolicitudInscripcion(models.Model):
     turno = models.CharField(max_length=30)
 
     nombre_tutor = models.CharField(max_length=100)
+    apellido_tutor = models.CharField(max_length=100)
     dni_tutor = models.CharField(max_length=8)
 
     telefono = models.CharField(max_length=20)
     email = models.CharField(max_length=100)
+
+    direccion = models.CharField(max_length=100,blank=True,null=True)
+
+    telefono_alumno = models.CharField(max_length=20,blank=True,null=True)
+
+    email_alumno = models.CharField(max_length=100,blank=True,null=True)
+    
+    direccion_tutor = models.CharField(
+        max_length=255,
+        blank=True,
+        default=""
+    )
+
 
     observaciones = models.TextField(
         blank=True,
@@ -470,6 +501,12 @@ class SolicitudInscripcion(models.Model):
     estado = models.CharField(
         max_length=30,
         default='Pendiente'
+    )
+
+    parentesco = models.CharField(
+        max_length=30,
+        blank=True,
+        null=True
     )
 
     class Meta:

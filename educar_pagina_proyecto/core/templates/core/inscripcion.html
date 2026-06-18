@@ -1,172 +1,257 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inscripción a cursado</title>
-  <link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inscripción a cursado</title>
+    <link rel="stylesheet" href="{% static 'core/css/styles.css' %}" />
+  </head>
 
-<body>
+  <body>
+    <div class="page">
+      {% include 'core/plantillas/cabecera.html' %}
 
-  <div class="page">
-    {% include 'core/plantillas/cabecera.html' %}
+      <main>
+        <section class="hero">
+          <h1>Inscripción a cursado</h1>
+          <p>
+            Completá el formulario para iniciar la solicitud de inscripción. El
+            equipo administrativo se comunicará para continuar el proceso.
+          </p>
+        </section>
 
-    <main>
-
-      <section class="hero">
-        <h1>Inscripción a cursado</h1>
-        <p>
-          Completá el formulario para iniciar la solicitud de inscripción.
-          El equipo administrativo se comunicará para continuar el proceso.
-        </p>
-      </section>
-
-      <section class="form-section">
-        {% if exito %}
-        <div style="background:#d4edda;padding:15px;margin-bottom:20px;border-radius:8px;">
+        <section class="form-section">
+          {% if exito %}
+          <div
+            style="
+              background: #d4edda;
+              padding: 15px;
+              margin-bottom: 20px;
+              border-radius: 8px;
+            "
+          >
             Solicitud enviada correctamente.
-        </div>
-        {% endif %}
-        {% if error %}
-        <div style="background:#f8d7da;padding:15px;margin-bottom:20px;border-radius:8px;">
-            <strong>Error:</strong><br>
+          </div>
+          {% endif %} {% if error %}
+          <div
+            style="
+              background: #f8d7da;
+              padding: 15px;
+              margin-bottom: 20px;
+              border-radius: 8px;
+            "
+          >
+            <strong>Error:</strong><br />
             {{ error }}
-        </div>
-        {% endif %}
-        <form
+          </div>
+          {% endif %}
+          <form
             class="form-card"
             method="POST"
-            onsubmit="return validarFormulario(event)">
-            <input type="hidden" name="_captcha" value="false">
+            onsubmit="return validarFormulario(event);"
+          >
+            <input type="hidden" name="_captcha" value="false" />
             {% csrf_token %}
-          <h2>Datos del estudiante</h2>
 
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="nombre">Nombre completo</label>
-              <input type="text" id="nombre" name="nombre" placeholder="Ingrese el nombre del estudiante" required oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')">
+            <h2>Datos del estudiante</h2>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" required />
+              </div>
+
+              <div class="form-group">
+                <label for="apellido">Apellido</label>
+                <input type="text" id="apellido" name="apellido" required />
+              </div>
+
+              <div class="form-group">
+                <label for="dni">DNI</label>
+                <input type="text" id="dni" name="dni" maxlength="8" required />
+              </div>
+
+              <div class="form-group">
+                <label for="fecha">Fecha de nacimiento</label>
+                <input type="date" id="fecha" name="fecha" required />
+              </div>
+
+              <div class="form-group">
+                <label for="direccion">Dirección</label>
+                <input
+                  type="text"
+                  id="direccion"
+                  name="direccion"
+                  placeholder="Ingrese la dirección"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="telefono_alumno"
+                  >Teléfono del alumno (opcional)</label
+                >
+                <input
+                  type="tel"
+                  id="telefono_alumno"
+                  name="telefono_alumno"
+                  placeholder="Ej: 3624000000"
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="email_alumno">Correo del alumno (opcional)</label>
+                <input
+                  type="email"
+                  id="email_alumno"
+                  name="email_alumno"
+                  placeholder="correo@ejemplo.com"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="nivel">Nivel educativo</label>
+                <select id="nivel" name="nivel" required>
+                  <option value="">Seleccione una opción</option>
+                  <option value="inicial">Nivel Inicial</option>
+                  <option value="primario">Nivel Primario</option>
+                  <option value="secundario">Nivel Secundario</option>
+                </select>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label for="dni">DNI</label>
-              <input type="text" id="dni" name="dni" placeholder="Ingrese el DNI" required 
-              oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="8">
-            </div>
+            <h2>Datos del responsable</h2>
 
-            <div class="form-group">
-              <label for="fecha">Fecha de nacimiento</label>
-              <input type="date" id="fecha" name="fecha" required>
-            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="tutor">Nombre del tutor</label>
+                <input type="text" id="tutor" name="tutor" required />
+              </div>
 
-            <div class="form-group">
-              <label for="nivel">Nivel educativo</label>
-              <select id="nivel" name="nivel" required>
-                <option value="">Seleccione una opción</option>
-                <option value="inicial">Nivel Inicial</option>
-                <option value="primario">Nivel Primario</option>
-                <option value="secundario">Nivel Secundario</option>
-              </select>
-            </div>
-          </div>
+              <div class="form-group">
+                <label for="apellido_tutor">Apellido del tutor</label>
+                <input
+                  type="text"
+                  id="apellido_tutor"
+                  name="apellido_tutor"
+                  required
+                />
+              </div>
 
-          <h2>Datos del responsable</h2>
-
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="tutor">Nombre del padre, madre o tutor</label>
-              <input type="text" id="tutor" name="tutor" placeholder="Ingrese nombre del responsable" required oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')">
-            </div>
-
-            <div class="form-group">
+              <div class="form-group">
                 <label for="dni_tutor">DNI del tutor</label>
                 <input
-                    type="text"
-                    id="dni_tutor"
-                    name="dni_tutor"
-                    placeholder="Ingrese el DNI del responsable"
-                    required
-                    maxlength="8"
-                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                  type="text"
+                  id="dni_tutor"
+                  name="dni_tutor"
+                  maxlength="8"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="direccion">Dirección</label>
+                <input
+                  type="text"
+                  id="direccion_tutor"
+                  name="direccion_tutor"
+                  placeholder="Ingrese la dirección del tutor"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="parentesco">Parentesco</label>
+                <select id="parentesco" name="parentesco" required>
+                  <option value="">Seleccione una opción</option>
+                  <option value="Padre">Padre</option>
+                  <option value="Madre">Madre</option>
+                  <option value="Tutor">Tutor</option>
+                  <option value="Abuelo">Abuelo/a</option>
+                  <option value="Tio">Tío/a</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <input type="tel" id="telefono" name="telefono" required />
+              </div>
+
+              <div class="form-group">
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+
+              <div class="form-group">
+                <label for="turno">Turno preferido</label>
+                <select id="turno" name="turno" required>
+                  <option value="">Seleccione una opción</option>
+                  <option value="mañana">Mañana</option>
+                  <option value="tarde">Tarde</option>
+                </select>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label for="telefono">Teléfono</label>
-              <input type="tel" id="telefono" name="telefono" placeholder="Ej: 3624 000000" required
-              oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <div class="form-group full">
+              <label for="observaciones">Observaciones</label>
+              <textarea
+                id="observaciones"
+                name="observaciones"
+                rows="5"
+                placeholder="Escriba cualquier información adicional"
+              ></textarea>
             </div>
+            <div
+              id="mensaje-error"
+              class="mensaje error"
+              style="display: none"
+            ></div>
+            <button type="submit" class="btn-form">Enviar solicitud</button>
+          </form>
+        </section>
+      </main>
+    </div>
 
-            <div class="form-group">
-              <label for="email">Correo electrónico</label>
-              <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required
-              pattern="^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com)$"
-              title="Solo se permiten correos de Gmail, Hotmail u Outlook.">
-            </div>
-
-            <div class="form-group">
-              <label for="turno">Turno preferido</label>
-              <select id="turno" name="turno" required>
-                <option value="">Seleccione una opción</option>
-                <option value="mañana">Mañana</option>
-                <option value="tarde">Tarde</option>
-
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group full">
-            <label for="observaciones">Observaciones</label>
-            <textarea id="observaciones" name="observaciones" rows="5" placeholder="Escriba cualquier información adicional"></textarea>
-          </div>
-          <div id="mensaje-error" class="mensaje error" style="display:none;"></div>
-          <button type="submit" class="btn-form">Enviar solicitud</button>
-
-        </form>
-
-      </section>
-
-    </main>
-
-  </div>
-
-  <script>
-  function validarFormulario(event) {
-    const dni = document.getElementById('dni').value.trim();
-    const telefono = document.getElementById('telefono').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const dniTutor = document.getElementById('dni_tutor').value.trim();
-    const errorDiv = document.getElementById('mensaje-error');
-    errorDiv.style.display = 'none';
-    //Filtro de email
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com)$/i;
-    if (!dni || !telefono || !email) {
-      errorDiv.textContent = "Por favor, rellene todos los campos obligatorios.";
-      errorDiv.style.display = "block";
-      event.preventDefault();
-      return false;
-    }
-    if (dni.length < 7 || dni.length > 8) {
-      errorDiv.textContent = "El DNI debe tener 7 u 8 dígitos.";
-      errorDiv.style.display = "block";
-      event.preventDefault();
-      return false;
-    }
-    if (dniTutor.length < 7 || dniTutor.length > 8) {
-      errorDiv.textContent = "El DNI del tutor debe tener 7 u 8 dígitos.";
-      errorDiv.style.display = "block";
-      event.preventDefault();
-      return false;
-    }
-    if (!emailRegex.test(email)) {
-      errorDiv.textContent = "El correo electrónico no es válido. Asegúrese de que tenga un formato correcto (ejemplo@dominio.com).";
-      errorDiv.style.display = "block";
-      event.preventDefault();
-      return false;
-    }
-    return true;
-  }
-</script>
-
-</body>
+    <script>
+      function validarFormulario(event) {
+        const dni = document.getElementById("dni").value.trim();
+        const telefono = document.getElementById("telefono").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const dniTutor = document.getElementById("dni_tutor").value.trim();
+        const errorDiv = document.getElementById("mensaje-error");
+        errorDiv.style.display = "none";
+        //Filtro de email
+        const emailRegex =
+          /^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com)$/i;
+        if (!dni || !telefono || !email) {
+          errorDiv.textContent =
+            "Por favor, rellene todos los campos obligatorios.";
+          errorDiv.style.display = "block";
+          event.preventDefault();
+          return false;
+        }
+        if (dni.length < 7 || dni.length > 8) {
+          errorDiv.textContent = "El DNI debe tener 7 u 8 dígitos.";
+          errorDiv.style.display = "block";
+          event.preventDefault();
+          return false;
+        }
+        if (dniTutor.length < 7 || dniTutor.length > 8) {
+          errorDiv.textContent = "El DNI del tutor debe tener 7 u 8 dígitos.";
+          errorDiv.style.display = "block";
+          event.preventDefault();
+          return false;
+        }
+        if (!emailRegex.test(email)) {
+          errorDiv.textContent =
+            "El correo electrónico no es válido. Asegúrese de que tenga un formato correcto (ejemplo@dominio.com).";
+          errorDiv.style.display = "block";
+          event.preventDefault();
+          return false;
+        }
+        return true;
+      }
+    </script>
+  </body>
 </html>

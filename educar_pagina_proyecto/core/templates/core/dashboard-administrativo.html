@@ -173,52 +173,53 @@
 
             <tbody>
 
-              {% for inscripcion in inscripciones %}
+              {% for solicitud in solicitudes %}
 
               <tr>
-                <td>{{ inscripcion.nombre_alumno }}</td>
-
-                <td>{{ inscripcion.nivel }}</td>
-
-                <td>{{ inscripcion.nombre_tutor }}</td>
+                <td>
+                  {{ solicitud.nombre_alumno }}
+                  {{ solicitud.apellido_alumno }}
+                </td>
 
                 <td>
-                  {{ inscripcion.fecha_solicitud|date:"d/m/Y" }}
+                  {{ solicitud.nivel }}
+                </td>
+
+                <td>
+                  {{ solicitud.nombre_tutor }}
+                  {{ solicitud.apellido_tutor }}
+                </td>
+
+                <td>
+                  {{ solicitud.fecha_solicitud|date:"d/m/Y" }}
                 </td>
 
                 <td>
 
-                  {% if inscripcion.estado == 'Pendiente' %}
+                  {% if solicitud.estado == 'Pendiente' %}
+
                   <span class="badge badge-yellow">
-                    {{ inscripcion.estado }}
+                    Pendiente
                   </span>
 
-                  {% elif inscripcion.estado == 'Aprobada' %}
-                  <span class="badge badge-green">
-                    {{ inscripcion.estado }}
-                  </span>
-
-                  {% else %}
-                  <span class="badge badge-red">
-                    {{ inscripcion.estado }}
-                  </span>
-                  {% endif %}
-
-                </td>
-
-                <td>
-
-                  {% if inscripcion.estado == 'Pendiente' %}
-
-                  <form method="POST" action="{% url 'aprobar-inscripcion' inscripcion.id_solicitud %}">
+                  <form method="POST" action="{% url 'aprobar-inscripcion' solicitud.id_solicitud %}"
+                    style="margin-top:5px;">
 
                     {% csrf_token %}
 
                     <button type="submit" class="btn-form">
+
                       Aprobar
+
                     </button>
 
                   </form>
+
+                  {% else %}
+
+                  <span class="badge badge-green">
+                    Aprobada
+                  </span>
 
                   {% endif %}
 
@@ -230,7 +231,7 @@
 
               <tr>
                 <td colspan="5">
-                  No hay solicitudes de inscripción.
+                  No hay solicitudes registradas.
                 </td>
               </tr>
 
