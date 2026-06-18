@@ -58,6 +58,7 @@ CREATE TABLE `asistencia` (
   `legajo_alumno` int(11) NOT NULL,
   `fecha` date DEFAULT NULL,
   `tipo_asistencia` enum('Presente','Ausente','Tardanza') NOT NULL,
+  `archivo_justificacion` VARCHAR(255) NULL,
   `observacion` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -66,14 +67,47 @@ CREATE TABLE `asistencia` (
 --
 
 INSERT INTO `asistencia`
-(`id_asistencia`, `legajo_alumno`, `fecha`, `tipo_asistencia`, `observacion`)
+(
+    `id_asistencia`,
+    `legajo_alumno`,
+    `fecha`,
+    `tipo_asistencia`,
+    `archivo_justificacion`,
+    `observacion`
+)
 VALUES
-(1, 1, '2024-04-08', 'Presente', NULL),
-(2, 2, '2024-04-08', 'Ausente', 'Ausente con aviso'),
-(3, 3, '2024-04-08', 'Presente', NULL),
-(4, 1, '2024-04-10', 'Presente', NULL),
-(5, 2, '2024-04-10', 'Presente', NULL),
-(6, 3, '2024-04-10', 'Tardanza', 'Llegó 15 minutos tarde');
+(
+    1,
+    1,
+    '2026-06-16',
+    'Ausente',
+    NULL,
+    'Falta justificada por enfermedad.'
+),
+(
+    2,
+    2,
+    '2026-06-16',
+    'Tardanza',
+    NULL,
+    'Llegó 15 minutos tarde.'
+),
+(
+    3,
+    1,
+    '2026-06-17',
+    'Ausente',
+    'justificaciones/Juan_Gómez_1A_2026-06-17_20260618_010457.png',
+    'Presentó certificado médico.'
+),
+(
+    4,
+    3,
+    '2026-06-18',
+    'Ausente',
+    NULL,
+    'Ausencia por trámite familiar.'
+);
 
 -- --------------------------------------------------------
 
@@ -637,10 +671,6 @@ CREATE TABLE `noticia` (
   `legajo_personal` int(11) NOT NULL,
   `imagen` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `noticia`
---
 
 --
 -- Volcado de datos para la tabla `noticia`

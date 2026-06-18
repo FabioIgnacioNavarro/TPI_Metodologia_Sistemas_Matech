@@ -8,7 +8,6 @@ from datetime import datetime
 from django.shortcuts import redirect
 from django.urls import reverse
 import re
-from django.core.files.storage import FileSystemStorage
 import os
 from django.shortcuts import render, redirect
 from django.db.models import Avg
@@ -18,6 +17,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import date
 from django.views.decorators.cache import never_cache
+
 from .models import (
     Inscripcion,
     Materia,
@@ -249,10 +249,119 @@ def dashboard_alumno(request):
 
     if not persona:
         return redirect('login')
-
     alumno = Alumno.objects.filter(
         id_persona=persona
     ).select_related('id_curso').first()
+    if request.method == 'POST' and request.FILES.get('justificacion'):
+
+        asistencia_id = request.POST.get('asistencia_id')
+
+        asistencia = Asistencia.objects.filter(
+            id_asistencia=asistencia_id,
+            legajo_alumno=alumno
+        ).first()
+        if not asistencia:
+            request.session["panel_activo"] = "asistencia"
+            messages.error(
+                request,
+                'No se encontró la asistencia seleccionada.'
+            )
+            return redirect('dashboard-alumno')
+        if asistencia.archivo_justificacion:
+            request.session["panel_activo"] = "asistencia"
+            messages.error(
+                request,
+                'Esta asistencia ya posee una justificación.'
+            )
+            return redirect('dashboard-alumno')
+        if asistencia:
+
+            archivo = request.FILES['justificacion']
+            extensiones_permitidas = [
+                '.pdf',
+                '.jpg',
+                '.jpeg',
+                '.png'
+            ]
+            tipos_permitidos = [
+                'application/pdf',
+                'image/jpeg',
+                'image/png'
+            ]
+
+            if archivo.content_type not in tipos_permitidos:
+                request.session["panel_activo"] = "asistencia"
+                messages.error(
+                    request,
+                    'Tipo de archivo no válido.'
+                )
+                return redirect('dashboard-alumno')
+            if archivo.size > 5 * 1024 * 1024:
+                request.session["panel_activo"] = "asistencia"
+                messages.error(
+                    request,
+                    'El archivo no puede superar los 5 MB.'
+                )
+                return redirect('dashboard-alumno')
+            extension = os.path.splitext(
+                archivo.name
+            )[1].lower()
+
+            if extension not in extensiones_permitidas:
+                request.session["panel_activo"] = "asistencia"
+                messages.error(
+                    request,
+                    'Solo se permiten archivos PDF, JPG, JPEG y PNG.'
+                )
+                return redirect('dashboard-alumno')
+            nombre_alumno = (
+                f"{persona.nombre}_{persona.apellido}"
+                .replace(" ", "_")
+            )
+
+            curso = f"{alumno.id_curso.anio}{alumno.id_curso.comision}"
+
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            nombre_archivo = (
+                f"{nombre_alumno}_{curso}_{asistencia.fecha}_{timestamp}"
+                f"{extension}"
+            )
+
+            carpeta = os.path.join(
+                settings.MEDIA_ROOT,
+                'justificaciones'
+            )
+
+            os.makedirs(
+                carpeta,
+                exist_ok=True
+            )
+
+            fs = FileSystemStorage(
+                location=carpeta
+            )
+
+            fs.save(
+                nombre_archivo,
+                archivo
+            )
+
+            asistencia.archivo_justificacion = (
+                f"justificaciones/{nombre_archivo}"
+            )
+
+            asistencia.save()
+
+            request.session["panel_activo"] = "asistencia"
+
+            messages.success(
+                request,
+                'Justificación enviada correctamente.'
+            )
+
+            return redirect('dashboard-alumno')
+
 
     curso_alumno = f"{alumno.id_curso.nivel} {alumno.id_curso.anio}° {alumno.id_curso.comision}"
     
@@ -314,9 +423,6 @@ def dashboard_alumno(request):
         else:
             materia.horario_formateado = "Sin horario"
             
-    alumno = Alumno.objects.filter(
-        id_persona=persona
-    ).select_related('id_curso').first()
     
     tutor_relacion = TutorTutoraAlumno.objects.filter(
         id_alumno=alumno
@@ -335,15 +441,15 @@ def dashboard_alumno(request):
     ).order_by('-fecha')
 
     presentes = asistencias.filter(
-        observacion__icontains='Presente'
+        tipo_asistencia='Presente'
     ).count()
 
     ausencias = asistencias.filter(
-        observacion__icontains='Ausente'
+        tipo_asistencia='Ausente'
     ).count()
 
     tardanzas = asistencias.filter(
-        observacion__icontains='Tardanza'
+        tipo_asistencia='Tardanza'
     ).count()
 
     # Porcentaje de asistencia (presente / total registros)
@@ -1380,8 +1486,16 @@ def dashboard_preceptor(request):
         ) if cursos.exists() else []
         
     total_alumnos = 0
-    
-    if request.method == 'POST':
+    hoy = date.today()
+
+    asistencia_tomada = False
+
+    if curso_seleccionado:
+        asistencia_tomada = Asistencia.objects.filter(
+            legajo_alumno__id_curso=curso_seleccionado,
+            fecha=hoy
+        ).exists()
+    if request.method == 'POST' and not asistencia_tomada:
 
         fecha_hoy = date.today()
 
@@ -1409,15 +1523,37 @@ def dashboard_preceptor(request):
                 observacion=observacion
             )
         return redirect('dashboard-preceptor') 
-        
+    total_alumnos = 0
+    hoy = date.today()
+
     for curso in cursos:
-        curso.cantidad_alumnos = Alumno.objects.filter(
+
+        curso.asistencia_tomada = Asistencia.objects.filter(
+            legajo_alumno__id_curso=curso,
+            fecha=hoy
+        ).exists()
+
+        alumnos_curso = Alumno.objects.filter(
             id_curso=curso
-        ).count()
+        ).select_related('id_persona')
+
+        for alumno in alumnos_curso:
+
+            asistencia_hoy = Asistencia.objects.filter(
+                legajo_alumno=alumno,
+                fecha=hoy
+            ).first()
+
+            alumno.estado_hoy = (
+                asistencia_hoy.tipo_asistencia
+                if asistencia_hoy
+                else "Sin registrar"
+            )
+
+        curso.alumnos = alumnos_curso
+        curso.cantidad_alumnos = alumnos_curso.count()
 
         total_alumnos += curso.cantidad_alumnos
-
-    hoy = date.today()
 
     presentes = Asistencia.objects.filter(
         fecha=hoy,
@@ -1433,7 +1569,44 @@ def dashboard_preceptor(request):
         fecha=hoy,
         tipo_asistencia='Tardanza'
     ).count()
+    cursos_pendientes = []
 
+    for curso in cursos:
+
+        curso.asistencia_tomada = Asistencia.objects.filter(
+            legajo_alumno__id_curso=curso,
+            fecha=hoy
+        ).exists()
+
+        if not curso.asistencia_tomada:
+            cursos_pendientes.append(
+                f"{curso.anio}° {curso.comision}"
+            )
+
+        alumnos_curso = Alumno.objects.filter(
+            id_curso=curso
+        ).select_related('id_persona')
+    justificaciones = Asistencia.objects.filter(
+        legajo_alumno__id_curso__in=cursos,
+        tipo_asistencia__in=['Ausente', 'Tardanza'],
+        archivo_justificacion__isnull=False
+    ).exclude(
+        archivo_justificacion=''
+    ).select_related(
+        'legajo_alumno__id_persona',
+        'legajo_alumno__id_curso'
+    ).order_by('-fecha')
+
+    for justificacion in justificaciones:
+        ruta_completa = os.path.join(
+            settings.MEDIA_ROOT,
+            justificacion.archivo_justificacion
+        )
+
+        justificacion.archivo_existe = os.path.exists(
+            ruta_completa
+        )
+        
     context = {
         'persona': persona,
         'cursos': cursos,
@@ -1445,6 +1618,10 @@ def dashboard_preceptor(request):
         'tardanzas': tardanzas,
         'curso_seleccionado': curso_seleccionado,
         'noticias': Noticia.objects.order_by('-fecha_publicacion')[:5],
+        'asistencia_tomada': asistencia_tomada,
+        'cursos_pendientes': cursos_pendientes,
+        'cantidad_pendientes': len(cursos_pendientes),
+        'justificaciones': justificaciones,
     }
 
     return render(

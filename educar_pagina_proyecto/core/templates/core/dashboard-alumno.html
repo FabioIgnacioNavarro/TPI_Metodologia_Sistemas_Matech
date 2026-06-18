@@ -234,7 +234,7 @@
             <div class="stat-card">
               <div class="stat-label">Inasistencias</div>
               <div class="stat-value" style="color:#dc2626">{{ ausencias }}</div>
-              <div class="stat-sub">Máximo permitido: 20</div>
+              <div class="stat-sub">En este ciclo lectivo</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Llegadas tarde</div>
@@ -242,35 +242,98 @@
               <div class="stat-sub">Este ciclo lectivo</div>
             </div>
           </div>
+          {% if messages %}
+            {% for message in messages %}
+              <div
+                class="{% if message.tags == 'success' %}mensaje-exito{% else %}mensaje-error{% endif %}"
+                id="mensaje-{{ forloop.counter }}"
+              >
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
           <table class="tabla">
             <thead>
-              <tr><th>Fecha</th><th>Estado</th><th>Observación</th></tr>
+              <tr>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Justificación</th>
+                <th>Observación</th>
+              </tr>
             </thead>
+
             <tbody>
               {% for asistencia in asistencias %}
               <tr>
                 <td>{{ asistencia.fecha|date:"d/m/Y" }}</td>
 
                 <td>
-                  {% if "Presente" in asistencia.observacion %}
-                    <span class="badge badge-green">Presente</span>
+                  {% if asistencia.tipo_asistencia == 'Presente' %}
+                    <span class="badge badge-green">
+                      Presente
+                    </span>
 
-                  {% elif "Ausente" in asistencia.observacion %}
-                    <span class="badge badge-red">Ausente</span>
+                  {% elif asistencia.tipo_asistencia == 'Ausente' %}
+                    <span class="badge badge-red">
+                      Ausente
+                    </span>
 
-                  {% elif "Tardanza" in asistencia.observacion %}
-                    <span class="badge badge-yellow">Tardanza</span>
-
-                  {% else %}
-                    <span class="badge">{{ asistencia.observacion }}</span>
+                  {% elif asistencia.tipo_asistencia == 'Tardanza' %}
+                    <span class="badge badge-yellow">
+                      Tardanza
+                    </span>
                   {% endif %}
                 </td>
 
-                <td>{{ asistencia.observacion }}</td>
+                <td>
+                  {% if asistencia.tipo_asistencia == 'Presente' %}
+
+                    <span class="badge badge-green">
+                      No requiere
+                    </span>
+
+                  {% elif asistencia.archivo_justificacion %}
+
+                    <span class="badge badge-green">
+                      Justificada
+                    </span>
+
+                  {% else %}
+
+                    <form method="post"
+                          enctype="multipart/form-data">
+                      {% csrf_token %}
+
+                      <input
+                        type="hidden"
+                        name="asistencia_id"
+                        value="{{ asistencia.id_asistencia }}"
+                      >
+
+                      <label for="archivo-{{ asistencia.id_asistencia }}"
+                            class="btn-archivo">
+                          📎 Subir justificativo
+                      </label>
+
+                      <input
+                        id="archivo-{{ asistencia.id_asistencia }}"
+                        type="file"
+                        name="justificacion"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        required
+                        onchange="this.form.submit()"
+                        style="display:none;"
+                      >
+                    </form>
+
+                  {% endif %}
+                </td>
+
+                <td>{{ asistencia.observacion|default:"-" }}</td>
               </tr>
               {% empty %}
               <tr>
-                <td colspan="3">No hay registros de asistencia.</td>
+                <td colspan="4">No hay registros de asistencia.</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -473,6 +536,15 @@
 
     });
 
+  </script>
+  <script>
+    setTimeout(() => {
+        document.querySelectorAll('.mensaje-exito, .mensaje-error')
+            .forEach(msg => {
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 500);
+            });
+    }, 3000);
   </script>
 </body>
 </html>
