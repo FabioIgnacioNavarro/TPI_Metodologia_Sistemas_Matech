@@ -352,7 +352,7 @@
             <span class="badge badge-green">Aprobado</span>
           </div>
         </div>
-
+    
         <div id="panel-reservas" class="panel">
           <p class="section-title">Reserva de espacios</p>
 
@@ -400,7 +400,14 @@
           </table>
 
           <div class="form-section" style="margin-top:30px">
-            <form method="POST" action="{% url 'crear-reserva' %}" class="form-card">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mensaje {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <form method="POST" action="{% url 'crear-gitreserva' %}">
               {% csrf_token %}
               <h2>Nueva reserva</h2>
 
@@ -430,7 +437,7 @@
 
                 <div class="form-group">
                   <label for="responsable">Responsable</label>
-                  <input type="text" id="responsable" name="responsable" placeholder="Nombre del solicitante">
+                  <input type="text" id="responsable" name="responsable" placeholder="Nombre completo del solicitante">
                 </div>
               </div>
 
@@ -701,6 +708,36 @@
     }
 
     cargarOpinionesAdmin();
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+      const hash = window.location.hash;
+
+      if (!hash) return;
+
+      const id = hash.replace("#", "");
+
+      document.querySelectorAll(".panel").forEach(p =>
+          p.classList.remove("active")
+      );
+
+      document.querySelectorAll(".sidebar-nav a").forEach(a =>
+          a.classList.remove("active")
+      );
+
+      document.getElementById("panel-" + id)?.classList.add("active");
+
+      const link = document.querySelector(
+          `.sidebar-nav a[onclick*="'${id}'"]`
+      );
+
+      if (link) {
+          link.classList.add("active");
+      }
+
+      // Borra el #reservas de la URL
+      history.replaceState(null, "", window.location.pathname);
+  });
 
   </script>
 
