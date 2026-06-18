@@ -1199,3 +1199,58 @@
 .mensaje-error{
   transition: opacity .5s ease;
 }
+
+.report-section{
+  margin-bottom:30px;
+}
+
+.report-title{
+  font-size:18px;
+  font-weight:700;
+  color:#1e293b;
+  margin-bottom:12px;
+  padding-bottom:8px;
+  border-bottom:2px solid #e2e8f0;
+}
+.report-layout{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+.report-card{
+    background:#fff;
+    border-radius:18px;
+    padding:24px;
+    box-shadow:0 10px 30px rgba(0,0,0,.05);
+}
+
+.report-card{
+    background:#fff;
+    border-radius:18px;
+    padding:24px;
+    box-shadow:0 10px 30px rgba(0,0,0,.05);
+    height: 100%;
+}
+
+.report-list{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+.report-list div{
+    display:flex;
+    justify-content:space-between;
+    padding:12px 0;
+    border-bottom:1px solid #e2e8f0;
+}
+
+.report-news{
+    margin:0;
+    padding-left:20px;
+}
+
+.report-news li{
+    margin-bottom:14px;
+}

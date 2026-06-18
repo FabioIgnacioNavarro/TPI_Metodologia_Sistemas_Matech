@@ -226,36 +226,185 @@
         <div id="panel-reportes" class="panel">
 
           <p class="section-title">
-            Reportes generales
+            Reporte institucional
           </p>
 
-          <div class="stat-grid">
+          <div class="report-layout">
 
-            <div class="stat-card">
-              <div class="stat-label">Estudiantes</div>
-              <div class="stat-value" style="color:#16a34a">
-                {{ cantidad_alumnos }}
-              </div>
+            <!-- Resumen -->
+            <div class="report-card">
+
+              <h3>📋 Resumen general</h3>
+
+              <table class="tabla">
+                <tbody>
+
+                  <tr>
+                    <td>Total de estudiantes</td>
+                    <td><strong>{{ cantidad_alumnos }}</strong></td>
+                  </tr>
+
+                  <tr>
+                    <td>Total de docentes</td>
+                    <td><strong>{{ cantidad_docentes }}</strong></td>
+                  </tr>
+
+                  <tr>
+                    <td>Preceptores</td>
+                    <td><strong>{{ cantidad_preceptores }}</strong></td>
+                  </tr>
+
+                  <tr>
+                    <td>Administrativos</td>
+                    <td><strong>{{ cantidad_administrativos }}</strong></td>
+                  </tr>
+
+                  <tr>
+                    <td>Promedio institucional</td>
+                    <td>
+                      <strong style="color:#e61c92">
+                        {{ promedio_institucional }}
+                      </strong>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+
             </div>
 
-            <div class="stat-card">
-              <div class="stat-label">Docentes</div>
-              <div class="stat-value" style="color:#1d66c2">
-                {{ cantidad_docentes }}
+            <!-- Plantel -->
+            <div class="report-card">
+
+              <h3>👥 Distribución del personal</h3>
+
+              <div class="report-list">
+
+                <div>
+                  <span>Docentes</span>
+                  <strong>{{ cantidad_docentes }}</strong>
+                </div>
+
+                <div>
+                  <span>Preceptores</span>
+                  <strong>{{ cantidad_preceptores }}</strong>
+                </div>
+
+                <div>
+                  <span>Administrativos</span>
+                  <strong>{{ cantidad_administrativos }}</strong>
+                </div>
+
               </div>
+
             </div>
 
-            <div class="stat-card">
-              <div class="stat-label">Promedio institucional</div>
-              <div class="stat-value" style="color:#e61c92">
-                {{ promedio_institucional }}
+            <!-- Noticias -->
+            <div class="report-card">
+
+              <h3>📰 Últimas noticias institucionales</h3>
+
+              <ul class="report-news">
+
+                {% for noticia in ultimas_noticias %}
+                  <li>
+                    <strong>{{ noticia.titulo }}</strong>
+                    <br>
+                    <small>
+                      {{ noticia.fecha_publicacion|date:"d/m/Y" }}
+                    </small>
+                  </li>
+                {% empty %}
+                  <li>No hay noticias publicadas.</li>
+                {% endfor %}
+
+              </ul>
+
+            </div>
+
+        
+          <!-- Asistencia -->
+          <div class="report-card">
+
+            <h3>📅 Asistencia institucional</h3>
+
+            <div class="report-list">
+
+              <div>
+                <span>Presentes</span>
+                <strong>{{ presentes }}</strong>
               </div>
+
+              <div>
+                <span>Ausentes</span>
+                <strong>{{ ausentes }}</strong>
+              </div>
+
+              <div>
+                <span>Tardanzas</span>
+                <strong>{{ tardanzas }}</strong>
+              </div>
+
             </div>
 
           </div>
 
-        </div>
+          <!-- Alumnos por nivel -->
+          <div class="report-card">
 
+            <h3>🎓 Alumnos por nivel</h3>
+
+            <div class="report-list">
+
+              <div>
+                <span>Inicial</span>
+                <strong>{{ alumnos_inicial }}</strong>
+              </div>
+
+              <div>
+                <span>Primario</span>
+                <strong>{{ alumnos_primario }}</strong>
+              </div>
+
+              <div>
+                <span>Secundario</span>
+                <strong>{{ alumnos_secundario }}</strong>
+              </div>
+
+            </div>
+
+          </div>
+          <!-- o inscripciones o postulaciones -->
+          <div class="report-card">
+
+            <h3>📝 Inscripciones</h3>
+
+            <div class="report-list">
+
+              <div>
+                <span>Solicitudes pendientes</span>
+                <strong>{{ solicitudes_pendientes }}</strong>
+              </div>
+
+            </div>
+
+          </div>
+          <div class="report-card">
+
+            <h3>💼 Recursos Humanos</h3>
+
+            <div class="report-list">
+
+              <div>
+                <span>Postulaciones recibidas</span>
+                <strong>{{ postulaciones }}</strong>
+              </div>
+
+            </div>
+
+          </div>
+          </div>   
+        </div>
         <!-- COMUNICADOS -->
         <div id="panel-comunicados" class="panel">
 

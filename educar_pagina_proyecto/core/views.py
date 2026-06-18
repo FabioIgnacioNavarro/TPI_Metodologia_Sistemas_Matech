@@ -781,6 +781,37 @@ def dashboard_directivo(request):
         'materia': materia.nombre,
         'nivel': nivel,
         })
+    hoy = date.today()
+
+    presentes = Asistencia.objects.filter(
+        fecha=hoy,
+        tipo_asistencia='Presente'
+    ).count()
+
+    ausentes = Asistencia.objects.filter(
+        fecha=hoy,
+        tipo_asistencia='Ausente'
+    ).count()
+
+    tardanzas = Asistencia.objects.filter(
+        fecha=hoy,
+        tipo_asistencia='Tardanza'
+    ).count()
+    alumnos_inicial = Alumno.objects.filter(
+        id_curso__nivel='Inicial'
+    ).count()
+
+    alumnos_primario = Alumno.objects.filter(
+        id_curso__nivel='Primario'
+    ).count()
+
+    alumnos_secundario = Alumno.objects.filter(
+        id_curso__nivel='Secundario'
+    ).count()
+    solicitudes_pendientes = SolicitudInscripcion.objects.filter(
+        estado='Pendiente'
+    ).count()
+    postulaciones = PostulacionLaboral.objects.count()
     return render(
         request,
         'core/dashboard-directivo.html',
@@ -792,7 +823,17 @@ def dashboard_directivo(request):
             'cantidad_administrativos': cantidad_administrativos,
             'promedio_institucional': round(promedio_institucional, 1),
             'ultimas_noticias': ultimas_noticias,
-            'docentes': docentes
+            'docentes': docentes,
+            'presentes': presentes,
+            'ausentes': ausentes,
+            'tardanzas': tardanzas,
+
+            'alumnos_inicial': alumnos_inicial,
+            'alumnos_primario': alumnos_primario,
+            'alumnos_secundario': alumnos_secundario,
+
+            'solicitudes_pendientes': solicitudes_pendientes,
+            'postulaciones': postulaciones
         }
     )
     
