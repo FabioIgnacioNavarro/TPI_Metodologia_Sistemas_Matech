@@ -81,7 +81,7 @@ VALUES
     1,
     '2026-06-16',
     'Ausente',
-    'justificaciones/Juan_Gómez_1A_2025-06-16.pdf',
+    NULL,
     'Falta justificada por enfermedad.'
 ),
 (
@@ -89,7 +89,7 @@ VALUES
     2,
     '2026-06-16',
     'Tardanza',
-    'justificaciones/María_Rodríguez_1A_2025-06-16.pdf',
+    NULL,
     'Llegó 15 minutos tarde.'
 ),
 (
@@ -97,7 +97,7 @@ VALUES
     1,
     '2026-06-17',
     'Ausente',
-    'justificaciones/Juan_Gómez_1A_2025-06-17.pdf',
+    'justificaciones/Juan_Gómez_1A_2026-06-17_20260618_010457.png',
     'Presentó certificado médico.'
 ),
 (
@@ -105,7 +105,7 @@ VALUES
     3,
     '2026-06-18',
     'Ausente',
-    'justificaciones/Lucas_Fernández_2B_2025-06-17.pdf',
+    NULL,
     'Ausencia por trámite familiar.'
 );
 
