@@ -33,7 +33,6 @@ DROP TABLE IF EXISTS `alumno`;
 CREATE TABLE `alumno` (
   `legajo` int(11) NOT NULL,
   `id_persona` int(11) NOT NULL,
-  `anio_cursado` int(11) DEFAULT NULL,
   `fecha_ingreso` date DEFAULT NULL,
   `id_curso` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -42,10 +41,10 @@ CREATE TABLE `alumno` (
 -- Volcado de datos para la tabla `alumno`
 --
 
-INSERT INTO `alumno` (`legajo`, `id_persona`, `anio_cursado`, `fecha_ingreso`, `id_curso`) VALUES
-(1, 1, 2024, '2024-03-01', 1),
-(2, 2, 2024, '2024-03-01', 1),
-(3, 3, 2024, '2024-03-01', 2);
+INSERT INTO `alumno` (`legajo`, `id_persona`, `fecha_ingreso`, `id_curso`) VALUES
+(1, 1, 2024, 1),
+(2, 2, 2024, 1),
+(3, 3, 2024, 2);
 
 -- --------------------------------------------------------
 

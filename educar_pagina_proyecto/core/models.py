@@ -11,7 +11,6 @@ from django.db import models
 class Alumno(models.Model):
     legajo = models.AutoField(primary_key=True)
     id_persona = models.ForeignKey('Persona', models.DO_NOTHING, db_column='id_persona')
-    anio_cursado = models.IntegerField(blank=True, null=True)
     fecha_ingreso = models.DateField(blank=True, null=True)
     id_curso = models.ForeignKey('Curso', models.DO_NOTHING, db_column='id_curso', blank=True, null=True)
 

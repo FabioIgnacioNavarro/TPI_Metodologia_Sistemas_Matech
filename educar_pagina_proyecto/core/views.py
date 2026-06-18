@@ -913,6 +913,10 @@ def dashboard_administrativo(request):
     ).count()
 
     solicitudes = SolicitudInscripcion.objects.all().order_by('-fecha_solicitud')
+
+    inscripciones_pendientes = SolicitudInscripcion.objects.filter(
+        estado="pendiente"
+    ).count()
     
 
     return render(request, 'core/dashboard-administrativo.html', {
@@ -924,6 +928,7 @@ def dashboard_administrativo(request):
         'cuotas': cuotas,
         'cuotas_pendientes': cuotas_pendientes,
         'solicitudes': solicitudes,
+        'inscripciones_pendientes': inscripciones_pendientes,
     })
     
 @never_cache
