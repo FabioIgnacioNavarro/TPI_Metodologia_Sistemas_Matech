@@ -90,6 +90,7 @@ def contacto(request):
 
                 if contenido:
                     opiniones = json.loads(contenido)
+                    opiniones.reverse()
 
         except (json.JSONDecodeError, FileNotFoundError):
             opiniones = []
