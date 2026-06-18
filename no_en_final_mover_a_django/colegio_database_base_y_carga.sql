@@ -79,7 +79,7 @@ VALUES
 (
     1,
     1,
-    '2025-03-10',
+    '2026-06-16',
     'Ausente',
     'justificaciones/Juan_Gómez_1A_2025-06-16.pdf',
     'Falta justificada por enfermedad.'
@@ -87,7 +87,7 @@ VALUES
 (
     2,
     2,
-    '2025-03-11',
+    '2026-06-16',
     'Tardanza',
     'justificaciones/María_Rodríguez_1A_2025-06-16.pdf',
     'Llegó 15 minutos tarde.'
@@ -95,7 +95,7 @@ VALUES
 (
     3,
     1,
-    '2025-03-12',
+    '2026-06-17',
     'Ausente',
     'justificaciones/Juan_Gómez_1A_2025-06-17.pdf',
     'Presentó certificado médico.'
@@ -103,7 +103,7 @@ VALUES
 (
     4,
     3,
-    '2025-03-14',
+    '2026-06-18',
     'Ausente',
     'justificaciones/Lucas_Fernández_2B_2025-06-17.pdf',
     'Ausencia por trámite familiar.'
