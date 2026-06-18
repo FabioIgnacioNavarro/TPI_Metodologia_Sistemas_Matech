@@ -117,6 +117,8 @@ def inscripcion(request):
 
             telefono=request.POST.get('telefono'),
             email=request.POST.get('email'),
+            
+            direccion_tutor=request.POST.get("direccion_tutor"),
 
             observaciones=request.POST.get('observaciones'),
 
@@ -952,7 +954,8 @@ def aprobar_inscripcion(request, id_solicitud):
         apellido=solicitud.apellido_tutor,
         fecha_nacimiento=date(2000, 1, 1),
         telefono=solicitud.telefono,
-        email=solicitud.email
+        email=solicitud.email,
+        direccion=solicitud.direccion_tutor,
     )
 
     tutor = Tutor.objects.create(

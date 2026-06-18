@@ -483,6 +483,12 @@ class SolicitudInscripcion(models.Model):
     telefono_alumno = models.CharField(max_length=20,blank=True,null=True)
 
     email_alumno = models.CharField(max_length=100,blank=True,null=True)
+    
+    direccion_tutor = models.CharField(
+        max_length=255,
+        blank=True,
+        default=""
+    )
 
 
     observaciones = models.TextField(
