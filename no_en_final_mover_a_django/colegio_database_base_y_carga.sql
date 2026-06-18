@@ -547,10 +547,12 @@ CREATE TABLE solicitud_inscripcion (
     id_solicitud INT AUTO_INCREMENT PRIMARY KEY,
 
     nombre_alumno VARCHAR(100) NOT NULL,
+    apellido_alumno VARCHAR(50) NOT NULL,
     dni_alumno VARCHAR(8) NOT NULL,
     fecha_nacimiento DATE NOT NULL,
 
     nombre_tutor VARCHAR(100) NOT NULL,
+    apellido_tutor VARCHAR(50) NOT NULL,
     dni_tutor VARCHAR(8) NOT NULL,
 
     telefono VARCHAR(20) NOT NULL,
@@ -559,12 +561,20 @@ CREATE TABLE solicitud_inscripcion (
     nivel VARCHAR(20) NOT NULL,
     turno VARCHAR(20) NOT NULL,
 
-    observaciones TEXT,
+    observaciones TEXT NULL,
 
     fecha_solicitud DATETIME NOT NULL,
 
-    estado VARCHAR(20) DEFAULT 'Pendiente'
-);
+    estado VARCHAR(20) DEFAULT 'Pendiente',
+
+    direccion VARCHAR(100) NULL,
+    telefono_alumno VARCHAR(20) NULL,
+    email_alumno VARCHAR(100) NULL,
+
+    parentesco VARCHAR(30) NULL,
+
+    direccion_tutor VARCHAR(255) NULL
+) 
 
 -- --------------------------------------------------------
 
