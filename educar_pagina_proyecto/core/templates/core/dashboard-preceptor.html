@@ -102,6 +102,9 @@ document.querySelectorAll('.nota-input').forEach(input => {
           <a href="#" class="active" onclick="showPanel('inicio', this); return false;">
             <span class="nav-icon">🏠</span> Inicio
           </a>
+          <a href="#" onclick="showPanel('notificaciones', this); return false;">
+            <span class="nav-icon">🔔</span> Notificaciones
+          </a>
           <a href="#" onclick="showPanel('cursos', this); return false;">
             <span class="nav-icon">📚</span> Cursos
           </a>
@@ -180,7 +183,6 @@ document.querySelectorAll('.nota-input').forEach(input => {
           </div>
         
           <p class="section-title" style="font-size:18px">Avisos del día</p>
-
           {% for noticia in noticias %}
           <div class="notif-item">
             <div class="notif-icon" style="background:#dbeafe">📰</div>
@@ -192,6 +194,37 @@ document.querySelectorAll('.nota-input').forEach(input => {
           {% empty %}
           <p style="color:#64748b">No hay noticias recientes.</p>
           {% endfor %}
+        </div>
+        <!-- NOTIFICACIONES-->
+        <div id="panel-notificaciones" class="panel">
+
+          <p class="section-title">
+            Notificaciones
+          </p>
+
+          {% for notificacion in notificaciones %}
+            <div class="notif-item">
+
+              <div class="notif-icon"
+                  style="background:{{ notificacion.color }}">
+                {{ notificacion.icono }}
+              </div>
+
+              <div class="notif-text">
+                <strong>{{ notificacion.titulo }}</strong>
+                <span>{{ notificacion.mensaje }}</span>
+              </div>
+
+            </div>
+
+          {% empty %}
+
+            <p style="color:#64748b">
+              No hay notificaciones pendientes.
+            </p>
+
+          {% endfor %}
+
         </div>
         <!-- panel-cursos -->
         <div id="panel-cursos" class="panel">
@@ -211,7 +244,6 @@ document.querySelectorAll('.nota-input').forEach(input => {
 
             <tbody>
               {% for curso in cursos %}
-
               <!-- FILA DEL CURSO -->
               <tr onclick="toggleCurso('{{ curso.id_curso }}')" style="cursor:pointer;">
                 <td>{{ curso.anio }}° {{ curso.comision }}</td>
