@@ -573,6 +573,35 @@ INSERT INTO `inscripcion` (`id_inscripcion`, `fecha_inscripcion`, `estado`, `id_
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `pago_pendiente`
+--
+
+CREATE TABLE pago_pendiente (
+    id_pago INT AUTO_INCREMENT PRIMARY KEY,
+
+    legajo_tutor INT NOT NULL,
+    legajo_alumno INT NOT NULL,
+
+    mes VARCHAR(20) NOT NULL,
+
+    importe DECIMAL(10,2) NOT NULL,
+
+    estado VARCHAR(20) DEFAULT 'Pendiente',
+
+    fecha_solicitud DATETIME NOT NULL,
+
+    CONSTRAINT fk_pago_tutor
+        FOREIGN KEY (legajo_tutor)
+        REFERENCES tutor(legajo_tutor),
+
+    CONSTRAINT fk_pago_alumno
+        FOREIGN KEY (legajo_alumno)
+        REFERENCES alumno(legajo_alumno)
+);
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `solicitud_inscripcion`
 --
 

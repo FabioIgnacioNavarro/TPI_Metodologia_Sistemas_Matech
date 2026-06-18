@@ -523,3 +523,36 @@ class SolicitudInscripcion(models.Model):
     class Meta:
         managed = False
         db_table = 'solicitud_inscripcion'
+        
+class PagoPendiente(models.Model):
+    id_pago = models.AutoField(primary_key=True)
+
+    legajo_tutor = models.ForeignKey(
+        Tutor,
+        models.DO_NOTHING,
+        db_column='legajo_tutor'
+    )
+
+    legajo_alumno = models.ForeignKey(
+        Alumno,
+        models.DO_NOTHING,
+        db_column='legajo_alumno'
+    )
+
+    mes = models.CharField(max_length=20)
+
+    importe = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    estado = models.CharField(
+        max_length=20,
+        default='Pendiente'
+    )
+
+    fecha_solicitud = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'pago_pendiente'

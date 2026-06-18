@@ -7,6 +7,7 @@ from datetime import date
 from datetime import datetime
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils import timezone
 import re
 import os
 from django.shortcuts import render, redirect
@@ -42,7 +43,8 @@ from .models import (
     Persona,
     Cuota,
     PostulacionLaboral,
-    SolicitudInscripcion
+    SolicitudInscripcion,
+    PagoPendiente
 )
 COMUNICADOS_FILE = os.path.join(
     os.path.dirname(__file__),
@@ -1026,6 +1028,8 @@ def dashboard_administrativo(request):
         estado="pendiente"
     ).count()
     
+    pagos_pendientes = PagoPendiente.objects.all()
+    
 
     return render(request, 'core/dashboard-administrativo.html', {
         'persona': persona,
@@ -1037,21 +1041,8 @@ def dashboard_administrativo(request):
         'cuotas_pendientes': cuotas_pendientes,
         'solicitudes': solicitudes,
         'inscripciones_pendientes': inscripciones_pendientes,
+        'pagos_pendientes': pagos_pendientes,
     })
-    
-@never_cache
-def aprobar_cuota(request, id_cuota):
-
-    cuota = Cuota.objects.get(
-        id_cuota=id_cuota
-    )
-
-    cuota.estado = "Pagada"
-    cuota.pagada = 1
-
-    cuota.save()
-
-    return redirect('dashboard-administrativo')    
 
 @never_cache
 def aprobar_inscripcion(request, id_solicitud):
@@ -1349,6 +1340,7 @@ def dashboard_padres(request):
             tardanzas += tar
 
             hijos.append({
+                'alumno': alumno,
                 'persona': alumno.id_persona,
                 'curso': alumno.id_curso,
                 'promedio': promedio,
@@ -1842,3 +1834,65 @@ def crear_comunicado(request):
             return redirect('dashboard-administrativo')
         else:
             return redirect('dashboard-directivo')
+        
+@never_cache
+def registrar_pago(request):
+
+    persona = obtener_persona(request)
+
+    if not persona:
+        return redirect('login')
+
+    tutor = Tutor.objects.filter(
+        id_persona=persona
+    ).first()
+
+    hijos = TutorTutoraAlumno.objects.filter(
+        id_tutor=tutor
+    )
+
+    if request.method == 'POST':
+        
+        print("ALUMNO RECIBIDO:", request.POST.get('alumno'))
+        print("POST alumno:", request.POST.get('alumno'))
+
+        print(
+            "Legajos existentes:",
+            list(
+                Alumno.objects.values_list('legajo', flat=True)
+            )
+        )
+        
+        print("POST alumno:", request.POST.get('alumno'))
+
+        for a in Alumno.objects.select_related('id_persona'):
+            print(
+                "Legajo:", a.legajo,
+                "DNI:", a.id_persona.dni,
+                "Nombre:", a.id_persona.nombre
+            )
+        alumno = Alumno.objects.get(
+            legajo=request.POST.get('alumno')
+        )
+
+        PagoPendiente.objects.create(
+            legajo_tutor=tutor,
+            legajo_alumno=alumno,
+            mes=request.POST.get('mes'),
+            importe=request.POST.get('importe'),
+            estado='Pendiente',
+            fecha_solicitud=timezone.now()
+        )
+
+        request.session["panel_activo"] = "pagos"
+
+        return redirect('dashboard-padres')
+    
+def aprobar_pago(request, id_pago):
+
+    pago = PagoPendiente.objects.get(id_pago=id_pago)
+
+    pago.estado = "Aprobado"
+    pago.save()
+
+    return redirect('dashboard-administrativo')
