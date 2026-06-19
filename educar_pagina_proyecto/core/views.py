@@ -1938,52 +1938,108 @@ def registrar_pago(request):
         id_persona=persona
     ).first()
 
-    hijos = TutorTutoraAlumno.objects.filter(
-        id_tutor=tutor
-    )
-
     if request.method == 'POST':
-        
-        print("ALUMNO RECIBIDO:", request.POST.get('alumno'))
-        print("POST alumno:", request.POST.get('alumno'))
 
-        print(
-            "Legajos existentes:",
-            list(
-                Alumno.objects.values_list('legajo', flat=True)
+        try:
+            alumno = Alumno.objects.get(
+                legajo=request.POST.get('alumno')
             )
-        )
-        
-        print("POST alumno:", request.POST.get('alumno'))
 
-        for a in Alumno.objects.select_related('id_persona'):
-            print(
-                "Legajo:", a.legajo,
-                "DNI:", a.id_persona.dni,
-                "Nombre:", a.id_persona.nombre
+            importe = request.POST.get('importe')
+
+            if float(importe) <= 0:
+                messages.error(
+                    request,
+                    'El importe debe ser mayor a cero.'
+                )
+            if float(importe) > 25000:
+                messages.error(
+                    request,
+                    'El importe debe ser menor a $25000.'
+                )
+
+                request.session["panel_activo"] = "pagos"
+                return redirect('dashboard-padres')
+            
+            if PagoPendiente.objects.filter(
+                legajo_alumno=alumno,
+                mes=request.POST.get('mes'),
+                estado='Pendiente'
+            ).exists():
+
+                messages.error(
+                    request,
+                    'Ya existe una solicitud pendiente para ese mes.'
+                )
+            if Cuota.objects.filter(
+                id_legajo_alumno=alumno,
+                periodo=request.POST.get('mes'),
+                estado='Pagada'
+            ).exists():
+
+                messages.error(
+                    request,
+                    f'La cuota de {request.POST.get("mes")} ya fue abonada.'
+                )
+
+                request.session["panel_activo"] = "pagos"
+                return redirect('dashboard-padres')
+
+
+                request.session["panel_activo"] = "pagos"
+                return redirect('dashboard-padres')
+            
+            
+
+            PagoPendiente.objects.create(
+                id_tutor=tutor,
+                legajo_alumno=alumno,
+                mes=request.POST.get('mes'),
+                importe=importe,
+                estado='Pendiente',
+                fecha_solicitud=timezone.now()
             )
-        alumno = Alumno.objects.get(
-            legajo=request.POST.get('alumno')
-        )
 
-        PagoPendiente.objects.create(
-            legajo_tutor=tutor,
-            legajo_alumno=alumno,
-            mes=request.POST.get('mes'),
-            importe=request.POST.get('importe'),
-            estado='Pendiente',
-            fecha_solicitud=timezone.now()
-        )
+            messages.success(
+                request,
+                'El comprobante de pago fue enviado correctamente y será revisado por administración.'
+            )
+
+        except Alumno.DoesNotExist:
+
+            messages.error(
+                request,
+                'Debe seleccionar un alumno válido.'
+            )
+
+        except Exception as e:
+
+            messages.error(
+                request,
+                f'Ocurrió un error al registrar el pago: {e}'
+            )
 
         request.session["panel_activo"] = "pagos"
 
         return redirect('dashboard-padres')
-    
+
+@never_cache
 def aprobar_pago(request, id_pago):
 
-    pago = PagoPendiente.objects.get(id_pago=id_pago)
+    pago = PagoPendiente.objects.get(
+        id_pago=id_pago
+    )
 
-    pago.estado = "Aprobado"
-    pago.save()
+    Cuota.objects.create(
+        periodo=pago.mes,
+        monto=pago.importe,
+        fecha_pago=date.today(),
+        medio_pago='Transferencia',
+        estado='Pagada',
+        id_tutor=pago.id_tutor,
+        id_legajo_alumno=pago.legajo_alumno
+    )
+
+    pago.delete()
 
     return redirect('dashboard-administrativo')

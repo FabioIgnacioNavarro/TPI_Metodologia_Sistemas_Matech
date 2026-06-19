@@ -286,30 +286,29 @@ INSERT INTO `calificacion` (`id_calificacion`, `nota`, `tipo_evaluacion`, `fecha
 --
 
 DROP TABLE IF EXISTS `cuota`;
-CREATE TABLE `cuota` (
-  `id_cuota` int(11) NOT NULL,
-  `periodo` varchar(20) DEFAULT NULL,
-  `monto` decimal(10,2) NOT NULL,
-  `fecha_vencimiento` date NOT NULL,
-  `estado` varchar(30) NOT NULL,
-  `fecha_pago` date DEFAULT NULL,
-  `medio_pago` varchar(50) DEFAULT NULL,
-  `fecha_emision_factura` date NOT NULL,
-  `pagada` tinyint(1) NOT NULL DEFAULT 0,
-  `id_tutor` int(11) NOT NULL,
-  `id_legajo_alumno` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+CREATE TABLE cuota (
+    id_cuota INT AUTO_INCREMENT PRIMARY KEY,
 
---
--- Volcado de datos para la tabla `cuota`
---
+    periodo VARCHAR(20) NOT NULL,
 
-INSERT INTO `cuota` (`id_cuota`, `periodo`, `monto`, `fecha_vencimiento`, `estado`, `fecha_pago`, `medio_pago`, `fecha_emision_factura`, `pagada`, `id_tutor`, `id_legajo_alumno`) VALUES
-(1, '2024-04', 15000.00, '2024-04-10', 'Pagada', '2024-04-08', 'Transferencia', '2024-04-01', 1, 1, 1),
-(2, '2024-05', 15000.00, '2024-05-10', 'Pagada', '2024-05-09', 'Efectivo', '2024-05-01', 1, 1, 1),
-(3, '2024-06', 15000.00, '2024-06-10', 'Pendiente', NULL, NULL, '2024-06-01', 0, 1, 1),
-(4, '2024-04', 15000.00, '2024-04-10', 'Pagada', '2024-04-07', 'Transferencia', '2024-04-01', 1, 2, 2),
-(5, '2024-05', 15000.00, '2024-05-10', 'Vencida', NULL, NULL, '2024-05-01', 0, 2, 2);
+    monto DECIMAL(10,2) NOT NULL,
+
+    fecha_pago DATE NOT NULL,
+
+    medio_pago VARCHAR(50),
+
+    estado VARCHAR(30) NOT NULL DEFAULT 'Pagada',
+
+    id_tutor INT NOT NULL,
+
+    id_legajo_alumno INT NOT NULL,
+
+    FOREIGN KEY (id_tutor)
+        REFERENCES tutor(id),
+
+    FOREIGN KEY (id_legajo_alumno)
+        REFERENCES alumno(legajo)
+);
 
 -- --------------------------------------------------------
 
@@ -579,7 +578,7 @@ INSERT INTO `inscripcion` (`id_inscripcion`, `fecha_inscripcion`, `estado`, `id_
 CREATE TABLE pago_pendiente (
     id_pago INT AUTO_INCREMENT PRIMARY KEY,
 
-    legajo_tutor INT NOT NULL,
+    id_tutor INT NOT NULL,
     legajo_alumno INT NOT NULL,
 
     mes VARCHAR(20) NOT NULL,
@@ -591,8 +590,8 @@ CREATE TABLE pago_pendiente (
     fecha_solicitud DATETIME NOT NULL,
 
     CONSTRAINT fk_pago_tutor
-        FOREIGN KEY (legajo_tutor)
-        REFERENCES tutor(legajo_tutor),
+        FOREIGN KEY (id_tutor)
+        REFERENCES tutor(id),
 
     CONSTRAINT fk_pago_alumno
         FOREIGN KEY (legajo_alumno)
@@ -1104,14 +1103,6 @@ ALTER TABLE `calificacion`
   ADD KEY `calificacion_ibfk_2` (`legajo_alumno`);
 
 --
--- Indices de la tabla `cuota`
---
-ALTER TABLE `cuota`
-  ADD PRIMARY KEY (`id_cuota`),
-  ADD KEY `id_tutor` (`id_tutor`),
-  ADD KEY `id_alumno` (`id_legajo_alumno`);
-
---
 -- Indices de la tabla `curso`
 --
 ALTER TABLE `curso`
@@ -1357,12 +1348,6 @@ ALTER TABLE `auth_user_user_permissions`
 --
 ALTER TABLE `calificacion`
   MODIFY `id_calificacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT de la tabla `cuota`
---
-ALTER TABLE `cuota`
-  MODIFY `id_cuota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `curso`

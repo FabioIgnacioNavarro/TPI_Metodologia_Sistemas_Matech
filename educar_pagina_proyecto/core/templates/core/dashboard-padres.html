@@ -309,6 +309,14 @@
             <div class="success-message">Pago enviado correctamente.</div>
             {% endif %}
 
+            {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags == 'success' %}mensaje-exito{% else %}mensaje-error{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
             <form method="POST" action="{% url 'registrar_pago' %}">
               {% csrf_token %}
 
