@@ -232,13 +232,25 @@
                     <span class="badge badge-yellow"> Pendiente </span>
 
                     <form
-                      method="POST"
-                      action="{% url 'aprobar-inscripcion' solicitud.id_solicitud %}"
-                      style="margin-top: 5px"
+                        method="POST"
+                        action="{% url 'aprobar-inscripcion' solicitud.id_solicitud %}"
+                        style="margin-top:5px;"
                     >
-                      {% csrf_token %}
+                        {% csrf_token %}
+                        <button type="submit" class="btn-aprobar">
+                            Aprobar
+                        </button>
+                    </form>
 
-                      <button type="submit" class="btn-form">Aprobar</button>
+                    <form
+                        method="POST"
+                        action="{% url 'rechazar-inscripcion' solicitud.id_solicitud %}"
+                        style="margin-top:5px;"
+                    >
+                        {% csrf_token %}
+                        <button type="submit" class="btn-rechazar">
+                            Rechazar
+                        </button>
                     </form>
 
                     {% else %}

@@ -1366,8 +1366,19 @@ def aprobar_inscripcion(request, id_solicitud):
         legajo_alumno=alumno
     )
 
-    solicitud.estado = 'Aprobada'
-    solicitud.save()
+    solicitud.delete()
+
+    return redirect('dashboard-administrativo')
+
+@never_cache
+def rechazar_inscripcion(request, id_solicitud):
+
+    solicitud = get_object_or_404(
+        SolicitudInscripcion,
+        id_solicitud=id_solicitud
+    )
+
+    solicitud.delete()
 
     return redirect('dashboard-administrativo')
 
