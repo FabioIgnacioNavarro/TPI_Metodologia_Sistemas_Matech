@@ -86,6 +86,9 @@
           <a href="#" onclick="showPanel('materias', this); return false;">
             <span class="nav-icon">📚</span> Materias
           </a>
+          <a href="#" onclick="showPanel('tareas-evaluaciones', this); return false;">
+            <span class="nav-icon">📝</span> Tareas y evaluaciones
+          </a>
           <a href="#" onclick="showPanel('horario', this); return false;">
             <span class="nav-icon">📅</span> Horario
           </a>
@@ -138,8 +141,9 @@
             <thead>
               <tr>
                 <th>Materia</th>
-                <th>1° Timestre</th>
-                <th>2° Timestre</th>
+                <th>1° Bimestre</th>
+                <th>2° Bimestre</th>
+                <th>3° Bimestre</th> <!-- 👈 Fila de cabecera -->
                 <th>Promedio</th>
                 <th>Estado</th>
               </tr>
@@ -150,6 +154,7 @@
                 <td>{{ nota.materia }}</td>
                 <td>{% if nota.trim1 %}{{ nota.trim1 }}{% else %}-{% endif %}</td>
                 <td>{% if nota.trim2 %}{{ nota.trim2 }}{% else %}-{% endif %}</td>
+                <td>{% if nota.trim3 %}{{ nota.trim3 }}{% else %}-{% endif %}</td> <!-- 👈 Celda de dato -->
                 <td>{% if nota.promedio %}{{ nota.promedio }}{% else %}-{% endif %}</td>
                 <td>
                   {% if nota.estado == 'Aprobado' %}
@@ -163,7 +168,7 @@
               </tr>
               {% empty %}
               <tr>
-                <td colspan="5">No hay calificaciones registradas.</td>
+                <td colspan="6">No hay calificaciones registradas.</td> <!-- 👈 colspan cambiado a 6 -->
               </tr>
               {% endfor %}
             </tbody>
@@ -225,6 +230,79 @@
             </tbody>
           </table>
 
+        </div>
+
+                <!-- TAREAS Y EVALUACIONES -->
+        <div id="panel-tareas-evaluaciones" class="panel">
+          <p class="section-title">Tareas y evaluaciones</p>
+          
+          {% if tareas_alumno %}
+            <table class="tabla">
+              <thead>
+                <tr>
+                  <th>Materia</th>
+                  <th>Docente</th>
+                  <th>Tarea / Evaluación</th>
+                  <th>Fecha de entrega</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              
+              <tbody>
+                {% for item in tareas_alumno %}
+                <tr>
+                  <td>{{ item.materia_nombre }}</td>
+                  <td>{{ item.docente_nombre }}</td>
+                  
+                  <!-- Título de la tarea -->
+                  <td style="font-weight: 600;">
+                    {{ item.tarea.titulo|default:"Evaluación" }}
+                    {% if item.tarea.descripcion %}
+                      <br><small style="color:#64748b; font-size:12px;">{{ item.tarea.descripcion|truncatechars:50 }}</small>
+                    {% endif %}
+                  </td>
+                  
+                  <!-- Fecha de entrega -->
+                  <td>
+                      {% if item.tarea.fecha %}
+                        {{ item.tarea.fecha|date:"d/m/Y" }}
+                      {% else %}
+                        -
+                      {% endif %}
+                  </td>
+                  
+                  <!-- Estado (solo lectura) -->
+                  <td>
+                    {% if item.tarea.estado == 'Pendiente' %}
+                      <span class="badge badge-yellow">Pendiente</span>
+                    {% elif item.tarea.estado == 'Completada' %}
+                      <span class="badge badge-green">Completada</span>
+                    {% elif item.tarea.estado == 'Entregada' %}
+                      <span class="badge badge-blue">Entregada</span>
+                    {% else %}
+                      <span class="badge">{{ item.tarea.estado|default:"-" }}</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                
+                <!-- Subtítulo para cada materia (opcional) -->
+                {% if forloop.first %}
+                <tr style="background:#f1f5f9; font-weight:600;">
+                  <td colspan="5" style="padding:8px 12px; color:#475569;">
+                    📚 {{ item.materia_nombre }}
+                  </td>
+                </tr>
+                {% endif %}
+                
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <div style="text-align:center; padding:40px 20px; color:#94a3b8;">
+              <span style="font-size:48px; display:block; margin-bottom:10px;">📝</span>
+              No hay tareas o evaluaciones asignadas en este momento.
+            </div>
+          {% endif %}
         </div>
 
         <!-- HORARIO -->

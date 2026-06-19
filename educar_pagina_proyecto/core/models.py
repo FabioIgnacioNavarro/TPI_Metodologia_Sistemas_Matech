@@ -267,6 +267,60 @@ class Evaluacion(models.Model):
     def __str__(self):
         return f"{self.alumno} - {self.materia} - {self.nota}"
 
+class Tarea(models.Model):
+    id = models.AutoField(primary_key=True)
+    
+    docente = models.ForeignKey(
+        'Docente', 
+        on_delete=models.CASCADE,
+        db_column='legajo_docente'
+    )
+    
+    materia = models.ForeignKey(
+        'Materia',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
+    
+    tipo = models.CharField(
+        max_length=50,
+        choices=[
+            ('Tarea', 'Tarea'),
+            ('Evaluación', 'Evaluación')
+        ]
+    )
+    
+    titulo = models.CharField(max_length=200)
+    descripcion = models.TextField()
+    fecha = models.DateField(null=True, blank=True)
+    
+    curso_destinado = models.ForeignKey(
+        Curso,
+        on_delete=models.CASCADE,
+        related_name='tareas_docente'
+    )
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_publicacion = models.DateTimeField(blank=True, null=True)
+    programa_publicacion = models.BooleanField(default=False)
+    
+    estado = models.CharField(
+        max_length=20,
+        choices=[
+            ('Borrador', 'Borrador'),
+            ('Publicado', 'Publicado'),
+            ('Programado', 'Programado')
+        ],
+        default='Borrador'
+    )
+    
+    def __str__(self):
+        return f"{self.titulo} - {self.estado}"
+
+    class Meta:
+        db_table = 'tarea'
+
 class Inscripcion(models.Model):
     id_inscripcion = models.AutoField(primary_key=True)
     fecha_inscripcion = models.DateField()

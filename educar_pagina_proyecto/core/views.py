@@ -1,4 +1,5 @@
 import requests
+from django.http import JsonResponse
 import re
 from django.core.files.storage import FileSystemStorage
 from datetime import datetime, date
@@ -46,7 +47,8 @@ from .models import (
     SolicitudInscripcion,
     PagoPendiente,
     Arancel,
-    DocumentacionAlumno
+    DocumentacionAlumno,
+    Tarea,
 )
 COMUNICADOS_FILE = os.path.join(
     os.path.dirname(__file__),
@@ -545,6 +547,8 @@ def dashboard_alumno(request):
     # Agrupar calificaciones por materia para el panel de notas
     from collections import OrderedDict
 
+    from collections import OrderedDict
+
     notas_resumen = []
     # Iterar por las materias asignadas al curso
     for curso_materia in materias:
@@ -553,20 +557,28 @@ def dashboard_alumno(request):
 
         trim1 = ''
         trim2 = ''
+        trim3 = ''
         numeric_notes = []
         estado = ''
 
-        for idx, c in enumerate(califs_mat):
-            display_val = ''
-            if c.nota is not None:
-                display_val = float(c.nota)
-            else:
-                display_val = c.tipo_evaluacion or ''
+        for c in califs_mat:
+            display_val = float(c.nota) if c.nota is not None else (c.tipo_evaluacion or '')
 
-            if idx == 0:
+            # Asignar según tipo de evaluación
+            if c.tipo_evaluacion == '1° Bimestre':
                 trim1 = display_val
-            elif idx == 1:
+            elif c.tipo_evaluacion == '2° Bimestre':
                 trim2 = display_val
+            elif c.tipo_evaluacion == '3° Bimestre':
+                trim3 = display_val
+            else:
+                # Fallback por compatibilidad
+                if not trim1:
+                    trim1 = display_val
+                elif not trim2:
+                    trim2 = display_val
+                elif not trim3:
+                    trim3 = display_val
 
             if c.nota is not None:
                 try:
@@ -583,6 +595,7 @@ def dashboard_alumno(request):
             'materia': mat.nombre,
             'trim1': trim1,
             'trim2': trim2,
+            'trim3': trim3,
             'promedio': promedio_mat,
             'estado': estado or 'En curso'
         })
@@ -620,15 +633,34 @@ def dashboard_alumno(request):
                     )
                 ]
 
-                # 🔥 ORDEN MÁS NUEVOS PRIMERO
+                
                 comunicados_alumno.reverse()
 
-            # 🔥 últimos 3 ya ordenados
+            
             ultimos_comunicados = comunicados_alumno[:3]
 
         except json.JSONDecodeError:
             comunicados_alumno = []
             ultimos_comunicados = []
+    
+    tareas_alumno = []
+    if materias.exists():
+        for curso_materia in materias:
+            materia_real = curso_materia.id_materia
+            tarea_materia = Tarea.objects.filter(
+                materia=materia_real,
+                curso_destinado=alumno.id_curso
+            ).select_related('docente', 'docente__id_persona', 'curso_destinado').order_by('-fecha_creacion')
+            
+            for tarea in tarea_materia:
+                tareas_alumno.append({
+                    'tarea': tarea,
+                    'materia_nombre': materia_real.nombre,
+                    'docente_nombre': f'{tarea.docente.id_persona.apellido} {tarea.docente.id_persona.nombre}',
+                    'curso_destinado': tarea.curso_destinado.comision if tarea.curso_destinado else '-',
+                })
+    tareas_alumno.sort(key=lambda x: x['tarea'].fecha_creacion, reverse=True)
+
     panel_activo = request.session.pop("panel_activo", "inicio")
     hay_horarios = any(clases for clases in horario_por_dia.values())
     return render(request, 'core/dashboard-alumno.html', {
@@ -654,6 +686,7 @@ def dashboard_alumno(request):
         'horario_por_dia': horario_por_dia,
         'hay_horarios': hay_horarios,
         "panel_activo": panel_activo,
+        'tareas_alumno': tareas_alumno,
     })
 
 @never_cache
@@ -682,33 +715,41 @@ def dashboard_docente(request):
         id_curso__in=cursos
     ).distinct()
 
-    # 🔥 1. calificaciones
+    tareas = Tarea.objects.filter(docente=docente).select_related('curso_destinado', 'materia').order_by('-fecha_creacion')
+
+    # calificaciones
     calificaciones = Calificacion.objects.filter(
         id_materia__in=materias,
         legajo_alumno__in=alumnos
     ).select_related('id_materia', 'legajo_alumno')
 
-    # 🔥 2. diccionario de notas
+    # diccionario de notas
+    # diccionario de notas (agrupado por tipo de bimestre)
+    # diccionario de notas (agrupado por tipo de bimestre)
     notas_por_alumno = {}
-
     for c in calificaciones:
         alumno_id = c.legajo_alumno_id
-
+        
+        # Crear entrada si no existe
         if alumno_id not in notas_por_alumno:
-            notas_por_alumno[alumno_id] = []
+            notas_por_alumno[alumno_id] = {'trim1': '', 'trim2': '', 'trim3': ''}
 
-        notas_por_alumno[alumno_id].append(c)
-
-    # 🔥 3. cursos
+        val_nota = float(c.nota) if c.nota is not None else ''
+        
+        # Asignar nota según el tipo de evaluación
+        if c.tipo_evaluacion == '1° Bimestre':
+            notas_por_alumno[alumno_id]['trim1'] = str(val_nota)  # Convertir a string para mostrar
+        elif c.tipo_evaluacion == '2° Bimestre':
+            notas_por_alumno[alumno_id]['trim2'] = str(val_nota)
+        elif c.tipo_evaluacion == '3° Bimestre':
+            notas_por_alumno[alumno_id]['trim3'] = str(val_nota)
+    # cursos
     cursos_data = []
-
     for curso in cursos:
         alumnos_count = Alumno.objects.filter(id_curso=curso).count()
-
         promedio = Calificacion.objects.filter(
             legajo_alumno__id_curso=curso
         ).aggregate(prom=Avg('nota'))['prom']
-
         cursos_data.append({
             'curso': getattr(curso, 'comision', str(curso)),
             'nivel': getattr(curso, 'nivel', ''),
@@ -717,19 +758,16 @@ def dashboard_docente(request):
             'promedio': round(promedio, 1) if promedio else 0,
         })
 
-    # 🔥 4. horarios (CORREGIDO PARA JSON)
+    # horarios
     horarios = CursoCursaMaterias.objects.filter(
         id_materia__in=materias
     ).select_related('id_curso', 'id_materia')
 
     horario_dict = {}
-
     for h in horarios:
         data = h.horarios
-
         if isinstance(data, str):
             data = json.loads(data)
-
         for dia, rango in data.items():
             if rango not in horario_dict:
                 horario_dict[rango] = {
@@ -739,26 +777,22 @@ def dashboard_docente(request):
                     'Jueves': '-',
                     'Viernes': '-',
                 }
-
             dia_cap = dia.capitalize()
-
             if dia_cap == 'Miercoles':
                 dia_cap = 'Miércoles'
-
             horario_dict[rango][dia_cap] = f"{h.id_curso.anio}° {h.id_curso.nivel} ({h.id_curso.comision}) - {h.id_curso.turno}"
-
-    # 🔥 ordenar
-    horario_ordenado = dict(sorted(horario_dict.items()))
 
     return render(request, 'core/dashboard-docente.html', {
         'persona': persona,
         'docente': docente,
         'materias': materias,
         'cursos': cursos_data,
+        'cursos_lista': cursos,       
         'alumnos': alumnos,
         'calificaciones': calificaciones,
         'notas_por_alumno': notas_por_alumno,
         'horario': horario_dict,
+        'tareas': tareas,             
     })
 
 
@@ -2383,3 +2417,263 @@ def rechazar_documentacion(request, id_documentacion):
     return redirect(
         'dashboard-administrativo'
     )
+    return redirect('dashboard-administrativo')
+
+@never_cache
+def list_tareas(request):
+    return redirect('/docente/?panel=tareas')
+
+@never_cache
+def crear_tarea(request):
+    persona = obtener_persona(request)
+    if not persona:
+        return redirect('login')
+    
+    docente = Docente.objects.filter(id_persona=persona).first()
+    if not docente:
+        return redirect('login')
+    
+    if request.method == 'POST':
+        titulo = request.POST.get('titulo')
+        descripcion = request.POST.get('descripcion')
+        curso_id = request.POST.get('curso')
+        tipo = request.POST.get('tipo', 'Tarea')
+        fecha_entrega = request.POST.get('fecha')
+        estado = request.POST.get('estado', 'Borrador')
+        
+        programar = request.POST.get('programar_publicacion') == 'on'
+        fecha_pub_str = request.POST.get('fecha_publicacion')
+        
+        curso = Curso.objects.get(id_curso=curso_id)
+        fecha_pub = None
+        
+        if programar and fecha_pub_str:
+            from django.utils.dateparse import parse_datetime
+            fecha_pub = parse_datetime(fecha_pub_str)
+            estado = 'Programado'
+        elif estado == 'Publicado':
+            fecha_pub = timezone.now()
+            
+        materia = Materia.objects.filter(
+            docentedictamateria__id_docente=docente,
+            cursocursamaterias__id_curso=curso
+        ).first()
+        
+        Tarea.objects.create(
+            docente=docente,
+            materia=materia,
+            tipo=tipo,
+            titulo=titulo,
+            descripcion=descripcion,
+            curso_destinado=curso,
+            fecha=fecha_entrega if fecha_entrega else None,
+            fecha_publicacion=fecha_pub,
+            programa_publicacion=programar,
+            estado=estado
+        )
+        messages.success(request, f"{tipo} creada exitosamente.")
+        
+    return redirect('/docente/?panel=tareas')
+@never_cache
+def editar_tarea(request, tarea_id):
+    persona = obtener_persona(request)
+    if not persona:
+        return redirect('login')
+    
+    docente = Docente.objects.filter(id_persona=persona).first()
+    if not docente:
+        return redirect('login')
+        
+    try:
+        tarea = Tarea.objects.get(id=tarea_id, docente=docente)
+    except Tarea.DoesNotExist:
+        messages.error(request, "La tarea no existe.")
+        return redirect('/docente/?panel=tareas')
+        
+    if request.method == 'POST':
+        titulo = request.POST.get('titulo')
+        descripcion = request.POST.get('descripcion')
+        curso_id = request.POST.get('curso')
+        tipo = request.POST.get('tipo', 'Tarea')
+        fecha_entrega = request.POST.get('fecha')
+        estado = request.POST.get('estado')
+        
+        programar = request.POST.get('programar_publicacion') == 'on'
+        fecha_pub_str = request.POST.get('fecha_publicacion')
+        
+        curso = Curso.objects.get(id_curso=curso_id)
+        
+        tarea.titulo = titulo
+        tarea.descripcion = descripcion
+        tarea.curso_destinado = curso
+        tarea.tipo = tipo
+        tarea.fecha = fecha_entrega if fecha_entrega else None
+        tarea.programa_publicacion = programar
+        
+        if programar and fecha_pub_str:
+            from django.utils.dateparse import parse_datetime
+            tarea.fecha_publicacion = parse_datetime(fecha_pub_str)
+            tarea.estado = 'Programado'
+        else:
+            tarea.estado = estado
+            if estado == 'Publicado':
+                tarea.fecha_publicacion = timezone.now()
+            else:
+                tarea.fecha_publicacion = None
+                
+        tarea.save()
+        messages.success(request, f"{tipo} modificada exitosamente.")
+        
+    return redirect('/docente/?panel=tareas')
+@never_cache
+def borrar_tarea(request, tarea_id):
+    persona = obtener_persona(request)
+    if not persona:
+        return redirect('login')
+        
+    docente = Docente.objects.filter(id_persona=persona).first()
+    if not docente:
+        return redirect('login')
+        
+    try:
+        tarea = Tarea.objects.get(id=tarea_id, docente=docente)
+        tipo = tarea.tipo
+        tarea.delete()
+        messages.success(request, f"{tipo} eliminada exitosamente.")
+    except Tarea.DoesNotExist:
+        messages.error(request, "La tarea no existe.")
+        
+    return redirect('/docente/?panel=tareas')
+@never_cache
+def programar_publicacion(request):
+    return redirect('/docente/?panel=tareas')
+@never_cache
+def guardar_nota(request):
+    """Vista para guardar las notas cargadas por el docente vinculándolas a su materia"""
+
+    if request.method != 'POST':
+        return redirect('dashboard-docente')
+
+    try:
+        data = json.loads(request.body)
+        
+        # Obtener legajo y convertir a int
+        legajo_alumno_raw = data.get('legajo_alumno')
+        if legajo_alumno_raw is None:
+            return JsonResponse({
+                'success': False, 
+                'error': 'Legajo inválido'
+            })
+        
+        try:
+            legajo_alumno = int(legajo_alumno_raw)
+        except (ValueError, TypeError):
+            return JsonResponse({
+                'success': False, 
+                'error': 'Legajo inválido'
+            })
+
+        # Obtener el docente autenticado desde la sesión
+        persona = obtener_persona(request)
+        if not persona:
+            return JsonResponse({
+                'success': False, 
+                'error': 'No se encontró una sesión activa para el docente'
+            })
+        
+        docente = Docente.objects.filter(id_persona=persona).first()
+        if not docente:
+            return JsonResponse({
+                'success': False, 
+                'error': 'El usuario actual no es un docente registrado'
+            })
+
+        # Obtener notas (pueden ser None, vacías o floats)
+        nota1_raw = data.get('nota1')
+        nota2_raw = data.get('nota2')
+        nota3_raw = data.get('nota3')
+
+        # Obtener el alumno por legajo
+        alumno = Alumno.objects.filter(legajo=legajo_alumno).first()
+
+        if not alumno:
+            return JsonResponse({
+                'success': False, 
+                'error': f'No se encontró un alumno con legajo {legajo_alumno}'
+            })
+
+        # Obtener el curso del alumno
+        curso = alumno.id_curso
+
+        if not curso:
+            return JsonResponse({
+                'success': False, 
+                'error': f'El alumno con legajo {legajo_alumno} no tiene curso asignado'
+            })
+
+        # Obtener las materias que dicta este docente
+        materias_docente = Materia.objects.filter(
+            docentedictamateria__id_docente=docente
+        )
+
+        # Filtrar las materias del curso del alumno que son dictadas por este docente
+        materias = CursoCursaMaterias.objects.filter(
+            id_curso=curso,
+            id_materia__in=materias_docente
+        ).select_related('id_materia')
+
+        if not materias.exists():
+            return JsonResponse({
+                'success': False, 
+                'error': f'Usted no dicta ninguna materia en el curso del alumno {alumno.id_persona.apellido}'
+            })
+
+        def procesar_nota(alumno, materia, tipo_eval, nota_raw):
+            if nota_raw is None or str(nota_raw).strip() == '':
+                # Si se borra la nota, se elimina de la base de datos si existe
+                Calificacion.objects.filter(
+                    legajo_alumno=alumno,
+                    id_materia=materia,
+                    tipo_evaluacion=tipo_eval
+                ).delete()
+            else:
+                try:
+                    nota_val = float(nota_raw)
+                    if nota_val < 0 or nota_val > 10:
+                        raise ValueError("La nota debe estar entre 0 y 10")
+                    
+                    # Actualizar o crear la calificación para esta materia específica
+                    Calificacion.objects.update_or_create(
+                        legajo_alumno=alumno,
+                        id_materia=materia,
+                        tipo_evaluacion=tipo_eval,
+                        defaults={'nota': nota_val, 'fecha': date.today()}
+                    )
+                except (ValueError, TypeError):
+                    raise ValueError(f"La nota del {tipo_eval} debe ser un número válido entre 0 y 10")
+
+        # Cargar las notas solo para las materias del docente en ese curso
+        for curso_materia in materias:
+            materia = curso_materia.id_materia
+            procesar_nota(alumno, materia, '1° Bimestre', nota1_raw)
+            procesar_nota(alumno, materia, '2° Bimestre', nota2_raw)
+            procesar_nota(alumno, materia, '3° Bimestre', nota3_raw)
+
+        return JsonResponse({
+            'success': True, 
+            'error': '',
+            'alumno': f'{alumno.id_persona.apellido}, {alumno.id_persona.nombre}'
+        })
+
+    except ValueError as ve:
+        return JsonResponse({
+            'success': False,
+            'error': str(ve)
+        })
+    except Exception as e:
+        import traceback
+        print("ERROR en guardar_nota:", traceback.format_exc())
+        return JsonResponse({
+            'success': False, 
+            'error': str(e)
+        }, status=500)
