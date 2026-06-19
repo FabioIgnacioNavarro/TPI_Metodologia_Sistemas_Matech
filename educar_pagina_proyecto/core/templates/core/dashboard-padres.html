@@ -129,19 +129,32 @@
             <a
               href="#"
               onclick="
+                showPanel('cuotas', this);
+                return false;
+              "
+            >
+              <span class="nav-icon">💰</span> Historial de pagos
+            </a>
+            <a
+              href="#"
+              onclick="
+                showPanel('documentacion', this);
+                return false;
+              "
+            >
+              <span class="nav-icon">📄</span>
+              Documentación
+            </a>
+
+            <a
+              href="#"
+              onclick="
                 showPanel('mensajes', this);
                 return false;
               "
             >
               <span class="nav-icon">💬</span> Mensajes
             </a>
-            <a
-              href="#"
-              onclick="
-                showPanel('contacto', this);
-                return false;
-              "
-            >
               <span class="nav-icon">📞</span> Contacto
             </a>
             <a
@@ -332,6 +345,48 @@
                   </option>
                   {% endfor %}
                 </select>
+
+                {% for hijo in hijos %}
+
+                    {% if hijo.documentacion %}
+
+                        {% if hijo.documentacion.estado == 'Rechazada' %}
+                            <div class="mensaje-error">
+                                <strong>
+                                    {{ hijo.persona.nombre }}
+                                    {{ hijo.persona.apellido }}
+                                </strong>
+                                <br>
+                                Documentación rechazada.
+                                <br>
+                                Motivo:
+                                {{ hijo.documentacion.observaciones }}
+                            </div>
+
+                        {% elif hijo.documentacion.estado == 'Aprobada' %}
+                            <div class="mensaje-exito">
+                                <strong>
+                                    {{ hijo.persona.nombre }}
+                                    {{ hijo.persona.apellido }}
+                                </strong>
+                                <br>
+                                Documentación aprobada.
+                            </div>
+
+                        {% elif hijo.documentacion.estado == 'Pendiente' %}
+                            <div class="badge badge-yellow">
+                                <strong>
+                                    {{ hijo.persona.nombre }}
+                                    {{ hijo.persona.apellido }}
+                                </strong>
+                                - Pendiente de revisión.
+                            </div>
+
+                        {% endif %}
+
+                    {% endif %}
+
+                {% endfor %}
               </div>
 
               <div class="form-group">
@@ -359,6 +414,177 @@
 
               <button type="submit" class="btn-form">Enviar pago</button>
             </form>
+          </div>
+          
+          <!-- HISTORIAL -->
+          <div id="panel-cuotas" class="panel">
+
+              <h2>Historial de cuotas</h2>
+
+              <table class="tabla">
+                  <thead>
+                      <tr>
+                          <th>Alumno</th>
+                          <th>Periodo</th>
+                          <th>Monto</th>
+                          <th>Estado</th>
+                      </tr>
+                  </thead>
+
+                  <tbody>
+
+                      {% for cuota in cuotas %}
+                      <tr>
+
+                          <td>
+                              {{ cuota.id_legajo_alumno.id_persona.nombre }}
+                              {{ cuota.id_legajo_alumno.id_persona.apellido }}
+                          </td>
+
+                          <td>{{ cuota.periodo }}</td>
+
+                          <td>${{ cuota.monto }}</td>
+
+                          <td>
+
+                              {% if cuota.estado == 'Pagada' %}
+                              <span class="badge badge-green">
+                                  Pagada
+                              </span>
+
+                              {% elif cuota.estado == 'Pendiente' %}
+                              <span class="badge badge-yellow">
+                                  Pendiente
+                              </span>
+
+                              {% else %}
+                              <span class="badge">
+                                  {{ cuota.estado }}
+                              </span>
+                              {% endif %}
+
+                          </td>
+
+                      </tr>
+                      {% empty %}
+                      <tr>
+                          <td colspan="4">
+                              No hay cuotas registradas.
+                          </td>
+                      </tr>
+                      {% endfor %}
+
+                  </tbody>
+              </table>
+          </div>
+
+          <!-- DOCUMENTACION -->
+          <div id="panel-documentacion" class="panel">
+
+                  <h2>Documentación del alumno</h2>
+
+                  {% if messages %}
+                      {% for message in messages %}
+                          <div class="{% if message.tags == 'success' %}mensaje-exito{% else %}mensaje-error{% endif %}">
+                              {{ message }}
+                          </div>
+                      {% endfor %}
+                  {% endif %}
+
+                  <!-- ESTADO DE LA DOCUMENTACION -->
+                  {% for hijo in hijos %}
+
+                      {% if hijo.documentacion %}
+
+                          <div class="tarea-card" style="margin-bottom:15px;">
+
+                              <strong>
+                                  {{ hijo.persona.nombre }}
+                                  {{ hijo.persona.apellido }}
+                              </strong>
+
+                              <br>
+
+                              Estado:
+                              {{ hijo.documentacion.estado }}
+
+                              {% if hijo.documentacion.estado == 'Rechazada' %}
+                                  <br>
+                                  Motivo:
+                                  {{ hijo.documentacion.observaciones }}
+                              {% endif %}
+
+                          </div>
+
+                      {% endif %}
+
+                  {% endfor %}
+
+                  <p class="section-title">
+                      Adjunte la documentación obligatoria para completar el legajo.
+                  </p>
+
+                  <form method="POST"
+                      action="{% url 'enviar_documentacion' %}"
+                      enctype="multipart/form-data">
+
+                  {% csrf_token %}
+
+                  <div class="form-group">
+                      <label>Alumno</label>
+
+                      <select name="alumno" required>
+                          <option value="">
+                              Seleccione un alumno
+                          </option>
+
+                          {% for hijo in hijos %}
+                          <option value="{{ hijo.alumno.legajo }}">
+                              {{ hijo.persona.nombre }}
+                              {{ hijo.persona.apellido }}
+                          </option>
+                          {% endfor %}
+                      </select>
+                  </div>
+
+                  <div class="form-group">
+                      <label>DNI (frente)</label>
+                      <input type="file"
+                            name="dni_frente"
+                            accept=".jpg,.jpeg,.png"
+                            required>
+                  </div>
+
+                  <div class="form-group">
+                      <label>DNI (dorso)</label>
+                      <input type="file"
+                            name="dni_dorso"
+                            accept=".jpg,.jpeg,.png"
+                            required>
+                  </div>
+
+                  <div class="form-group">
+                      <label>Partida de nacimiento</label>
+                      <input type="file"
+                            name="partida"
+                            accept=".jpg,.jpeg,.png"
+                            required>
+                  </div>
+
+                  <div class="form-group">
+                      <label>Certificado de salud</label>
+                      <input type="file"
+                            name="salud"
+                            accept=".jpg,.jpeg,.png"
+                            required>
+                  </div>
+
+                  <button type="submit" class="btn-form">
+                      Enviar documentación
+                  </button>
+
+              </form>
+
           </div>
 
           <!-- MENSAJES -->
