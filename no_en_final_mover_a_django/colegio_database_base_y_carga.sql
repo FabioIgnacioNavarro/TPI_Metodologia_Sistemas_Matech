@@ -8,6 +8,7 @@
 -- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET FOREIGN_KEY_CHECKS = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -301,13 +302,8 @@ CREATE TABLE cuota (
 
     id_tutor INT NOT NULL,
 
-    id_legajo_alumno INT NOT NULL,
+    id_legajo_alumno INT NOT NULL
 
-    FOREIGN KEY (id_tutor)
-        REFERENCES tutor(id),
-
-    FOREIGN KEY (id_legajo_alumno)
-        REFERENCES alumno(legajo)
 );
 
 -- --------------------------------------------------------
@@ -575,28 +571,16 @@ INSERT INTO `inscripcion` (`id_inscripcion`, `fecha_inscripcion`, `estado`, `id_
 -- Estructura de tabla para la tabla `pago_pendiente`
 --
 
+DROP TABLE IF EXISTS `pago_pendiente`;
 CREATE TABLE pago_pendiente (
     id_pago INT AUTO_INCREMENT PRIMARY KEY,
-
     id_tutor INT NOT NULL,
     legajo_alumno INT NOT NULL,
-
     mes VARCHAR(20) NOT NULL,
-
     importe DECIMAL(10,2) NOT NULL,
-
     estado VARCHAR(20) DEFAULT 'Pendiente',
-
-    fecha_solicitud DATETIME NOT NULL,
-
-    CONSTRAINT fk_pago_tutor
-        FOREIGN KEY (id_tutor)
-        REFERENCES tutor(id),
-
-    CONSTRAINT fk_pago_alumno
-        FOREIGN KEY (legajo_alumno)
-        REFERENCES alumno(legajo_alumno)
-);
+    fecha_solicitud DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -1204,6 +1188,15 @@ ALTER TABLE `noticia`
   ADD KEY `legajo_personal` (`legajo_personal`);
 
 --
+-- Indices de la tabla `pago_pendiente`
+--
+ALTER TABLE `pago_pendiente`
+  ADD KEY `id_tutor` (`id_tutor`),
+  ADD KEY `legajo_alumno` (`legajo_alumno`);
+
+
+
+--
 -- Indices de la tabla `persona`
 --
 ALTER TABLE `persona`
@@ -1611,6 +1604,16 @@ ALTER TABLE `inscripcion`
 ALTER TABLE `noticia`
   ADD CONSTRAINT `noticia_ibfk_1` FOREIGN KEY (`legajo_personal`) REFERENCES `personal_administrativo` (`legajo`);
 
+
+--
+-- Filtros para la tabla `pago_pendiente`
+--
+ALTER TABLE `pago_pendiente`
+  ADD CONSTRAINT `fk_pago_tutor` FOREIGN KEY (`id_tutor`) REFERENCES `tutor` (`id`),
+  ADD CONSTRAINT `fk_pago_alumno` FOREIGN KEY (`legajo_alumno`) REFERENCES `alumno` (`legajo`);
+
+
+
 --
 -- Filtros para la tabla `persona`
 --
@@ -1668,7 +1671,6 @@ ALTER TABLE `viaje`
 ALTER TABLE `viaje_utiliza_vehiculo`
   ADD CONSTRAINT `viaje_utiliza_vehiculo_ibfk_1` FOREIGN KEY (`id_viaje`) REFERENCES `viaje` (`id_viaje`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `viaje_utiliza_vehiculo_ibfk_2` FOREIGN KEY (`id_vehiculo`) REFERENCES `vehiculo` (`id_vehiculo`) ON DELETE CASCADE ON UPDATE CASCADE;
-COMMIT;
 
 -- Datos de cv
 CREATE TABLE postulacion_laboral (
@@ -1683,6 +1685,12 @@ CREATE TABLE postulacion_laboral (
     cv VARCHAR(255),
     fecha_postulacion DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+
+COMMIT;
+SET FOREIGN_KEY_CHECKS = 1;
+
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
