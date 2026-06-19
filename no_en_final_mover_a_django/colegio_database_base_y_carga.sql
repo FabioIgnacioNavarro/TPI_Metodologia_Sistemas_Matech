@@ -1005,6 +1005,10 @@ CREATE TABLE documentacion_alumno (
     fecha_envio DATETIME,
 
     observaciones TEXT,
+
+    fecha_revision DATETIME NULL,
+
+    id_administrativo INT NULL
 );
 -- --------------------------------------------------------
 
@@ -1782,6 +1786,12 @@ ALTER TABLE `documentacion_alumno`
   FOREIGN KEY (`legajo_alumno`)
   REFERENCES `alumno` (`legajo`)
   ON DELETE CASCADE
+  ON UPDATE CASCADE,
+
+  ADD CONSTRAINT `documentacion_alumno_ibfk_2`
+  FOREIGN KEY (`id_administrativo`)
+  REFERENCES `personal_administrativo` (`legajo`)
+  ON DELETE SET NULL
   ON UPDATE CASCADE;
 
 -- Datos de cv
