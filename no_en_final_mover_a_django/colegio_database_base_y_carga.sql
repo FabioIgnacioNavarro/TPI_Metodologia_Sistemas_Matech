@@ -1756,7 +1756,6 @@ ALTER TABLE `viaje`
 ALTER TABLE `viaje_utiliza_vehiculo`
   ADD CONSTRAINT `viaje_utiliza_vehiculo_ibfk_1` FOREIGN KEY (`id_viaje`) REFERENCES `viaje` (`id_viaje`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `viaje_utiliza_vehiculo_ibfk_2` FOREIGN KEY (`id_vehiculo`) REFERENCES `vehiculo` (`id_vehiculo`) ON DELETE CASCADE ON UPDATE CASCADE;
-<<<<<<< HEAD
 
 --
 -- AUTO_INCREMENT para la tabla `disciplina_deportiva`
@@ -1774,13 +1773,17 @@ ALTER TABLE `disciplina_deportiva`
   FOREIGN KEY (`id_instalacion`)
   REFERENCES `instalacion` (`id`);
 
-=======
 --
--- Filtros para la tabla `documentacion_alummno`
+-- Filtros para la tabla `documentacion_alumno`
 --
+
 ALTER TABLE `documentacion_alumno`
-  ADD CONSTRAINT `documentacion_alumno_ibfk_1` FOREIGN KEY (`legajo_alumno`) REFERENCES `alumno` (`legajo`) ON DELETE CASCADE ON UPDATE CASCADE;
->>>>>>> joel
+  ADD CONSTRAINT `documentacion_alumno_ibfk_1`
+  FOREIGN KEY (`legajo_alumno`)
+  REFERENCES `alumno` (`legajo`)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+
 -- Datos de cv
 CREATE TABLE postulacion_laboral (
     id INT AUTO_INCREMENT PRIMARY KEY,
