@@ -663,6 +663,12 @@ def dashboard_alumno(request):
 
     panel_activo = request.session.pop("panel_activo", "inicio")
     hay_horarios = any(clases for clases in horario_por_dia.values())
+    
+    alumno = Alumno.objects.select_related(
+        'id_curso'
+    ).get(
+        id_persona=persona
+    )
     return render(request, 'core/dashboard-alumno.html', {
         'persona': persona,
         'alumno': alumno,

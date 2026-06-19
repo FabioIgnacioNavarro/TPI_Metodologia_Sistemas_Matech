@@ -74,7 +74,12 @@
             {{ persona.nombre|slice:":1"|upper }}{{ persona.apellido|slice:":1"|upper }}
           </div>
           <strong>{{ persona.nombre }} {{ persona.apellido }}</strong>
-          <span>3° Año B · Secundario</span>
+          <span>
+              {{ alumno.id_curso.anio }}° Año
+              {{ alumno.id_curso.comision }}
+              ·
+              {{ alumno.id_curso.nivel }}
+          </span>
         </div>
         <nav class="sidebar-nav">
           <a href="#" class="active" onclick="showPanel('inicio', this); return false;">
