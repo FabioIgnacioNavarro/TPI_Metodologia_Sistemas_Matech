@@ -4,7 +4,6 @@ from django.core.files.storage import FileSystemStorage
 from datetime import datetime, date
 from django.conf import settings
 from datetime import date
-from datetime import datetime
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -18,7 +17,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import date
 from django.views.decorators.cache import never_cache
-
+from django.shortcuts import get_object_or_404, redirect
 from .models import (
     Inscripcion,
     Materia,
@@ -45,7 +44,9 @@ from .models import (
     Cuota,
     PostulacionLaboral,
     SolicitudInscripcion,
-    PagoPendiente
+    PagoPendiente,
+    Arancel,
+    DocumentacionAlumno
 )
 COMUNICADOS_FILE = os.path.join(
     os.path.dirname(__file__),
@@ -1144,17 +1145,23 @@ def dashboard_administrativo(request):
         'id_legajo_alumno__id_persona'
     )
     
-    cuotas_pendientes = Cuota.objects.filter(
-        estado='Vencida'
+    cuotas_pendientes = PagoPendiente.objects.exclude(
+        estado='Pagada'
     ).count()
 
     solicitudes = SolicitudInscripcion.objects.all().order_by('-fecha_solicitud')
 
     inscripciones_pendientes = SolicitudInscripcion.objects.filter(
-        estado="pendiente"
+        estado="Pendiente"
     ).count()
     
     pagos_pendientes = PagoPendiente.objects.all()
+    documentacion_pendiente = DocumentacionAlumno.objects.filter(
+        estado='Pendiente'
+    ).count()
+    documentaciones = DocumentacionAlumno.objects.filter(
+        estado='Pendiente'
+    ).order_by('-fecha_envio')
     
 
     return render(request, 'core/dashboard-administrativo.html', {
@@ -1168,6 +1175,8 @@ def dashboard_administrativo(request):
         'solicitudes': solicitudes,
         'inscripciones_pendientes': inscripciones_pendientes,
         'pagos_pendientes': pagos_pendientes,
+        'documentaciones': documentaciones,
+        'documentacion_pendiente': documentacion_pendiente,
     })
 
 @never_cache
@@ -1464,6 +1473,10 @@ def dashboard_padres(request):
             presentes += pres
             ausencias += aus
             tardanzas += tar
+            
+            documentacion = DocumentacionAlumno.objects.filter(
+                legajo_alumno=alumno
+            ).first()
 
             hijos.append({
                 'alumno': alumno,
@@ -1472,7 +1485,8 @@ def dashboard_padres(request):
                 'promedio': promedio,
                 'presentes': pres,
                 'ausencias': aus,
-                'tardanzas': tar
+                'tardanzas': tar,
+                'documentacion': documentacion,
             })
 
     # 📊 promedio general
@@ -1551,6 +1565,18 @@ def dashboard_padres(request):
         except json.JSONDecodeError:
             comunicados_filtrados = []
     panel_activo = request.session.pop("panel_activo", "inicio")
+    
+    cuotas_pendientes = Cuota.objects.filter(
+        id_tutor=tutor,
+        estado='Pendiente'
+    ).count()
+
+    cuotas = Cuota.objects.filter(
+        id_tutor=tutor
+    ).select_related(
+        'id_legajo_alumno__id_persona'
+    ).order_by('-id_cuota')
+    
     return render(
         request,
         'core/dashboard-padres.html',
@@ -1564,6 +1590,9 @@ def dashboard_padres(request):
             'tardanzas': tardanzas,
             'noticias': comunicados_filtrados,
             "panel_activo": panel_activo,
+            'cuotas_pendientes': cuotas_pendientes,
+            'cuotas': cuotas,
+            'documentacion': documentacion,
         }
     )
 
@@ -2022,52 +2051,335 @@ def registrar_pago(request):
         id_persona=persona
     ).first()
 
-    hijos = TutorTutoraAlumno.objects.filter(
-        id_tutor=tutor
+    if request.method == 'POST':
+
+        try:
+
+            alumno = Alumno.objects.get(
+                legajo=request.POST.get('alumno')
+            )
+
+            curso = alumno.id_curso
+
+            arancel = Arancel.objects.get(
+                nivel=curso.nivel
+            )
+
+            importe = arancel.monto
+
+            if PagoPendiente.objects.filter(
+                legajo_alumno=alumno,
+                mes=request.POST.get('mes'),
+                estado='Pendiente'
+            ).exists():
+
+                messages.error(
+                    request,
+                    'Ya existe una solicitud pendiente para ese mes.'
+                )
+
+                request.session["panel_activo"] = "pagos"
+                return redirect('dashboard-padres')
+
+            if Cuota.objects.filter(
+                id_legajo_alumno=alumno,
+                periodo=request.POST.get('mes'),
+                estado='Pagada'
+            ).exists():
+
+                messages.error(
+                    request,
+                    f'La cuota de {request.POST.get("mes")} ya fue abonada.'
+                )
+
+                request.session["panel_activo"] = "pagos"
+                return redirect('dashboard-padres')
+
+            PagoPendiente.objects.create(
+                id_tutor=tutor,
+                legajo_alumno=alumno,
+                mes=request.POST.get('mes'),
+                importe=importe,
+                estado='Pendiente',
+                fecha_solicitud=timezone.now()
+            )
+
+            messages.success(
+                request,
+                'El comprobante de pago fue enviado correctamente y será revisado por administración.'
+            )
+
+        except Alumno.DoesNotExist:
+
+            messages.error(
+                request,
+                'Debe seleccionar un alumno válido.'
+            )
+
+        except Arancel.DoesNotExist:
+
+            messages.error(
+                request,
+                'No existe un arancel configurado para este nivel.'
+            )
+
+        except Exception as e:
+
+            messages.error(
+                request,
+                f'Ocurrió un error al registrar el pago: {e}'
+            )
+
+        request.session["panel_activo"] = "pagos"
+        return redirect('dashboard-padres')
+    return redirect('dashboard-padres')
+
+@never_cache
+def aprobar_pago(request, id_pago):
+
+    pago = PagoPendiente.objects.get(
+        id_pago=id_pago
     )
 
-    if request.method == 'POST':
-        
-        print("ALUMNO RECIBIDO:", request.POST.get('alumno'))
-        print("POST alumno:", request.POST.get('alumno'))
+    Cuota.objects.create(
+        periodo=pago.mes,
+        monto=pago.importe,
+        fecha_pago=date.today(),
+        medio_pago='Transferencia',
+        estado='Pagada',
+        id_tutor=pago.id_tutor,
+        id_legajo_alumno=pago.legajo_alumno
+    )
 
-        print(
-            "Legajos existentes:",
-            list(
-                Alumno.objects.values_list('legajo', flat=True)
-            )
-        )
-        
-        print("POST alumno:", request.POST.get('alumno'))
+    pago.delete()
 
-        for a in Alumno.objects.select_related('id_persona'):
-            print(
-                "Legajo:", a.legajo,
-                "DNI:", a.id_persona.dni,
-                "Nombre:", a.id_persona.nombre
-            )
+    return redirect('dashboard-administrativo')
+
+@never_cache
+def enviar_documentacion(request):
+
+    if request.method != 'POST':
+        return redirect('dashboard-padres')
+
+    try:
+
         alumno = Alumno.objects.get(
             legajo=request.POST.get('alumno')
         )
 
-        PagoPendiente.objects.create(
-            legajo_tutor=tutor,
-            legajo_alumno=alumno,
-            mes=request.POST.get('mes'),
-            importe=request.POST.get('importe'),
-            estado='Pendiente',
-            fecha_solicitud=timezone.now()
+        doc_existente = DocumentacionAlumno.objects.filter(
+            legajo_alumno=alumno
+        ).first()
+
+        if doc_existente and doc_existente.estado == 'Pendiente':
+
+            messages.error(
+                request,
+                'Este alumno ya tiene documentación cargada.'
+            )
+
+            request.session["panel_activo"] = "documentacion"
+            return redirect('dashboard-padres')
+
+        if doc_existente and doc_existente.estado == 'Rechazada':
+            doc_existente.delete()
+
+        fs = FileSystemStorage(
+            location='media/documentacion'
         )
 
-        request.session["panel_activo"] = "pagos"
+        dni_frente = request.FILES.get('dni_frente')
+        dni_dorso = request.FILES.get('dni_dorso')
+        partida = request.FILES.get('partida')
+        salud = request.FILES.get('salud')
 
-        return redirect('dashboard-padres')
-    
-def aprobar_pago(request, id_pago):
+        if not all([
+            dni_frente,
+            dni_dorso,
+            partida,
+            salud
+        ]):
+            raise ValueError(
+                'Debe adjuntar toda la documentación requerida.'
+            )
 
-    pago = PagoPendiente.objects.get(id_pago=id_pago)
+        timestamp = datetime.now().strftime(
+            '%Y%m%d_%H%M%S'
+        )
 
-    pago.estado = "Aprobado"
-    pago.save()
+        ext_dni_frente = os.path.splitext(
+            dni_frente.name
+        )[1]
+
+        ext_dni_dorso = os.path.splitext(
+            dni_dorso.name
+        )[1]
+
+        ext_partida = os.path.splitext(
+            partida.name
+        )[1]
+
+        ext_salud = os.path.splitext(
+            salud.name
+        )[1]
+
+        nombre_dni_frente = (
+            f'dni_frente_{alumno.legajo}_{timestamp}'
+            f'{ext_dni_frente}'
+        )
+
+        nombre_dni_dorso = (
+            f'dni_dorso_{alumno.legajo}_{timestamp}'
+            f'{ext_dni_dorso}'
+        )
+
+        nombre_partida = (
+            f'partida_{alumno.legajo}_{timestamp}'
+            f'{ext_partida}'
+        )
+
+        nombre_salud = (
+            f'salud_{alumno.legajo}_{timestamp}'
+            f'{ext_salud}'
+        )
+        
+        permitidos = ['.jpg', '.jpeg', '.png']
+        for ext in [
+            ext_dni_frente,
+            ext_dni_dorso,
+            ext_partida,
+            ext_salud
+        ]:
+            if ext.lower() not in permitidos:
+                raise ValueError(
+                    'Todos los archivos deben ser JPG o PNG.'
+                )
+
+        ruta_dni_frente = fs.save(
+            nombre_dni_frente,
+            dni_frente
+        )
+
+        ruta_dni_dorso = fs.save(
+            nombre_dni_dorso,
+            dni_dorso
+        )
+
+        ruta_partida = fs.save(
+            nombre_partida,
+            partida
+        )
+
+        ruta_salud = fs.save(
+            nombre_salud,
+            salud
+        )
+
+        DocumentacionAlumno.objects.create(
+            legajo_alumno=alumno,
+            dni_frente=f'documentacion/{ruta_dni_frente}',
+            dni_dorso=f'documentacion/{ruta_dni_dorso}',
+            partida_nacimiento=f'documentacion/{ruta_partida}',
+            certificado_salud=f'documentacion/{ruta_salud}',
+            fecha_envio=timezone.now(),
+            estado='Pendiente'
+        )
+
+        messages.success(
+            request,
+            'La documentación fue enviada correctamente.'
+        )
+
+    except Exception as e:
+
+        messages.error(
+            request,
+            f'Error al enviar la documentación: {e}'
+        )
+
+    request.session["panel_activo"] = "documentacion"
+
+    return redirect('dashboard-padres')
+
+@never_cache
+def aprobar_documentacion(request, id_documentacion):
+
+    doc = get_object_or_404(
+        DocumentacionAlumno,
+        id_documentacion=id_documentacion
+    )
+
+    persona = obtener_persona(request)
+
+    administrativo = PersonalAdministrativo.objects.filter(
+        id_persona=persona
+    ).first()
+
+    doc.estado = "Aprobada"
+    doc.fecha_revision = timezone.now()
+    doc.id_administrativo = administrativo
+    doc.observaciones = "Documentación aprobada."
+
+    doc.save()
 
     return redirect('dashboard-administrativo')
+
+
+def rechazar_documentacion(request, id_documentacion):
+
+    doc = DocumentacionAlumno.objects.get(
+        id_documentacion=id_documentacion
+    )
+
+    persona = obtener_persona(request)
+
+    administrativo = PersonalAdministrativo.objects.filter(
+        id_persona=persona
+    ).first()
+
+    doc.estado = 'Rechazada'
+
+    doc.observaciones = request.POST.get(
+        'observaciones'
+    )
+
+    doc.fecha_revision = timezone.now()
+
+    doc.id_administrativo = administrativo
+
+    # Eliminar archivos físicos
+    archivos = [
+        doc.dni_frente,
+        doc.dni_dorso,
+        doc.partida_nacimiento,
+        doc.certificado_salud
+    ]
+
+    for archivo in archivos:
+
+        if archivo:
+
+            ruta = os.path.join(
+                settings.MEDIA_ROOT,
+                archivo
+            )
+
+            if os.path.exists(ruta):
+                os.remove(ruta)
+
+    # Vaciar rutas de archivos
+    doc.dni_frente = None
+    doc.dni_dorso = None
+    doc.partida_nacimiento = None
+    doc.certificado_salud = None
+
+    doc.save()
+
+    messages.success(
+        request,
+        'La documentación fue rechazada.'
+    )
+
+    return redirect(
+        'dashboard-administrativo'
+    )

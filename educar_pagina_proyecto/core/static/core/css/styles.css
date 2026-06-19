@@ -1254,3 +1254,81 @@
 .report-news li{
     margin-bottom:14px;
 }
+
+.documentos-links{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+
+.documentos-links a{
+  text-decoration:none;
+  background:#eff6ff;
+  color:#2563eb;
+  padding:6px 12px;
+  border-radius:8px;
+  font-size:14px;
+  font-weight:600;
+  transition:.2s;
+}
+
+.documentos-links a:hover{
+  background:#dbeafe;
+}
+
+.btn-aprobar{
+  background:#16a34a;
+  color:white;
+  border:none;
+  padding:8px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:600;
+  margin-bottom:8px;
+}
+
+.btn-aprobar:hover{
+  background:#15803d;
+}
+
+.btn-rechazar{
+  background:#dc2626;
+  color:white;
+  border:none;
+  padding:8px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.btn-rechazar:hover{
+  background:#b91c1c;
+}
+
+.tarea-card{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+}
+
+.tarea-info{
+  flex:1;
+}
+
+.tarea-info strong{
+  display:block;
+  margin-bottom:5px;
+}
+
+.tarea-info span{
+  display:block;
+  color:#64748b;
+  margin-bottom:10px;
+}
+.acciones-documentacion{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}

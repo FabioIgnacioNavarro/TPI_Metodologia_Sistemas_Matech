@@ -970,6 +970,45 @@ INSERT INTO `vehiculo` (`id_vehiculo`, `patente`, `modelo`, `capacidad`, `estado
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `arancel`
+--
+CREATE TABLE arancel (
+    id_arancel INT AUTO_INCREMENT PRIMARY KEY,
+    nivel VARCHAR(30) NOT NULL,
+    monto DECIMAL(10,2) NOT NULL
+);
+--
+-- Volcado de datos para la tabla `arancel`
+--
+INSERT INTO arancel (nivel, monto)
+VALUES
+('Inicial', 25000),
+('Primario', 30000),
+('Secundario', 35000);
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `documentacion_alumno`
+--
+CREATE TABLE documentacion_alumno (
+    id_documentacion INT AUTO_INCREMENT PRIMARY KEY,
+
+    legajo_alumno INT NOT NULL,
+
+    partida_nacimiento VARCHAR(255),
+    dni_frente VARCHAR(255),
+    dni_dorso VARCHAR(255),
+    certificado_salud VARCHAR(255),
+
+    estado VARCHAR(20) DEFAULT 'Pendiente',
+
+    fecha_envio DATETIME,
+
+    observaciones TEXT,
+);
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `viaje`
 --
 
@@ -1717,6 +1756,7 @@ ALTER TABLE `viaje`
 ALTER TABLE `viaje_utiliza_vehiculo`
   ADD CONSTRAINT `viaje_utiliza_vehiculo_ibfk_1` FOREIGN KEY (`id_viaje`) REFERENCES `viaje` (`id_viaje`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `viaje_utiliza_vehiculo_ibfk_2` FOREIGN KEY (`id_vehiculo`) REFERENCES `vehiculo` (`id_vehiculo`) ON DELETE CASCADE ON UPDATE CASCADE;
+<<<<<<< HEAD
 
 --
 -- AUTO_INCREMENT para la tabla `disciplina_deportiva`
@@ -1734,6 +1774,13 @@ ALTER TABLE `disciplina_deportiva`
   FOREIGN KEY (`id_instalacion`)
   REFERENCES `instalacion` (`id`);
 
+=======
+--
+-- Filtros para la tabla `documentacion_alummno`
+--
+ALTER TABLE `documentacion_alumno`
+  ADD CONSTRAINT `documentacion_alumno_ibfk_1` FOREIGN KEY (`legajo_alumno`) REFERENCES `alumno` (`legajo`) ON DELETE CASCADE ON UPDATE CASCADE;
+>>>>>>> joel
 -- Datos de cv
 CREATE TABLE postulacion_laboral (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -1748,6 +1795,7 @@ CREATE TABLE postulacion_laboral (
     fecha_postulacion DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+<<<<<<< HEAD
 --
 -- Estructura de tabla para la tabla `docente_disciplina`
 --
@@ -1766,6 +1814,8 @@ CREATE TABLE docente_disciplina (
     FOREIGN KEY (id_disciplina)
     REFERENCES disciplina_deportiva(id_disciplina)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+=======
+>>>>>>> joel
 
 COMMIT;
 SET FOREIGN_KEY_CHECKS = 1;

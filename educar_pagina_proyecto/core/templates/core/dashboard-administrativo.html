@@ -188,7 +188,9 @@
 
               <div class="stat-card">
                 <div class="stat-label">Documentos</div>
-                <div class="stat-value" style="color: #d97706">1</div>
+                <div class="stat-value" style="color: #d97706">
+                  {{ documentacion_pendiente }}
+                </div>
                 <div class="stat-sub">Por validar</div>
               </div>
             </div>
@@ -284,8 +286,8 @@
                       <td>{{ pago.legajo_alumno.id_persona.dni }}</td>
 
                       <td>
-                          {{ pago.legajo_tutor.id_persona.nombre }}
-                          {{ pago.legajo_tutor.id_persona.apellido }}
+                          {{ pago.id_tutor.id_persona.nombre }}
+                          {{ pago.id_tutor.id_persona.apellido }}
                       </td>
 
                       <td>{{ pago.mes }}</td>
@@ -322,27 +324,98 @@
             </table>
           </div>
 
+          <!-- DOCUMENTACION -->
           <div id="panel-documentacion" class="panel">
-            <p class="section-title">Documentación pendiente</p>
 
-            <div class="tarea-card">
-              <div class="tarea-info">
-                <strong>Juan Gómez · Nivel Secundario</strong>
-                <span
-                  >Documentación enviada. Pendiente de validación
-                  administrativa.</span
-                >
-              </div>
-              <span class="badge badge-yellow">Pendiente</span>
-            </div>
+              <p class="section-title">
+                  Documentación de alumnos
+              </p>
 
-            <div class="tarea-card">
-              <div class="tarea-info">
-                <strong>María Rodriguez · Nivel Secundario</strong>
-                <span>Legajo completo y aprobado.</span>
+              {% for doc in documentaciones %}
+
+              <div class="tarea-card">
+
+                  <div class="tarea-info">
+
+                      <strong>
+                          {{ doc.legajo_alumno.id_persona.nombre }}
+                          {{ doc.legajo_alumno.id_persona.apellido }}
+                      </strong>
+
+                      <span>
+                          Enviado el {{ doc.fecha_envio|date:"d/m/Y H:i" }}
+                      </span>
+
+                      <div class="documentos-links">
+
+                          <a href="/media/{{ doc.dni_frente }}" target="_blank">
+                              DNI Frente
+                          </a>
+
+                          <a href="/media/{{ doc.dni_dorso }}" target="_blank">
+                              DNI Dorso
+                          </a>
+
+                          <a href="/media/{{ doc.partida_nacimiento }}" target="_blank">
+                              Partida
+                          </a>
+
+                          <a href="/media/{{ doc.certificado_salud }}" target="_blank">
+                              Certificado
+                          </a>
+
+                      </div>
+
+                  </div>
+
+                  <div class="acciones-documentacion">
+
+                      <form method="POST"
+                            action="{% url 'aprobar_documentacion' doc.id_documentacion %}">
+                          {% csrf_token %}
+                          <button type="submit" class="btn-aprobar">
+                              Aprobar
+                          </button>
+                      </form>
+
+                      <button
+                          type="button"
+                          class="btn-rechazar"
+                          onclick="mostrarRechazo('{{ doc.id_documentacion }}')">
+                          Rechazar
+                      </button>
+
+                      <form
+                          id="rechazo-{{ doc.id_documentacion }}"
+                          method="POST"
+                          action="{% url 'rechazar_documentacion' doc.id_documentacion %}"
+                          style="display:none; margin-top:10px;">
+
+                          {% csrf_token %}
+
+                          <textarea
+                              name="observaciones"
+                              placeholder="Escriba el motivo del rechazo..."
+                              required></textarea>
+
+                          <button
+                              type="submit"
+                              class="btn-rechazar">
+                              Confirmar rechazo
+                          </button>
+
+                      </form>
+
+                  </div>
+
               </div>
-              <span class="badge badge-green">Aprobado</span>
-            </div>
+
+              {% empty %}
+
+              <p>No hay documentación pendiente.</p>
+
+              {% endfor %}
+
           </div>
 
           <div id="panel-reservas" class="panel">
@@ -709,6 +782,19 @@
         // Borra el #reservas de la URL
         history.replaceState(null, "", window.location.pathname);
       });
+
+      function mostrarRechazo(id) {
+
+          const form = document.getElementById(
+              'rechazo-' + id
+          );
+
+          if (form.style.display === 'none') {
+              form.style.display = 'block';
+          } else {
+              form.style.display = 'none';
+          }
+      }
     </script>
   </body>
 </html>

@@ -31,7 +31,9 @@ urlpatterns = [
     path('enviar-postulacion/',views.enviar_postulacion,name='enviar-postulacion'),
     path('enviar-consulta/',views.enviar_consulta,name='enviar-consulta'),
     path('registrar-pago/',views.registrar_pago,name='registrar_pago'),
-    
+    path('enviar-documentacion/',views.enviar_documentacion,name='enviar_documentacion'),
+    path('aprobar-documentacion/<int:id_documentacion>/',views.aprobar_documentacion,name='aprobar_documentacion'),
+    path('rechazar-documentacion/<int:id_documentacion>/',views.rechazar_documentacion,name='rechazar_documentacion'),
 ]
 if settings.DEBUG:
     urlpatterns += static(

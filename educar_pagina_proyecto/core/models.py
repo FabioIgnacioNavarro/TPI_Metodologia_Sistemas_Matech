@@ -99,21 +99,37 @@ class Calificacion(models.Model):
 
 class Cuota(models.Model):
     id_cuota = models.AutoField(primary_key=True)
-    periodo = models.CharField(max_length=20, blank=True, null=True)
-    monto = models.DecimalField(max_digits=10, decimal_places=2)
-    fecha_vencimiento = models.DateField()
-    estado = models.CharField(max_length=30)
-    fecha_pago = models.DateField(blank=True, null=True)
-    medio_pago = models.CharField(max_length=50, blank=True, null=True)
-    fecha_emision_factura = models.DateField()
-    pagada = models.IntegerField()
-    id_tutor = models.ForeignKey('Tutor', models.DO_NOTHING, db_column='id_tutor')
-    id_legajo_alumno = models.ForeignKey(Alumno, models.DO_NOTHING, db_column='id_legajo_alumno')
+
+    periodo = models.CharField(max_length=20)
+
+    monto = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+    fecha_pago = models.DateField()
+    medio_pago = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True
+    )
+    estado = models.CharField(
+        max_length=30,
+        default='Pagada'
+    )
+    id_tutor = models.ForeignKey(
+        'Tutor',
+        models.DO_NOTHING,
+        db_column='id_tutor'
+    )
+    id_legajo_alumno = models.ForeignKey(
+        'Alumno',
+        models.DO_NOTHING,
+        db_column='id_legajo_alumno'
+    )
 
     class Meta:
         managed = False
         db_table = 'cuota'
-
 
 class Curso(models.Model):
     id_curso = models.AutoField(primary_key=True, db_column='id')
@@ -570,10 +586,10 @@ class SolicitudInscripcion(models.Model):
 class PagoPendiente(models.Model):
     id_pago = models.AutoField(primary_key=True)
 
-    legajo_tutor = models.ForeignKey(
+    id_tutor = models.ForeignKey(
         Tutor,
         models.DO_NOTHING,
-        db_column='legajo_tutor'
+        db_column='id_tutor'
     )
 
     legajo_alumno = models.ForeignKey(
@@ -599,3 +615,76 @@ class PagoPendiente(models.Model):
     class Meta:
         managed = False
         db_table = 'pago_pendiente'
+        
+class Arancel(models.Model):
+    id_arancel = models.AutoField(primary_key=True)
+    nivel = models.CharField(max_length=30)
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        managed = False
+        db_table = 'arancel'
+        
+class DocumentacionAlumno(models.Model):
+    id_documentacion = models.AutoField(
+        primary_key=True
+    )
+
+    legajo_alumno = models.ForeignKey(
+        Alumno,
+        models.DO_NOTHING,
+        db_column='legajo_alumno'
+    )
+
+    dni_frente = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
+    dni_dorso = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
+    partida_nacimiento = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
+    certificado_salud = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
+    fecha_envio = models.DateTimeField()
+
+    estado = models.CharField(
+        max_length=20,
+        default='Pendiente'
+    )
+
+    observaciones = models.TextField(
+        blank=True,
+        null=True
+    )
+    
+    fecha_revision = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    id_administrativo = models.ForeignKey(
+        PersonalAdministrativo,
+        models.DO_NOTHING,
+        db_column='id_administrativo',
+        blank=True,
+        null=True
+    )
+
+    class Meta:
+        managed = False
+        db_table = 'documentacion_alumno'
