@@ -59,17 +59,36 @@
             <div class="form-grid">
               <div class="form-group">
                 <label for="nombre">Nombre</label>
-                <input type="text" id="nombre" name="nombre" required />
+                <input
+                  type="text"
+                  id="nombre"
+                  name="nombre"
+                  required
+                  oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '')"
+                />
               </div>
 
               <div class="form-group">
                 <label for="apellido">Apellido</label>
-                <input type="text" id="apellido" name="apellido" required />
+                <input
+                  type="text"
+                  id="apellido"
+                  name="apellido"
+                  required
+                  oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '')"
+                />
               </div>
 
               <div class="form-group">
                 <label for="dni">DNI</label>
-                <input type="text" id="dni" name="dni" maxlength="8" required />
+                <input
+                  type="text"
+                  id="dni"
+                  name="dni"
+                  maxlength="8"
+                  required
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                />
               </div>
 
               <div class="form-group">
@@ -84,6 +103,7 @@
                   id="direccion"
                   name="direccion"
                   placeholder="Ingrese la dirección"
+                  required
                 />
               </div>
 
@@ -126,7 +146,13 @@
             <div class="form-grid">
               <div class="form-group">
                 <label for="tutor">Nombre del tutor</label>
-                <input type="text" id="tutor" name="tutor" required />
+                <input
+                  type="text"
+                  id="tutor"
+                  name="tutor"
+                  required
+                  oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '')"
+                />
               </div>
 
               <div class="form-group">
@@ -136,6 +162,7 @@
                   id="apellido_tutor"
                   name="apellido_tutor"
                   required
+                  oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '')"
                 />
               </div>
 
@@ -147,11 +174,12 @@
                   name="dni_tutor"
                   maxlength="8"
                   required
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                 />
               </div>
 
               <div class="form-group">
-                <label for="direccion">Dirección</label>
+                <label for="direccion_tutor">Dirección</label>
                 <input
                   type="text"
                   id="direccion_tutor"
@@ -175,7 +203,13 @@
 
               <div class="form-group">
                 <label for="telefono">Teléfono</label>
-                <input type="tel" id="telefono" name="telefono" required />
+                <input
+                  type="tel"
+                  id="telefono"
+                  name="telefono"
+                  required
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                />
               </div>
 
               <div class="form-group">
@@ -214,42 +248,144 @@
     </div>
 
     <script>
+      const nombreRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
+      const dniRegex = /^\d{7,8}$/;
+      const telefonoRegex = /^\d{8,15}$/;
+      const emailRegex =
+        /^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com)$/i;
+      const rangosNivel = {
+        inicial: { min: 3, max: 5, label: "Inicial" },
+        primario: { min: 6, max: 11, label: "Primario" },
+        secundario: { min: 12, max: 18, label: "Secundario" },
+      };
+
+      function calcularEdad(fechaNacimiento) {
+        const hoy = new Date();
+        const nacimiento = new Date(fechaNacimiento + "T00:00:00");
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const mes = hoy.getMonth() - nacimiento.getMonth();
+        if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+          edad--;
+        }
+        return edad;
+      }
+
+      function mostrarError(errorDiv, mensaje, event) {
+        errorDiv.textContent = mensaje;
+        errorDiv.style.display = "block";
+        event.preventDefault();
+        return false;
+      }
+
       function validarFormulario(event) {
+        const nombre = document.getElementById("nombre").value.trim();
+        const apellido = document.getElementById("apellido").value.trim();
         const dni = document.getElementById("dni").value.trim();
+        const fecha = document.getElementById("fecha").value;
+        const direccion = document.getElementById("direccion").value.trim();
+        const nivel = document.getElementById("nivel").value;
+        const tutor = document.getElementById("tutor").value.trim();
+        const apellidoTutor = document
+          .getElementById("apellido_tutor")
+          .value.trim();
+        const dniTutor = document.getElementById("dni_tutor").value.trim();
         const telefono = document.getElementById("telefono").value.trim();
         const email = document.getElementById("email").value.trim();
-        const dniTutor = document.getElementById("dni_tutor").value.trim();
         const errorDiv = document.getElementById("mensaje-error");
         errorDiv.style.display = "none";
-        //Filtro de email
-        const emailRegex =
-          /^[a-zA-Z0-9._%+-]+@(gmail\.com|hotmail\.com|outlook\.com)$/i;
-        if (!dni || !telefono || !email) {
-          errorDiv.textContent =
-            "Por favor, rellene todos los campos obligatorios.";
-          errorDiv.style.display = "block";
-          event.preventDefault();
-          return false;
+
+        if (
+          !nombre ||
+          !apellido ||
+          !dni ||
+          !fecha ||
+          !direccion ||
+          !nivel ||
+          !tutor ||
+          !apellidoTutor ||
+          !dniTutor ||
+          !telefono ||
+          !email
+        ) {
+          return mostrarError(
+            errorDiv,
+            "Por favor, rellene todos los campos obligatorios.",
+            event
+          );
         }
-        if (dni.length < 7 || dni.length > 8) {
-          errorDiv.textContent = "El DNI debe tener 7 u 8 dígitos.";
-          errorDiv.style.display = "block";
-          event.preventDefault();
-          return false;
+
+        if (!nombreRegex.test(nombre)) {
+          return mostrarError(
+            errorDiv,
+            "El nombre solo puede contener letras.",
+            event
+          );
         }
-        if (dniTutor.length < 7 || dniTutor.length > 8) {
-          errorDiv.textContent = "El DNI del tutor debe tener 7 u 8 dígitos.";
-          errorDiv.style.display = "block";
-          event.preventDefault();
-          return false;
+        if (!nombreRegex.test(apellido)) {
+          return mostrarError(
+            errorDiv,
+            "El apellido solo puede contener letras.",
+            event
+          );
         }
+        if (!nombreRegex.test(tutor)) {
+          return mostrarError(
+            errorDiv,
+            "El nombre del tutor solo puede contener letras.",
+            event
+          );
+        }
+        if (!nombreRegex.test(apellidoTutor)) {
+          return mostrarError(
+            errorDiv,
+            "El apellido del tutor solo puede contener letras.",
+            event
+          );
+        }
+
+        if (!dniRegex.test(dni)) {
+          return mostrarError(
+            errorDiv,
+            "El DNI debe tener 7 u 8 dígitos numéricos.",
+            event
+          );
+        }
+        if (!dniRegex.test(dniTutor)) {
+          return mostrarError(
+            errorDiv,
+            "El DNI del tutor debe tener 7 u 8 dígitos numéricos.",
+            event
+          );
+        }
+
+        if (!telefonoRegex.test(telefono)) {
+          return mostrarError(
+            errorDiv,
+            "El teléfono debe contener solo números (entre 8 y 15 dígitos).",
+            event
+          );
+        }
+
         if (!emailRegex.test(email)) {
-          errorDiv.textContent =
-            "El correo electrónico no es válido. Asegúrese de que tenga un formato correcto (ejemplo@dominio.com).";
-          errorDiv.style.display = "block";
-          event.preventDefault();
-          return false;
+          return mostrarError(
+            errorDiv,
+            "El correo electrónico no es válido. Asegúrese de que tenga un formato correcto (ejemplo@dominio.com).",
+            event
+          );
         }
+
+        const rango = rangosNivel[nivel];
+        if (rango) {
+          const edad = calcularEdad(fecha);
+          if (edad < rango.min || edad > rango.max) {
+            return mostrarError(
+              errorDiv,
+              `La edad (${edad} años) no corresponde al Nivel ${rango.label} (de ${rango.min} a ${rango.max} años).`,
+              event
+            );
+          }
+        }
+
         return true;
       }
     </script>
