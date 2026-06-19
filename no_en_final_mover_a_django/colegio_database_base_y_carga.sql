@@ -1798,11 +1798,11 @@ CREATE TABLE postulacion_laboral (
     fecha_postulacion DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-<<<<<<< HEAD
 --
 -- Estructura de tabla para la tabla `docente_disciplina`
 --
 DROP TABLE IF EXISTS docente_disciplina;
+
 CREATE TABLE docente_disciplina (
   legajo_docente INT(11) NOT NULL,
   id_disciplina INT(11) NOT NULL,
@@ -1817,13 +1817,9 @@ CREATE TABLE docente_disciplina (
     FOREIGN KEY (id_disciplina)
     REFERENCES disciplina_deportiva(id_disciplina)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-=======
->>>>>>> joel
 
 COMMIT;
 SET FOREIGN_KEY_CHECKS = 1;
-
-
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
