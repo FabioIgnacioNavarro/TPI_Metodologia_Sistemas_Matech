@@ -472,9 +472,15 @@
             </table>
 
             <div class="form-section" style="margin-top: 30px">
-              {% if messages %} {% for message in messages %}
-              <div class="mensaje {{ message.tags }}">{{ message }}</div>
-              {% endfor %} {% endif %}
+              {% if messages %}
+                  {% for message in messages %}
+                      {% if 'reservas' in message.tags %}
+                          <div class="mensaje {{ message.level_tag }}">
+                              {{ message }}
+                          </div>
+                      {% endif %}
+                  {% endfor %}
+              {% endif %}
               <form method="POST" action="{% url 'crear-reserva' %}">
                 {% csrf_token %}
                 <h2>Nueva reserva</h2>
@@ -557,6 +563,16 @@
 
           <div id="panel-usuarios" class="panel">
             <p class="section-title">Gestión de usuarios del sistema</p>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    {% if 'usuarios' in message.tags %}
+                        <div class="mensaje {{ message.level_tag }}">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
 
             <div class="form-section">
               <form
@@ -708,6 +724,23 @@
         document.getElementById("panel-" + id).classList.add("active");
         el.classList.add("active");
       }
+    </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+
+          const panel = "{{ panel_activo }}";
+
+          if (panel === "inicio") return;
+
+          const enlace = document.querySelector(
+              `.sidebar-nav a[onclick*="showPanel('${panel}'"]`
+          );
+
+          if (enlace) {
+              showPanel(panel, enlace);
+          }
+      });
     </script>
 
     <script>

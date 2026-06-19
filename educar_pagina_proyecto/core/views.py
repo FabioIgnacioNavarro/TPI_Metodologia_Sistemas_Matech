@@ -1287,7 +1287,8 @@ def dashboard_administrativo(request):
         estado='Pendiente'
     ).order_by('-fecha_envio')
     
-
+    panel_activo = request.session.pop("panel_activo", "inicio")
+    
     return render(request, 'core/dashboard-administrativo.html', {
         'persona': persona,
         'administrativo': administrativo,
@@ -1301,6 +1302,7 @@ def dashboard_administrativo(request):
         'pagos_pendientes': pagos_pendientes,
         'documentaciones': documentaciones,
         'documentacion_pendiente': documentacion_pendiente,
+        'panel_activo': panel_activo,
     })
 
 @never_cache
@@ -1395,7 +1397,7 @@ def crear_reserva(request):
         horario = request.POST.get("horario", "").strip()
 
         if "-" not in horario:
-            messages.error(request, "Debe escribir un horario válido.")
+            messages.error(request, "Debe escribir un horario válido.", extra_tags="reservas")
             return redirect(reverse('dashboard-administrativo') + '#reservas')
 
         hora_inicio, hora_fin = horario.split("-", 1)
@@ -1404,7 +1406,7 @@ def crear_reserva(request):
         try:
             instalacion = Instalacion.objects.get(pk=id_instalacion)
         except Instalacion.DoesNotExist:
-            messages.error(request, "Debe seleccionar un espacio válido.")
+            messages.error(request, "Debe seleccionar un espacio válido.", extra_tags="reservas")
             return redirect(reverse('dashboard-administrativo') + '#reservas')
 
         partes = responsable.strip().split()
@@ -1412,7 +1414,8 @@ def crear_reserva(request):
         if len(partes) < 2:
             messages.error(
                 request,
-                "Debe ingresar el nombre y apellido del solicitante. Ejemplo: Juan Ramírez."
+                "Debe ingresar el nombre y apellido del solicitante. Ejemplo: Juan Ramírez.",
+                extra_tags="reservas"
             )
             return redirect(reverse('dashboard-administrativo') + '#reservas')
 
@@ -1427,7 +1430,8 @@ def crear_reserva(request):
         if not persona:
             messages.error(
                 request,
-                "No se encontró una persona con ese nombre y apellido."
+                "No se encontró una persona con ese nombre y apellido.",
+                extra_tags="reservas"
             )
             return redirect(reverse('dashboard-administrativo') + '#reservas')
 
@@ -1437,7 +1441,7 @@ def crear_reserva(request):
             hora_inicio = datetime.strptime(hora_inicio.strip(), "%H:%M").time()
             hora_fin = datetime.strptime(hora_fin.strip(), "%H:%M").time()
         except ValueError:
-            messages.error(request, "El horario ingresado no es válido.")
+            messages.error(request, "El horario ingresado no es válido.", extra_tags="reservas")
             return redirect(reverse('dashboard-administrativo') + '#reservas')
         
         fecha = request.POST.get("fecha")
@@ -1446,11 +1450,11 @@ def crear_reserva(request):
         try:
             fecha = datetime.strptime(fecha, "%Y-%m-%d").date()
         except (TypeError, ValueError):
-            messages.error(request, "La fecha ingresada no es válida.")
+            messages.error(request, "La fecha ingresada no es válida.", extra_tags="reservas")
             return redirect(reverse('dashboard-administrativo') + '#reservas')
 
         if fecha < date.today():
-            messages.error(request, "No se pueden registrar reservas para días anteriores.")
+            messages.error(request, "No se pueden registrar reservas para días anteriores.", extra_tags="reservas")
             return redirect(reverse('dashboard-administrativo') + '#reservas')
         
         if Reserva.objects.filter(
@@ -1461,7 +1465,8 @@ def crear_reserva(request):
         ).exists():
             messages.error(
                 request,
-                "Ya existe una reserva para ese espacio, fecha y horario."
+                "Ya existe una reserva para ese espacio, fecha y horario.",
+                extra_tags="reservas"
             )
             return redirect(reverse('dashboard-administrativo') + '#reservas')
 
@@ -1476,7 +1481,7 @@ def crear_reserva(request):
             id_instalacion=instalacion
         )
 
-        messages.success(request, "Reserva registrada correctamente.")
+        messages.success(request, "Reserva registrada correctamente.", extra_tags="reservas")
         return redirect(reverse('dashboard-administrativo') + '#reservas')
 
 @never_cache
@@ -1511,24 +1516,45 @@ def crear_usuario(request):
         ).first()
 
         if not persona:
-            print("No existe una persona con ese DNI")
-            return redirect('dashboard-administrativo')
+            messages.error(
+                request,
+                "No existe una persona con ese DNI.",
+                extra_tags="usuarios"
+            )
+            request.session["panel_activo"] = "usuarios"
+            return redirect("dashboard-administrativo")
 
         if persona.id_usuario:
-            print("La persona ya tiene usuario")
-            return redirect('dashboard-administrativo')
+            messages.error(
+                request,
+                "La persona ya tiene un usuario asignado.",
+                extra_tags="usuarios"
+            )
+            request.session["panel_activo"] = "usuarios"
+            return redirect("dashboard-administrativo")
 
         if Usuario.objects.filter(
             nombre_usuario=nombre_usuario
         ).exists():
-            print("El nombre de usuario ya existe")
-            return redirect('dashboard-administrativo')
+
+            messages.error(
+                request,
+                "El nombre de usuario ya existe.",
+                extra_tags="usuarios"
+            )
+            request.session["panel_activo"] = "usuarios"
+            return redirect("dashboard-administrativo")
         
         correo = request.POST.get("correo")
         
         if Usuario.objects.filter(correo=correo).exists():
-            print("Ese correo ya existe")
-            return redirect('dashboard-administrativo')
+            messages.error(
+                request,
+                "Ese correo ya está registrado.",
+                extra_tags="usuarios"
+            )
+            request.session["panel_activo"] = "usuarios"
+            return redirect("dashboard-administrativo")
 
         usuario = Usuario.objects.create(
             nombre_usuario=nombre_usuario,
@@ -1539,7 +1565,12 @@ def crear_usuario(request):
         persona.id_usuario = usuario
         persona.save()
 
-        print("Usuario creado correctamente")
+        messages.success(
+            request,
+            "Usuario creado correctamente.",
+            extra_tags="usuarios"
+        )
+        request.session["panel_activo"] = "usuarios"
 
     return redirect('dashboard-administrativo')
 
