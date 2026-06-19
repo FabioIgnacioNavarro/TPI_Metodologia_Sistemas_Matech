@@ -38,6 +38,7 @@ from .models import (
     Asistencia,
     CursoCursaMaterias,
     DocenteDictaMateria,
+    DisciplinaDeportiva,
     Reserva,
     Instalacion,
     Persona,
@@ -254,7 +255,44 @@ def dashboard_alumno(request):
         return redirect('login')
     alumno = Alumno.objects.filter(
         id_persona=persona
-    ).select_related('id_curso').first()
+    ).select_related(
+        'id_curso',
+        'id_disciplina',
+        'id_disciplina__id_instalacion',
+    ).first()
+
+    if request.method == 'POST' and request.POST.get('accion') == 'inscribir_deporte':
+        request.session['panel_activo'] = 'deportes'
+        id_disciplina = request.POST.get('id_disciplina')
+
+        if not id_disciplina:
+            messages.error(request, 'Debes seleccionar una disciplina.')
+            return redirect('dashboard-alumno')
+
+        disciplina_elegida = DisciplinaDeportiva.objects.filter(
+            id_disciplina=id_disciplina
+        ).first()
+
+        if not disciplina_elegida:
+            messages.error(request, 'La disciplina seleccionada no existe.')
+            return redirect('dashboard-alumno')
+
+        if alumno.id_disciplina_id == disciplina_elegida.id_disciplina:
+            messages.info(
+                request,
+                f'Ya estás inscripto en {disciplina_elegida.nombre}.'
+            )
+            return redirect('dashboard-alumno')
+
+        alumno.id_disciplina = disciplina_elegida
+        alumno.save(update_fields=['id_disciplina'])
+
+        messages.success(
+            request,
+            f'Te inscribiste correctamente en {disciplina_elegida.nombre}.'
+        )
+        return redirect('dashboard-alumno')
+
     if request.method == 'POST' and request.FILES.get('justificacion'):
 
         asistencia_id = request.POST.get('asistencia_id')
@@ -425,6 +463,47 @@ def dashboard_alumno(request):
                 materia.horario_formateado = str(materia.horarios)
         else:
             materia.horario_formateado = "Sin horario"
+
+    disciplina = alumno.id_disciplina
+    disciplina_horario_formateado = "Sin horario"
+
+    if disciplina:
+        if disciplina.horarios:
+            try:
+                horarios_disciplina = json.loads(disciplina.horarios)
+                horario_items = []
+                for dia, hora in horarios_disciplina.items():
+                    dia_norm = _normalize_dia(dia)
+                    horario_items.append(f"{dia_norm.capitalize()}: {hora}")
+
+                    if dia_norm in horario_por_dia:
+                        horario_por_dia[dia_norm].append({
+                            'materia': disciplina.nombre,
+                            'hora': hora,
+                            'es_deporte': True,
+                        })
+
+                disciplina_horario_formateado = " | ".join(horario_items)
+            except Exception:
+                disciplina_horario_formateado = str(disciplina.horarios)
+
+    disciplinas_disponibles = DisciplinaDeportiva.objects.select_related(
+        'id_instalacion'
+    ).all()
+
+    for dep in disciplinas_disponibles:
+        if dep.horarios:
+            try:
+                horarios_dep = json.loads(dep.horarios)
+                horario_items = []
+                for dia, hora in horarios_dep.items():
+                    dia_norm = _normalize_dia(dia)
+                    horario_items.append(f"{dia_norm.capitalize()}: {hora}")
+                dep.horario_formateado = " | ".join(horario_items)
+            except Exception:
+                dep.horario_formateado = str(dep.horarios)
+        else:
+            dep.horario_formateado = "Sin horario"
             
     
     tutor_relacion = TutorTutoraAlumno.objects.filter(
@@ -550,6 +629,7 @@ def dashboard_alumno(request):
             comunicados_alumno = []
             ultimos_comunicados = []
     panel_activo = request.session.pop("panel_activo", "inicio")
+    hay_horarios = any(clases for clases in horario_por_dia.values())
     return render(request, 'core/dashboard-alumno.html', {
         'persona': persona,
         'alumno': alumno,
@@ -566,8 +646,12 @@ def dashboard_alumno(request):
         'total_materias': total_materias,
         'notas_resumen': notas_resumen,
         'materias': materias,
+        'disciplina': disciplina,
+        'disciplina_horario_formateado': disciplina_horario_formateado,
+        'disciplinas_disponibles': disciplinas_disponibles,
         'tutor_relacion': tutor_relacion,
         'horario_por_dia': horario_por_dia,
+        'hay_horarios': hay_horarios,
         "panel_activo": panel_activo,
     })
 

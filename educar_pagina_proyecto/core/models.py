@@ -12,6 +12,13 @@ class Alumno(models.Model):
     legajo = models.AutoField(primary_key=True)
     id_persona = models.ForeignKey('Persona', models.DO_NOTHING, db_column='id_persona')
     fecha_ingreso = models.DateField(blank=True, null=True)
+    id_disciplina = models.ForeignKey(
+        'DisciplinaDeportiva',
+        models.DO_NOTHING,
+        db_column='id_disciplina',
+        blank=True,
+        null=True,
+    )
     id_curso = models.ForeignKey('Curso', models.DO_NOTHING, db_column='id_curso', blank=True, null=True)
 
     class Meta:
@@ -151,6 +158,24 @@ class Directivo(models.Model):
         db_table = 'directivo'
 
 
+class DisciplinaDeportiva(models.Model):
+    id_disciplina = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=100)
+    horarios = models.TextField(db_collation='utf8mb4_bin', blank=True, null=True)
+    id_instalacion = models.ForeignKey(
+        'Instalacion',
+        models.DO_NOTHING,
+        db_column='id_instalacion',
+    )
+
+    class Meta:
+        managed = False
+        db_table = 'disciplina_deportiva'
+
+    def __str__(self):
+        return self.nombre
+
+
 class Docente(models.Model):
     legajo = models.AutoField(primary_key=True)
     id_persona = models.ForeignKey('Persona', models.DO_NOTHING, db_column='id_persona')
@@ -170,6 +195,24 @@ class DocenteDictaMateria(models.Model):
     class Meta:
         managed = False
         db_table = 'docente_dicta_materia'
+
+
+class DocenteDisciplina(models.Model):
+    legajo_docente = models.ForeignKey(
+        Docente,
+        models.DO_NOTHING,
+        db_column='legajo_docente',
+    )
+    id_disciplina = models.ForeignKey(
+        DisciplinaDeportiva,
+        models.DO_NOTHING,
+        db_column='id_disciplina',
+    )
+
+    class Meta:
+        managed = False
+        db_table = 'docente_disciplina'
+
 
 class Evaluacion(models.Model):
     id_evaluacion = models.AutoField(primary_key=True)

@@ -89,6 +89,9 @@
           <a href="#" onclick="showPanel('horario', this); return false;">
             <span class="nav-icon">📅</span> Horario
           </a>
+          <a href="#" onclick="showPanel('deportes', this); return false;">
+            <span class="nav-icon">⚽</span> Deportes
+          </a>
           <a href="#" onclick="showPanel('asistencia', this); return false;">
             <span class="nav-icon">✅</span> Asistencia
           </a>
@@ -196,13 +199,39 @@
             </tbody>
           </table>
 
+          <p class="section-title" style="margin-top: 30px;">Disciplina deportiva</p>
+
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Disciplina</th>
+                <th>Instalación</th>
+                <th>Horario</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% if disciplina %}
+              <tr>
+                <td>{{ disciplina.nombre }}</td>
+                <td>{{ disciplina.id_instalacion.nombre }}</td>
+                <td>{{ disciplina_horario_formateado }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="3">No tenés una disciplina deportiva asignada.</td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+
         </div>
 
         <!-- HORARIO -->
         <div id="panel-horario" class="panel">
           <p class="section-title">Horario semanal</p>
           
-          {% if horario_por_dia %}
+          {% if hay_horarios %}
             <div style="display: grid; gap: 15px;">
               {% for dia, clases in horario_por_dia.items %}
                 {% if clases %}
@@ -210,7 +239,12 @@
                     <strong style="color: #1d66c2; text-transform: capitalize;">{{ dia }}:</strong>
                     <div style="margin-top: 6px; color: #64748b;">
                       {% for clase in clases %}
-                        <div>{{ clase.materia }} - {{ clase.hora }}</div>
+                        <div>
+                          {% if clase.es_deporte %}
+                            <span class="badge" style="background:#dcfce7;color:#166534;margin-right:6px;">Deporte</span>
+                          {% endif %}
+                          {{ clase.materia }} - {{ clase.hora }}
+                        </div>
                       {% endfor %}
                     </div>
                   </div>
@@ -220,6 +254,83 @@
           {% else %}
             <p style="color: #94a3b8;">No hay horarios registrados.</p>
           {% endif %}
+        </div>
+
+        <!-- DEPORTES -->
+        <div id="panel-deportes" class="panel">
+          <p class="section-title">Inscripción deportiva</p>
+
+          {% if disciplina %}
+          <div class="stat-card" style="margin-bottom: 24px;">
+            <div class="stat-label">Tu disciplina actual</div>
+            <div class="stat-value" style="font-size: 22px; color: #16a34a;">{{ disciplina.nombre }}</div>
+            <div class="stat-sub">
+              {{ disciplina.id_instalacion.nombre }} · {{ disciplina_horario_formateado }}
+            </div>
+          </div>
+          {% else %}
+          <div class="stat-card" style="margin-bottom: 24px;">
+            <div class="stat-label">Estado</div>
+            <div class="stat-sub">Todavía no estás inscripto en ninguna disciplina deportiva.</div>
+          </div>
+          {% endif %}
+
+          {% if panel_activo == 'deportes' %}
+            {% if messages %}
+              {% for message in messages %}
+                <div
+                  class="{% if message.tags == 'success' %}mensaje-exito{% elif message.tags == 'info' %}mensaje-exito{% else %}mensaje-error{% endif %}"
+                  style="margin-bottom: 16px;"
+                >
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endif %}
+
+          <p class="section-title">Disciplinas disponibles</p>
+
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Disciplina</th>
+                <th>Instalación</th>
+                <th>Horario</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for dep in disciplinas_disponibles %}
+              <tr>
+                <td>{{ dep.nombre }}</td>
+                <td>{{ dep.id_instalacion.nombre }}</td>
+                <td>{{ dep.horario_formateado }}</td>
+                <td>
+                  {% if disciplina and disciplina.id_disciplina == dep.id_disciplina %}
+                    <span class="badge badge-green">Inscripto</span>
+                  {% else %}
+                    <form method="post" style="display: inline;">
+                      {% csrf_token %}
+                      <input type="hidden" name="accion" value="inscribir_deporte">
+                      <input type="hidden" name="id_disciplina" value="{{ dep.id_disciplina }}">
+                      <button
+                        type="submit"
+                        class="btn-form"
+                        style="margin-top: 0; padding: 8px 16px; font-size: 14px;"
+                      >
+                        {% if disciplina %}Cambiar{% else %}Inscribirme{% endif %}
+                      </button>
+                    </form>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4">No hay disciplinas deportivas disponibles.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
 
         <!-- ASISTENCIA -->
@@ -242,15 +353,17 @@
               <div class="stat-sub">Este ciclo lectivo</div>
             </div>
           </div>
-          {% if messages %}
-            {% for message in messages %}
-              <div
-                class="{% if message.tags == 'success' %}mensaje-exito{% else %}mensaje-error{% endif %}"
-                id="mensaje-{{ forloop.counter }}"
-              >
-                {{ message }}
-              </div>
-            {% endfor %}
+          {% if panel_activo == 'asistencia' %}
+            {% if messages %}
+              {% for message in messages %}
+                <div
+                  class="{% if message.tags == 'success' %}mensaje-exito{% else %}mensaje-error{% endif %}"
+                  id="mensaje-{{ forloop.counter }}"
+                >
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
           {% endif %}
           <table class="tabla">
             <thead>

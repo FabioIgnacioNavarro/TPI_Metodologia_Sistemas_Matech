@@ -35,6 +35,7 @@ CREATE TABLE `alumno` (
   `legajo` int(11) NOT NULL,
   `id_persona` int(11) NOT NULL,
   `fecha_ingreso` date DEFAULT NULL,
+  `id_disciplina` int(11) DEFAULT NULL,
   `id_curso` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -42,10 +43,12 @@ CREATE TABLE `alumno` (
 -- Volcado de datos para la tabla `alumno`
 --
 
-INSERT INTO `alumno` (`legajo`, `id_persona`, `fecha_ingreso`, `id_curso`) VALUES
-(1, 1, 2024, 1),
-(2, 2, 2024, 1),
-(3, 3, 2024, 2);
+
+INSERT INTO `alumno`
+(`legajo`, `id_persona`, `fecha_ingreso`, `id_disciplina`, `id_curso`) VALUES
+(1, 1, '2024-03-01', 3, 1),
+(2, 2, '2024-03-01', 5, 1),
+(3, 3, '2024-03-01', 7, 2);
 
 -- --------------------------------------------------------
 
@@ -1009,8 +1012,46 @@ INSERT INTO `viaje_utiliza_vehiculo` (`id`, `id_viaje`, `id_vehiculo`, `fecha_us
 (1, 1, 1, '2024-08-15');
 
 --
+-- Estructura de tabla para la tabla `disciplina_deportiva`
+--
+
+DROP TABLE IF EXISTS `disciplina_deportiva`;
+CREATE TABLE `disciplina_deportiva` (
+  `id_disciplina` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `id_instalacion` int(11) NOT NULL,
+  `horarios` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `disciplina_deportiva`
+-- (suponiendo que ya existen instalaciones con IDs del 1 al 4)
+--
+
+INSERT INTO `disciplina_deportiva` (`id_disciplina`, `nombre`, `id_instalacion`, `horarios`) VALUES
+(1, 'Atletismo', 3, '{\"lunes\":\"16:00-18:00\",\"miercoles\":\"16:00-18:00\"}'),
+(2, 'Natación', 2, '{\"martes\":\"15:00-17:00\",\"jueves\":\"15:00-17:00\"}'),
+(3, 'Fútbol', 3, '{\"lunes\":\"17:00-19:00\",\"viernes\":\"17:00-19:00\"}'),
+(4, 'Artes Marciales', 1, '{\"martes\":\"16:00-18:00\",\"jueves\":\"16:00-18:00\"}'),
+(5, 'Vóleibol', 1, '{\"miercoles\":\"16:00-18:00\",\"viernes\":\"16:00-18:00\"}'),
+(6, 'Danza', 2, '{\"lunes\":\"15:00-17:00\",\"miercoles\":\"15:00-17:00\"}'),
+(7, 'Básquet', 1, '{\"martes\":\"17:00-19:00\",\"jueves\":\"17:00-19:00\"}'),
+(8, 'Ajedrez', 2, '{\"viernes\":\"14:00-16:00\"}');
+
+
+
+--
 -- Índices para tablas volcadas
 --
+
+--
+-- Índices para la tabla `disciplina_deportiva`
+--
+
+ALTER TABLE `disciplina_deportiva`
+  ADD PRIMARY KEY (`id_disciplina`),
+  ADD KEY `id_instalacion` (`id_instalacion`);
+
 
 --
 -- Indices de la tabla `alumno`
@@ -1019,6 +1060,11 @@ ALTER TABLE `alumno`
   ADD PRIMARY KEY (`legajo`),
   ADD KEY `id_curso` (`id_curso`),
   ADD KEY `id_persona` (`id_persona`);
+
+ALTER TABLE `alumno`
+  ADD CONSTRAINT fk_alumno_disciplina
+  FOREIGN KEY (id_disciplina)
+  REFERENCES disciplina_deportiva(id_disciplina);
 
 --
 -- Indices de la tabla `asistencia`
@@ -1672,6 +1718,22 @@ ALTER TABLE `viaje_utiliza_vehiculo`
   ADD CONSTRAINT `viaje_utiliza_vehiculo_ibfk_1` FOREIGN KEY (`id_viaje`) REFERENCES `viaje` (`id_viaje`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `viaje_utiliza_vehiculo_ibfk_2` FOREIGN KEY (`id_vehiculo`) REFERENCES `vehiculo` (`id_vehiculo`) ON DELETE CASCADE ON UPDATE CASCADE;
 
+--
+-- AUTO_INCREMENT para la tabla `disciplina_deportiva`
+--
+
+ALTER TABLE `disciplina_deportiva`
+  MODIFY `id_disciplina` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- Restricciones para la tabla `disciplina_deportiva`
+--
+
+ALTER TABLE `disciplina_deportiva`
+  ADD CONSTRAINT `fk_disciplina_instalacion`
+  FOREIGN KEY (`id_instalacion`)
+  REFERENCES `instalacion` (`id`);
+
 -- Datos de cv
 CREATE TABLE postulacion_laboral (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -1686,6 +1748,24 @@ CREATE TABLE postulacion_laboral (
     fecha_postulacion DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+--
+-- Estructura de tabla para la tabla `docente_disciplina`
+--
+DROP TABLE IF EXISTS docente_disciplina;
+CREATE TABLE docente_disciplina (
+  legajo_docente INT(11) NOT NULL,
+  id_disciplina INT(11) NOT NULL,
+
+  PRIMARY KEY (legajo_docente, id_disciplina),
+
+  CONSTRAINT fk_dd_docente
+    FOREIGN KEY (legajo_docente)
+    REFERENCES docente(legajo),
+
+  CONSTRAINT fk_dd_disciplina
+    FOREIGN KEY (id_disciplina)
+    REFERENCES disciplina_deportiva(id_disciplina)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 COMMIT;
 SET FOREIGN_KEY_CHECKS = 1;
