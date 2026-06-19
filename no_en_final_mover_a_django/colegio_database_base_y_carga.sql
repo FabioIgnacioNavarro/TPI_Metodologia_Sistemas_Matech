@@ -271,17 +271,8 @@ CREATE TABLE `calificacion` (
   `legajo_alumno` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `calificacion`
---
 
-INSERT INTO `calificacion` (`id_calificacion`, `nota`, `tipo_evaluacion`, `fecha`, `id_materia`, `legajo_alumno`) VALUES
-(1, 8.50, 'Parcial', '2024-05-10', 1, 1),
-(2, 7.00, 'Parcial', '2024-05-10', 1, 2),
-(3, 9.25, 'Parcial', '2024-05-10', 2, 1),
-(4, 6.75, 'Parcial', '2024-05-10', 2, 2),
-(5, 10.00, 'Trabajo Práctico', '2024-06-01', 1, 3),
-(6, 8.00, 'Parcial', '2024-05-15', 3, 3);
+
 
 -- --------------------------------------------------------
 
