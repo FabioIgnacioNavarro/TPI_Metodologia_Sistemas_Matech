@@ -63,7 +63,53 @@ document.querySelectorAll('.nota-input').forEach(input => {
     });
 });
 </script>
+<script>
+  function showPanel(id, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    el.classList.add('active');
+  }
+</script>
+  <script>
+    window.onload = function() {
+      const cursoSeleccionado = "{{ curso_seleccionado|default:'' }}";
+      const panelParam = "{{ request.GET.panel|default:'' }}";
 
+      if (cursoSeleccionado) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+        document.getElementById('panel-asistencia-curso').classList.add('active');
+        document.getElementById('menu-asistencias').classList.add('active');
+
+      } else if (panelParam === 'justificaciones') {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+        document.getElementById('panel-justificaciones').classList.add('active');
+        document.querySelector('[onclick*="justificaciones"]').classList.add('active');
+      }
+
+      history.replaceState(null, '', window.location.pathname);
+    };
+  </script>
+  <script>
+    function toggleCurso(id) {
+
+        const fila = document.getElementById("curso-" + id);
+        const flecha = document.getElementById("flecha-" + id);
+
+        if (fila.style.display === "none") {
+
+            fila.style.display = "table-row";
+            flecha.innerHTML = "▲";
+
+        } else {
+
+            fila.style.display = "none";
+            flecha.innerHTML = "▼";
+        }
+    }
+  </script>
 <body>
   <div class="page">
 
@@ -126,7 +172,33 @@ document.querySelectorAll('.nota-input').forEach(input => {
       </aside>
 
       <main class="dashboard-main">
-
+        {% if request.GET.panel == 'justificaciones' and request.GET.guardado == '1' %}
+        <div id="toast-guardado" style="
+          position:fixed; bottom:28px; right:28px;
+          background:#16a34a; color:#fff;
+          padding:12px 20px; border-radius:10px;
+          font-size:14px; font-weight:600;
+          box-shadow:0 4px 16px rgba(0,0,0,.15);
+          z-index:9999; display:flex; align-items:center; gap:8px;
+          animation: fadeInUp .3s ease;
+        ">✅ Observación guardada correctamente</div>
+        <style>
+          @keyframes fadeInUp {
+            from { opacity:0; transform:translateY(12px); }
+            to   { opacity:1; transform:translateY(0); }
+          }
+        </style>
+        <script>
+          setTimeout(function() {
+            var t = document.getElementById('toast-guardado');
+            if (t) {
+              t.style.transition = 'opacity .4s ease';
+              t.style.opacity = '0';
+              setTimeout(function() { t.remove(); }, 400);
+            }
+          }, 3000);
+        </script>
+        {% endif %}
         <div id="panel-inicio" class="panel active">
           <p class="section-title">Hola de nuevo, {{ persona.nombre }}</p>
 
@@ -165,10 +237,10 @@ document.querySelectorAll('.nota-input').forEach(input => {
 
                   Falta tomar asistencia en:
 
-                  <br><br>
+                  
 
                   {% for curso in cursos_pendientes %}
-                    • {{ curso }}<br>
+                    {{ curso }}{% if not forloop.last %}, {% endif %}
                   {% endfor %}
 
                 {% else %}
@@ -477,6 +549,68 @@ document.querySelectorAll('.nota-input').forEach(input => {
                       ⚠ El archivo no se encuentra
                   </span>
               {% endif %}
+              <form method="post" action="{% url 'guardar-observacion-justificacion' %}">
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="id_asistencia"
+                    value="{{ asistencia.id_asistencia }}"
+                >
+
+                <button
+                    type="button"
+                    class="btn-small"
+                    style="margin-top:10px; background:#f1f5f9; color:#475569; border:1.5px solid #e2e8f0;"
+                    onclick="
+                      var panel = this.nextElementSibling;
+                      var visible = panel.style.display !== 'none';
+                      panel.style.display = visible ? 'none' : 'block';
+                      this.textContent = visible ? '📝 Agregar observación' : '✕ Cancelar';
+                    "
+                >📝 Agregar observación</button>
+
+                <div style="display:none; margin-top:10px;">
+                  <label style="
+                    display:block;
+                    font-size:12px;
+                    font-weight:600;
+                    color:#64748b;
+                    text-transform:uppercase;
+                    letter-spacing:.05em;
+                    margin-bottom:6px;
+                  ">📝 Observación del preceptor</label>
+
+                  <textarea
+                      name="observacion"
+                      rows="3"
+                      placeholder="Escriba una observación sobre esta justificación..."
+                      style="
+                        width:100%;
+                        box-sizing:border-box;
+                        padding:10px 12px;
+                        border:1.5px solid #e2e8f0;
+                        border-radius:8px;
+                        font-size:14px;
+                        color:#334155;
+                        background:#f8fafc;
+                        resize:vertical;
+                        outline:none;
+                        transition:border-color .2s, box-shadow .2s;
+                        font-family:inherit;
+                        line-height:1.5;
+                      "
+                      onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99,102,241,.12)'; this.style.background='#fff';"
+                      onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'; this.style.background='#f8fafc';"
+                  >{{ asistencia.observacion|default:'' }}</textarea>
+
+                  <button
+                      type="submit"
+                      class="btn-small"
+                      style="margin-top:10px;"
+                  >Guardar observación</button>
+                </div>
+              </form>
             </div>
 
             <span class="badge badge-yellow">
@@ -551,6 +685,7 @@ document.querySelectorAll('.nota-input').forEach(input => {
 
         </div>
 
+        <!-- PERFIL -->
         <div id="panel-perfil" class="panel">
           <p class="section-title">Mi perfil</p>
 
@@ -594,54 +729,5 @@ document.querySelectorAll('.nota-input').forEach(input => {
     </div>
   </div>
 
-  <script>
-    function showPanel(id, el) {
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
-      document.getElementById('panel-' + id).classList.add('active');
-      el.classList.add('active');
-
-      // Limpia el ?curso_id=... de la URL sin recargar la página
-      history.replaceState(null, '', window.location.pathname);
-    }
-  </script>
-  <script>
-      window.onload = function() {
-          const cursoSeleccionado = "{{ curso_seleccionado|default:'' }}";
-
-          if (cursoSeleccionado) {
-
-              document.querySelectorAll('.panel')
-                  .forEach(p => p.classList.remove('active'));
-
-              document.querySelectorAll('.sidebar-nav a')
-                  .forEach(a => a.classList.remove('active'));
-
-              document.getElementById('panel-asistencia-curso')
-                  .classList.add('active');
-
-              document.getElementById('menu-asistencias')
-                  .classList.add('active');
-          }
-      };
-  </script>
-  <script>
-    function toggleCurso(id) {
-
-        const fila = document.getElementById("curso-" + id);
-        const flecha = document.getElementById("flecha-" + id);
-
-        if (fila.style.display === "none") {
-
-            fila.style.display = "table-row";
-            flecha.innerHTML = "▲";
-
-        } else {
-
-            fila.style.display = "none";
-            flecha.innerHTML = "▼";
-        }
-    }
-  </script>
 </body>
 </html>

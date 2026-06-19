@@ -2809,3 +2809,24 @@ def guardar_nota(request):
             'success': False, 
             'error': str(e)
         }, status=500)
+
+
+@never_cache
+def guardar_observacion_justificacion(request):
+
+    if request.method == 'POST':
+
+        id_asistencia = request.POST.get('id_asistencia')
+        observacion = request.POST.get('observacion', '').strip()
+
+        asistencia = Asistencia.objects.filter(
+            id_asistencia=id_asistencia
+        ).first()
+
+        if asistencia:
+            asistencia.observacion = observacion
+            asistencia.save(
+                update_fields=['observacion']
+            )
+
+    return redirect(reverse('dashboard-preceptor') + '?panel=justificaciones&guardado=1')
