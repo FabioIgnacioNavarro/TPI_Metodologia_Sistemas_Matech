@@ -109,11 +109,95 @@ def contacto(request):
         'dashboard_url': dashboard_url
     })
 
+_NOMBRE_REGEX = re.compile(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$')
+_DNI_REGEX = re.compile(r'^\d{7,8}$')
+_TELEFONO_REGEX = re.compile(r'^\d{8,15}$')
+_RANGOS_NIVEL = {
+    'inicial': (3, 5, 'Inicial'),
+    'primario': (6, 11, 'Primario'),
+    'secundario': (12, 18, 'Secundario'),
+}
+
+
+def _calcular_edad(fecha_nacimiento):
+    hoy = date.today()
+    edad = hoy.year - fecha_nacimiento.year
+    if (hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day):
+        edad -= 1
+    return edad
+
+
+def _validar_datos_inscripcion(post):
+    errores = []
+
+    campos_nombre = (
+        ('nombre', 'El nombre'),
+        ('apellido', 'El apellido'),
+        ('tutor', 'El nombre del tutor'),
+        ('apellido_tutor', 'El apellido del tutor'),
+    )
+    for campo, etiqueta in campos_nombre:
+        valor = (post.get(campo) or '').strip()
+        if not valor:
+            errores.append(f'{etiqueta} es obligatorio.')
+        elif not _NOMBRE_REGEX.match(valor):
+            errores.append(f'{etiqueta} solo puede contener letras.')
+
+    for campo, etiqueta in (('dni', 'El DNI'), ('dni_tutor', 'El DNI del tutor')):
+        valor = (post.get(campo) or '').strip()
+        if not _DNI_REGEX.match(valor):
+            errores.append(f'{etiqueta} debe tener 7 u 8 dígitos numéricos.')
+
+    direccion = (post.get('direccion') or '').strip()
+    if not direccion:
+        errores.append('La dirección del estudiante es obligatoria.')
+
+    telefono = (post.get('telefono') or '').strip()
+    if not _TELEFONO_REGEX.match(telefono):
+        errores.append(
+            'El teléfono debe contener solo números (entre 8 y 15 dígitos).'
+        )
+
+    telefono_alumno = (post.get('telefono_alumno') or '').strip()
+    if telefono_alumno and not _TELEFONO_REGEX.match(telefono_alumno):
+        errores.append(
+            'El teléfono del alumno debe contener solo números (entre 8 y 15 dígitos).'
+        )
+
+    nivel = post.get('nivel')
+    fecha_str = post.get('fecha')
+    if fecha_str and nivel in _RANGOS_NIVEL:
+        try:
+            fecha_nac = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+            edad = _calcular_edad(fecha_nac)
+            min_edad, max_edad, label = _RANGOS_NIVEL[nivel]
+            if edad < min_edad or edad > max_edad:
+                errores.append(
+                    f'La edad ({edad} años) no corresponde al Nivel {label} '
+                    f'(de {min_edad} a {max_edad} años).'
+                )
+        except ValueError:
+            errores.append('La fecha de nacimiento no es válida.')
+
+    return errores
+
+
 def inscripcion(request):
     # 1. Obtenemos los datos de sesión al inicio de la función
     persona, dashboard_url = obtener_datos_sesion(request)
 
     if request.method == 'POST':
+        errores = _validar_datos_inscripcion(request.POST)
+        if errores:
+            return render(
+                request,
+                'core/inscripcion.html',
+                {
+                    'error': ' '.join(errores),
+                    'persona': persona,
+                    'dashboard_url': dashboard_url,
+                },
+            )
 
         SolicitudInscripcion.objects.create(
             nombre_alumno=request.POST.get('nombre'),
